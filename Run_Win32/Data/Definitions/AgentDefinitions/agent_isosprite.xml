@@ -1,0 +1,302 @@
+<!-- Casting -->
+<isosprite id="agent.cast0">
+   <facing dir="0,1" src="agent.cast.up0" />         
+   <facing dir="-1,0" src="agent.cast.left0" /> 
+   <facing dir="0,-1" src="agent.cast.down0" /> 
+   <facing dir="1,0" src="agent.cast.right0" /> 
+</isosprite>
+
+<isosprite id="agent.cast1">
+   <facing dir="0,1" src="agent.cast.up1" />         
+   <facing dir="-1,0" src="agent.cast.left1" /> 
+   <facing dir="0,-1" src="agent.cast.down1" /> 
+   <facing dir="1,0" src="agent.cast.right1" /> 
+</isosprite>
+
+<isosprite id="agent.cast2">
+   <facing dir="0,1" src="agent.cast.up2" />         
+   <facing dir="-1,0" src="agent.cast.left2" /> 
+   <facing dir="0,-1" src="agent.cast.down2" /> 
+   <facing dir="1,0" src="agent.cast.right2" /> 
+</isosprite>
+
+<isosprite id="agent.cast3">
+   <facing dir="0,1" src="agent.cast.up3" />         
+   <facing dir="-1,0" src="agent.cast.left3" /> 
+   <facing dir="0,-1" src="agent.cast.down3" /> 
+   <facing dir="1,0" src="agent.cast.right3" /> 
+</isosprite>
+
+<isosprite id="agent.cast4">
+   <facing dir="0,1" src="agent.cast.up4" />         
+   <facing dir="-1,0" src="agent.cast.left4" /> 
+   <facing dir="0,-1" src="agent.cast.down4" /> 
+   <facing dir="1,0" src="agent.cast.right4" /> 
+</isosprite>
+
+<isosprite id="agent.cast5">
+   <facing dir="0,1" src="agent.cast.up5" />         
+   <facing dir="-1,0" src="agent.cast.left5" /> 
+   <facing dir="0,-1" src="agent.cast.down5" /> 
+   <facing dir="1,0" src="agent.cast.right5" /> 
+</isosprite>
+
+<isosprite id="agent.cast6">
+   <facing dir="0,1" src="agent.cast.up6" />         
+   <facing dir="-1,0" src="agent.cast.left6" /> 
+   <facing dir="0,-1" src="agent.cast.down6" /> 
+   <facing dir="1,0" src="agent.cast.right6" /> 
+</isosprite>
+
+
+<!-- Walking -->
+<isosprite id="agent.walk0">
+   <facing dir="0,1" src="agent.walk.up0" />         
+   <facing dir="-1,0" src="agent.walk.left0" /> 
+   <facing dir="0,-1" src="agent.walk.down0" /> 
+   <facing dir="1,0" src="agent.walk.right0" /> 
+</isosprite>
+
+<isosprite id="agent.walk1">
+   <facing dir="0,1" src="agent.walk.up1" />         
+   <facing dir="-1,0" src="agent.walk.left1" /> 
+   <facing dir="0,-1" src="agent.walk.down1" /> 
+   <facing dir="1,0" src="agent.walk.right1" /> 
+</isosprite>
+
+<isosprite id="agent.walk2">
+   <facing dir="0,1" src="agent.walk.up2" />         
+   <facing dir="-1,0" src="agent.walk.left2" /> 
+   <facing dir="0,-1" src="agent.walk.down2" /> 
+   <facing dir="1,0" src="agent.walk.right2" /> 
+</isosprite>
+
+<isosprite id="agent.walk3">
+   <facing dir="0,1" src="agent.walk.up3" />         
+   <facing dir="-1,0" src="agent.walk.left3" /> 
+   <facing dir="0,-1" src="agent.walk.down3" /> 
+   <facing dir="1,0" src="agent.walk.right3" /> 
+</isosprite>
+
+<isosprite id="agent.walk4">
+   <facing dir="0,1" src="agent.walk.up4" />         
+   <facing dir="-1,0" src="agent.walk.left4" /> 
+   <facing dir="0,-1" src="agent.walk.down4" /> 
+   <facing dir="1,0" src="agent.walk.right4" /> 
+</isosprite>
+
+<isosprite id="agent.walk5">
+   <facing dir="0,1" src="agent.walk.up5" />         
+   <facing dir="-1,0" src="agent.walk.left5" /> 
+   <facing dir="0,-1" src="agent.walk.down5" /> 
+   <facing dir="1,0" src="agent.walk.right5" /> 
+</isosprite>
+
+<isosprite id="agent.walk6">
+   <facing dir="0,1" src="agent.walk.up6" />         
+   <facing dir="-1,0" src="agent.walk.left6" /> 
+   <facing dir="0,-1" src="agent.walk.down6" /> 
+   <facing dir="1,0" src="agent.walk.right6" /> 
+</isosprite>
+
+<isosprite id="agent.walk7">
+   <facing dir="0,1" src="agent.walk.up7" />         
+   <facing dir="-1,0" src="agent.walk.left7" /> 
+   <facing dir="0,-1" src="agent.walk.down7" /> 
+   <facing dir="1,0" src="agent.walk.right7" /> 
+</isosprite>
+
+<isosprite id="agent.walk8">
+   <facing dir="0,1" src="agent.walk.up8" />         
+   <facing dir="-1,0" src="agent.walk.left8" /> 
+   <facing dir="0,-1" src="agent.walk.down8" /> 
+   <facing dir="1,0" src="agent.walk.right8" /> 
+</isosprite>
+
+
+<!-- Shoot -->
+<isosprite id="agent.shoot0">
+   <facing dir="0,1" src="agent.shoot.up0" />         
+   <facing dir="-1,0" src="agent.shoot.left0" /> 
+   <facing dir="0,-1" src="agent.shoot.down0" /> 
+   <facing dir="1,0" src="agent.shoot.right0" /> 
+</isosprite>
+
+<isosprite id="agent.shoot1">
+   <facing dir="0,1" src="agent.shoot.up1" />         
+   <facing dir="-1,0" src="agent.shoot.left1" /> 
+   <facing dir="0,-1" src="agent.shoot.down1" /> 
+   <facing dir="1,0" src="agent.shoot.right1" /> 
+</isosprite>
+
+<isosprite id="agent.shoot2">
+   <facing dir="0,1" src="agent.shoot.up2" />         
+   <facing dir="-1,0" src="agent.shoot.left2" /> 
+   <facing dir="0,-1" src="agent.shoot.down2" /> 
+   <facing dir="1,0" src="agent.shoot.right2" /> 
+</isosprite>
+
+<isosprite id="agent.shoot3">
+   <facing dir="0,1" src="agent.shoot.up3" />         
+   <facing dir="-1,0" src="agent.shoot.left3" /> 
+   <facing dir="0,-1" src="agent.shoot.down3" /> 
+   <facing dir="1,0" src="agent.shoot.right3" /> 
+</isosprite>
+
+<isosprite id="agent.shoot4">
+   <facing dir="0,1" src="agent.shoot.up4" />         
+   <facing dir="-1,0" src="agent.shoot.left4" /> 
+   <facing dir="0,-1" src="agent.shoot.down4" /> 
+   <facing dir="1,0" src="agent.shoot.right4" /> 
+</isosprite>
+
+<isosprite id="agent.shoot5">
+   <facing dir="0,1" src="agent.shoot.up5" />         
+   <facing dir="-1,0" src="agent.shoot.left5" /> 
+   <facing dir="0,-1" src="agent.shoot.down5" /> 
+   <facing dir="1,0" src="agent.shoot.right5" /> 
+</isosprite>
+
+<isosprite id="agent.shoot6">
+   <facing dir="0,1" src="agent.shoot.up6" />         
+   <facing dir="-1,0" src="agent.shoot.left6" /> 
+   <facing dir="0,-1" src="agent.shoot.down6" /> 
+   <facing dir="1,0" src="agent.shoot.right6" /> 
+</isosprite>
+
+<isosprite id="agent.shoot7">
+   <facing dir="0,1" src="agent.shoot.up7" />         
+   <facing dir="-1,0" src="agent.shoot.left7" /> 
+   <facing dir="0,-1" src="agent.shoot.down7" /> 
+   <facing dir="1,0" src="agent.shoot.right7" /> 
+</isosprite>
+
+<isosprite id="agent.shoot8">
+   <facing dir="0,1" src="agent.shoot.up8" />         
+   <facing dir="-1,0" src="agent.shoot.left8" /> 
+   <facing dir="0,-1" src="agent.shoot.down8" /> 
+   <facing dir="1,0" src="agent.shoot.right8" /> 
+</isosprite>
+
+<isosprite id="agent.shoot9">
+   <facing dir="0,1" src="agent.shoot.up9" />         
+   <facing dir="-1,0" src="agent.shoot.left9" /> 
+   <facing dir="0,-1" src="agent.shoot.down9" /> 
+   <facing dir="1,0" src="agent.shoot.right9" /> 
+</isosprite>
+
+<isosprite id="agent.shoot10">
+   <facing dir="0,1" src="agent.shoot.up10" />         
+   <facing dir="-1,0" src="agent.shoot.left10" /> 
+   <facing dir="0,-1" src="agent.shoot.down10" /> 
+   <facing dir="1,0" src="agent.shoot.right10" /> 
+</isosprite>
+
+<isosprite id="agent.shoot11">
+   <facing dir="0,1" src="agent.shoot.up11" />         
+   <facing dir="-1,0" src="agent.shoot.left11" /> 
+   <facing dir="0,-1" src="agent.shoot.down11" /> 
+   <facing dir="1,0" src="agent.shoot.right11" /> 
+</isosprite>
+
+<isosprite id="agent.shoot12">
+   <facing dir="0,1" src="agent.shoot.up12" />         
+   <facing dir="-1,0" src="agent.shoot.left12" /> 
+   <facing dir="0,-1" src="agent.shoot.down12" /> 
+   <facing dir="1,0" src="agent.shoot.right12" /> 
+</isosprite>
+
+<!-- Dead -->
+<isosprite id="agent.dead0">
+   <facing dir="0,1" src="agent.dead.up0" />         
+   <facing dir="-1,0" src="agent.dead.left0" /> 
+   <facing dir="0,-1" src="agent.dead.down0" /> 
+   <facing dir="1,0" src="agent.dead.right0" /> 
+</isosprite>
+
+<isosprite id="agent.dead1">
+   <facing dir="0,1" src="agent.dead.up1" />         
+   <facing dir="-1,0" src="agent.dead.left1" /> 
+   <facing dir="0,-1" src="agent.dead.down1" /> 
+   <facing dir="1,0" src="agent.dead.right1" /> 
+</isosprite>
+
+<isosprite id="agent.dead2">
+   <facing dir="0,1" src="agent.dead.up2" />         
+   <facing dir="-1,0" src="agent.dead.left2" /> 
+   <facing dir="0,-1" src="agent.dead.down2" /> 
+   <facing dir="1,0" src="agent.dead.right2" /> 
+</isosprite>
+
+<isosprite id="agent.dead3">
+   <facing dir="0,1" src="agent.dead.up3" />         
+   <facing dir="-1,0" src="agent.dead.left3" /> 
+   <facing dir="0,-1" src="agent.dead.down3" /> 
+   <facing dir="1,0" src="agent.dead.right3" /> 
+</isosprite>
+
+<isosprite id="agent.dead4">
+   <facing dir="0,1" src="agent.dead.up4" />         
+   <facing dir="-1,0" src="agent.dead.left4" /> 
+   <facing dir="0,-1" src="agent.dead.down4" /> 
+   <facing dir="1,0" src="agent.dead.right4" /> 
+</isosprite>
+
+<isosprite id="agent.dead5">
+   <facing dir="0,1" src="agent.dead.up5" />         
+   <facing dir="-1,0" src="agent.dead.left5" /> 
+   <facing dir="0,-1" src="agent.dead.down5" /> 
+   <facing dir="1,0" src="agent.dead.right5" /> 
+</isosprite>
+
+<!-- Stand -->
+<isosprite id="agent.stand0">
+   <facing dir="0,1" src="agent.stand.up0" />         
+   <facing dir="-1,0" src="agent.stand.left0" /> 
+   <facing dir="0,-1" src="agent.stand.down0" /> 
+   <facing dir="1,0" src="agent.stand.right0" /> 
+</isosprite>
+
+<isosprite id="agent.stand1">
+   <facing dir="0,1" src="agent.stand.up1" />         
+   <facing dir="-1,0" src="agent.stand.left1" /> 
+   <facing dir="0,-1" src="agent.stand.down1" /> 
+   <facing dir="1,0" src="agent.stand.right1" /> 
+</isosprite>
+
+<isosprite id="agent.stand2">
+   <facing dir="0,1" src="agent.stand.up2" />         
+   <facing dir="-1,0" src="agent.stand.left2" /> 
+   <facing dir="0,-1" src="agent.stand.down2" /> 
+   <facing dir="1,0" src="agent.stand.right2" /> 
+</isosprite>
+
+<isosprite id="agent.stand3">
+   <facing dir="0,1" src="agent.stand.up3" />         
+   <facing dir="-1,0" src="agent.stand.left3" /> 
+   <facing dir="0,-1" src="agent.stand.down3" /> 
+   <facing dir="1,0" src="agent.stand.right3" /> 
+</isosprite>
+
+<isosprite id="agent.stand4">
+   <facing dir="0,1" src="agent.stand.up4" />         
+   <facing dir="-1,0" src="agent.stand.left4" /> 
+   <facing dir="0,-1" src="agent.stand.down4" /> 
+   <facing dir="1,0" src="agent.stand.right4" /> 
+</isosprite>
+
+<isosprite id="agent.stand5">
+   <facing dir="0,1" src="agent.stand.up5" />         
+   <facing dir="-1,0" src="agent.stand.left5" /> 
+   <facing dir="0,-1" src="agent.stand.down5" /> 
+   <facing dir="1,0" src="agent.stand.right5" /> 
+</isosprite>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+<shader name="default">
+
+   <program define="">
+      <vertex file="default" />
+      <fragment file="default" />
+   </program>
+
+   <lighting lit="false"/>
+
+   <order sortLayer="0" renderQueue="opaque" />
+
+   <blend>
+      <color op="add" src="one" dest="zero" />
+      <alpha op="add" src="one" dest="one" />
+   </blend>
+
+   <!-- compare less is default -->
+   <depth write="false" compare="less"/>
+
+    <!-- bindings -->
+    <bindings>
+   </bindings>
+</shader>

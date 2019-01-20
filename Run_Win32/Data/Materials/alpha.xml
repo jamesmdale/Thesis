@@ -1,0 +1,6 @@
+<material name="alpha">
+	<shader name="alpha" />
+	<textures>
+		<texture bind="0" file="default" />
+	</textures>
+</material>

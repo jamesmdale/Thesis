@@ -1,0 +1,48 @@
+<TileDefinitions>
+  
+  <TileDefinition
+  name="Grass"
+  baseSpriteCoords="0,1"
+  baseSpriteTint="180,180,180"
+  allowsWalking="true"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+  />
+
+  <TileDefinition
+  name="Wall"
+  baseSpriteCoords="0,6"
+  baseSpriteTint="255,255,255"
+  allowsWalking="false" 
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+  />
+
+  <TileDefinition
+  name="Portal"
+  baseSpriteCoords="1,7"
+  baseSpriteTint="255,255,255"
+  allowsWalking="true"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+  />
+
+  <TileDefinition
+  name="Building"
+  baseSpriteCoords="2,6"
+  baseSpriteTint="255,255,255"
+  allowsWalking="false"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+    />
+
+  <TileDefinition
+  name="BuildingAccess"
+  baseSpriteCoords="7,2"
+  baseSpriteTint="255,255,255"
+  allowsWalking="true"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+    />
+  
+</TileDefinitions>

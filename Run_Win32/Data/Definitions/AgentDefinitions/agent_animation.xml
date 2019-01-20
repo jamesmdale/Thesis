@@ -1,0 +1,58 @@
+<anim id="agent.idle" loop="true">
+   <frame src="agent.cast0" duration="0.33" />
+   <frame src="agent.cast1" duration="0.33" />
+   <frame src="agent.cast2" duration="0.33" />
+</anim>
+<anim id="agent.cast" loop="true">
+   <frame src="agent.cast0" duration="0.15" />
+   <frame src="agent.cast1" duration="0.15" />
+   <frame src="agent.cast2" duration="0.15" />
+   <frame src="agent.cast3" duration="0.15" />
+   <frame src="agent.cast4" duration="0.15" />
+   <frame src="agent.cast5" duration="0.15" />
+   <frame src="agent.cast6" duration="0.15" />
+</anim>
+<anim id="agent.walk" loop="true">
+   <frame src="agent.walk0" duration="0.12" />
+   <frame src="agent.walk1" duration="0.12" />
+   <frame src="agent.walk2" duration="0.12" />
+   <frame src="agent.walk3" duration="0.12" />
+   <frame src="agent.walk4" duration="0.12" />
+   <frame src="agent.walk5" duration="0.12" />
+   <frame src="agent.walk6" duration="0.12" />
+   <frame src="agent.walk7" duration="0.12" />
+   <frame src="agent.walk8" duration="0.12" />
+</anim>
+<anim id="agent.shoot">
+   <frame src="agent.shoot0" duration="0.16" />
+   <frame src="agent.shoot1" duration="0.16" />
+   <frame src="agent.shoot2" duration="0.16" />
+   <frame src="agent.shoot3" duration="0.16" />
+   <frame src="agent.shoot4" duration="0.16" />
+   <frame src="agent.shoot5" duration="0.16" />
+   <frame src="agent.shoot6" duration="0.16" />
+   <frame src="agent.shoot7" duration="0.16" />
+   <frame src="agent.shoot8" duration="0.16" />
+   <frame src="agent.shoot9" duration="0.16" />
+   <frame src="agent.shoot10" duration="0.16" />
+   <frame src="agent.shoot11" duration="0.16" />
+   <frame src="agent.shoot12" duration="0.16" />
+</anim>
+<anim id="agent.die">
+   <frame src="agent.die0" duration="0.16" />
+   <frame src="agent.die1" duration="0.16" />
+   <frame src="agent.die2" duration="0.16" />
+   <frame src="agent.die3" duration="0.16" />
+   <frame src="agent.die4" duration="0.16" />
+   <frame src="agent.die5" duration="0.16" />
+</anim>
+<anim id="agent.stand">
+   <frame src="agent.die5" duration="0.16" />
+   <frame src="agent.die4" duration="0.16" />
+   <frame src="agent.die3" duration="0.16" />
+   <frame src="agent.die2" duration="0.16" />
+   <frame src="agent.die1" duration="0.16" />
+   <frame src="agent.die0" duration="0.16" />
+</anim>
+
+

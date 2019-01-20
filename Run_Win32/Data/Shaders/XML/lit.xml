@@ -1,0 +1,25 @@
+<shader name="lit">
+
+   <program define="">
+      <vertex file="Data/Shaders/lit" />
+      <fragment file="Data/Shaders/lit" />
+   </program>
+
+   <lighting lit="true"/>
+
+   <order sortLayer="0" renderQueue="opaque" />
+
+   <blend>
+      <color op="add" src="one" dest="zero" />
+      <alpha op="add" src="one" dest="one" />
+   </blend>
+
+   <!-- compare less is default -->
+   <depth write="true" compare="less"/>
+
+    <!-- bindings -->
+    <bindings>
+      <binding type="float" bind="SPECULAR_AMOUNT" value="0.75" />
+      <binding type="float" bind="SPECULAR_POWER" value="100.0" />\
+   </bindings>
+</shader>

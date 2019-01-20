@@ -1,0 +1,6 @@
+<material name="default">
+	<shader name="default" />
+	<textures>
+		<texture bind="0" file="default" />
+	</textures>
+</material>

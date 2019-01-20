@@ -1,0 +1,20 @@
+<shader name="skybox" cull="none" drawFace="front_and_back">
+
+   <program define="">
+      <vertex file="Data/Shaders/skybox" />
+      <fragment file="Data/Shaders/skybox" />
+   </program>
+
+   <lighting lit="false"/>
+
+   <order sortLayer="0" renderQueue="opaque" />
+
+   <blend>
+      <color op="add" src="one" dest="one" />
+      <alpha op="add" src="one" dest="one" />
+   </blend>
+
+   <!-- compare less is default -->
+   <depth write="false" compare="lequal"/>
+
+</shader>

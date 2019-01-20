@@ -1,0 +1,24 @@
+<shader name="lit">
+
+   <program define="">
+      <vertex file="Data/Shaders/lit.vs" />
+      <fragment file="Data/Shaders/lit.fs" />
+   </program>
+
+   <order sortLayer="0" renderQueue="opaque" />
+
+   <blend>
+      <color op="add" src="one" dest="zero" />
+      <alpha op="add" src="one" dest="one" />
+   </blend>
+
+   <!-- compare less is default -->
+   <depth write="true" compare="less"/>
+
+    <!-- bindings -->
+    <bindings>
+      <datatype="float" bind="SPEC_FACTOR" value="1.0" />
+      <datatype="float bind="SPEC_FACTOR" value="16.0" />
+      <datatype="rgba" bind="TINT" value="255,255,255,255" />
+   </bindings>
+</shader>

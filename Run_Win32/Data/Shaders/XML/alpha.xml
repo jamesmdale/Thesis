@@ -1,0 +1,24 @@
+<shader name="alpha" cull="none" drawFace="front_and_back">
+
+   <program define="">
+      <vertex file="Data/Shaders/additive" />
+      <fragment file="Data/Shaders/additive" />
+   </program>
+
+   <lighting lit="false"/>
+
+   <order sortLayer="0" renderQueue="alpha" />
+
+   <blend>
+      <color op="add" src="src_alpha" dest="inv_src_alpha" />
+      <alpha op="add" src="one" dest="one" />
+   </blend>
+
+   <!-- compare less is default -->
+   <depth write="false" compare="less"/>
+
+    <!-- bindings -->
+    <bindings>
+      <binding type="vector4" bind="TINT" value="1,1,1,1" />
+   </bindings>
+</shader>

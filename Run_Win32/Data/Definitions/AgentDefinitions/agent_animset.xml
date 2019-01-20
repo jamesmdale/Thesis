@@ -1,0 +1,26 @@
+<!-- 
+   Goal of an animation set is to alias keywords to one or more animations.
+   This allows us to add animation variations, or control an animation using 
+   known keywords that alias to actual aniamtions.
+-->
+
+<animset id="agent">
+   <set id="idle">
+      <anim id="agent.idle" />
+   </set>
+   <set id="walk">
+      <anim id="agent.walk" />
+   </set>
+    <set id="cast">
+      <anim id="agent.cast" />
+   </set>
+   <set id="shoot">
+      <anim id="agent.shoot" />
+   </set>
+   <set id="die">
+      <anim id="agent.die" />
+   </set>
+   <set id="stand">
+       <anim id="agent.stand" />
+   </set>
+</animset>

@@ -1,0 +1,79 @@
+<SimulationDefinitions>
+
+    <SimulationDefinition
+  name="default_optimized"
+  mapName="30x30"
+  numAgents="50"
+  numArmories="3"
+  numLumberyards="3"
+  numMedStations="0"
+  bombardmentRatePerSecond="5.0"
+  threatRatePerSecond = "10.0"
+  startingThreat="100"
+  processTimerInSeconds="30"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
+   <SimulationDefinition
+  name="default"
+  mapName="30x30"
+  numAgents="50"
+  numArmories="3"
+  numLumberyards="3"
+  numMedStations="0"
+  bombardmentRatePerSecond="5.0"
+  threatRatePerSecond = "10.0"
+  startingThreat="100"
+  processTimerInSeconds="30"
+  isOptimized="false" 
+  isBudgeted="false"
+  />  
+</SimulationDefinitions>
+
+ <!-->
+  <SimulationDefinition
+  name="default_unoptimized"
+  mapName="20x20"
+  numAgents="10"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="0"
+  bombardmentRatePerSecond="5.0"
+  threatRatePerSecond = "30.0"
+  startingThreat="100"
+  processTimerInSeconds="100"
+  isOptimized="false" 
+  />
+  
+ 
+  <SimulationDefinition
+  name="default"
+  mapName="30x30"
+  numAgents="100"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="0"
+  bombardmentRatePerSecond="5.0"
+  threatRatePerSecond = "30.0"
+  startingThreat="100"
+  processTimerInSeconds="100"
+  isOptimized="true" 
+  />
+
+
+    <SimulationDefinition
+  name="default_unoptimized"
+  mapName="30x30"
+  numAgents="100"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="0"
+  bombardmentRatePerSecond="5.0"
+  threatRatePerSecond = "30.0"
+  startingThreat="100"
+  processTimerInSeconds="100"
+  isOptimized="false" 
+  />
+   <!-->
+

@@ -1,0 +1,6 @@
+<material name="text">
+	<shader name="alpha" />
+	<textures>
+		<texture bind="0" file="Data\Fonts\SquirrelFixedFont.png" />
+	</textures>
+</material>
