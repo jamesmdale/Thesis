@@ -191,8 +191,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalUsingDirectories>$(SolutionDir)Engine/Code/</AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)Engine/Code/</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>$(SolutionDir)Engine/Code/;$(SolutionDir)Engine/</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)Engine/Code/;$(SolutionDir)Engine/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -216,8 +216,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalUsingDirectories>$(SolutionDir)Engine/Code/</AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)Engine/Code/</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>$(SolutionDir)Engine/Code/;$(SolutionDir)Engine/</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)Engine/Code/;$(SolutionDir)Engine/</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -273,8 +273,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalUsingDirectories>$(SolutionDir)Engine/Code/</AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)Engine/Code/</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>$(SolutionDir)Engine/Code/;$(SolutionDir)Engine/</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)Engine/Code/;$(SolutionDir)Engine/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
