@@ -103,6 +103,7 @@ data/log/
 Data/Config/User.config
 *.ipch
 **/.vs/
+/.vs/
 
 /Temporary/
 **/Temporary/
