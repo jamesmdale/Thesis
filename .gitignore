@@ -16,6 +16,17 @@
 !**/Data/*.dll
 !**/Run_Win32/*.dll
 
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
 # Fortran module files
 *.mod
 
@@ -97,15 +108,11 @@ data/log/
 *.suo
 *.TMP
 
-
-
 *.log
 Data/Config/User.config
 *.ipch
 **/.vs/
 /.vs/
-.vs/
-/.vs
 
 /Temporary/
 **/Temporary/
