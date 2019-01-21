@@ -104,6 +104,8 @@ Data/Config/User.config
 *.ipch
 **/.vs/
 /.vs/
+.vs/
+/.vs
 
 /Temporary/
 **/Temporary/
