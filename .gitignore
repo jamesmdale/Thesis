@@ -25,7 +25,7 @@ ipch/
 *.sdf
 *.cachefile
 *.VC.db
-*Browse.VC.db
+*.Browse.VC.db
 *.VC.VC.opendb
 
 # Fortran module files
