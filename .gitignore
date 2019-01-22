@@ -112,9 +112,8 @@ data/log/
 *.log
 Data/Config/User.config
 *.ipch
-**/.vs/
-/.vs/
 
-/Temporary/
-**/Temporary/
-!**/ThirdParty/**/*.*
+#custom stuff
+**/.vs/**
+**/Temporary/**
+!**/ThirdParty
