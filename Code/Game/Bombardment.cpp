@@ -1,25 +1,28 @@
 #include "Game\Bombardment.hpp"
-#include "Engine\Renderer\Renderer.hpp"
+#include "Game\Game.hpp"
 #include "Game\GameCommon.hpp"
 #include "Engine\Profiler\Profiler.hpp"
+#include "Engine\Renderer\Renderer.hpp"
 
 
-
+//  =========================================================================================
 Bombardment::Bombardment(const Vector2& position)
 {
 	m_disc.center = position;
 	m_disc.radius = 0.f;
 
-	m_timer = new Stopwatch(GetMasterClock());
+	m_timer = new Stopwatch(GetGameClock());
 	m_timer->SetTimer(g_bombardmentExplosionTime);
 }
 
+//  =========================================================================================
 Bombardment::~Bombardment()
 {
 	delete(m_timer);
 	m_timer = nullptr;
 }
 
+//  =========================================================================================
 void Bombardment::Update(float deltaSeconds)
 {
 	PROFILER_PUSH();
@@ -29,6 +32,7 @@ void Bombardment::Update(float deltaSeconds)
 	m_disc.radius = g_bombardmentExplosionSize * percentComplete;
 }
 
+//  =========================================================================================
 void Bombardment::Render()
 {
 	PROFILER_PUSH();
@@ -40,6 +44,7 @@ void Bombardment::Render()
 	theRenderer->SetShader(theRenderer->m_defaultShader);
 }
 
+//  =========================================================================================
 bool Bombardment::IsExplosionComplete()
 {
 	return m_timer->HasElapsed();

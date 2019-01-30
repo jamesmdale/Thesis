@@ -18,13 +18,9 @@ public:
 
 	//resoureces
 	void InitializeGameResources();
-
-	bool GetPauseState();
 };
 
 void Quit(Command &cmd);
-void TogglePaused(Command& cmd);
-
 void WriteTestCSV();
 
 extern TheApp* g_theApp;

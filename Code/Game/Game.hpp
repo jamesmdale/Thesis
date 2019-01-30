@@ -4,11 +4,11 @@
 #include "Engine\Camera\Camera.hpp"
 #include "Engine\Camera\OrbitCamera.hpp"
 #include "Engine\Core\GameObject.hpp"
-#include <vector>
 #include "Engine\Renderer\RenderScene.hpp"
 #include "Engine\Renderer\ForwardRenderingPath.hpp"
 #include "Engine\ParticleSystem\ParticleEmitter.hpp"
 #include "Engine\Renderer\ForwardRenderingPath2D.hpp"
+#include <vector>
 
 class Game
 {
@@ -16,6 +16,7 @@ public:
 
 	//camera members
 	Camera* m_gameCamera = nullptr;
+	Clock* m_gameClock = nullptr;
 
 	//rendering members
 	ForwardRenderingPath2D* m_forwardRenderingPath2D = nullptr;
@@ -37,9 +38,10 @@ public:
 	void InitializeMapDefinitions();
 	void InitializeAgentDefinitions();
 	void InitializeSimulationDefinitions();
+
 };
 
-static Clock* g_gameClock = nullptr;
+Clock* GetGameClock();
 
 
 

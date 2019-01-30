@@ -35,7 +35,7 @@ Agent::Agent(Vector2 startingPosition, IsoSpriteAnimSet* animationSet, Map* mapR
 
 	m_id = mapReference->m_agentsOrderedByXPosition.size();
 
-	actionTimer = new Stopwatch(GetMasterClock());
+	actionTimer = new Stopwatch(GetGameClock());
 
 	GenerateRandomStats();
 }
@@ -106,7 +106,7 @@ void Agent::QuickUpdate(float deltaSeconds)
 		m_forward = m_intermediateGoalPosition - m_position;
 		m_forward.NormalizeAndGetLength();
 
-		m_position += (m_forward * (m_movespeed * GetMasterDeltaSeconds() * 0.5f));
+		m_position += (m_forward * (m_movespeed * GetGameClock()->GetDeltaSeconds() * 0.5f));
 	}
 
 	TODO("Later add more criteria to better define this data");
@@ -392,7 +392,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 		agent->m_forward = agent->m_intermediateGoalPosition - agent->m_position;
 		agent->m_forward.NormalizeAndGetLength();
 
-		agent->m_position += (agent->m_forward * (agent->m_movespeed * GetMasterDeltaSeconds()));
+		agent->m_position += (agent->m_forward * (agent->m_movespeed * GetGameClock()->GetDeltaSeconds()));
 	}		
 	else
 	{
@@ -416,7 +416,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 			agent->m_forward = agent->m_intermediateGoalPosition - agent->m_position;
 			agent->m_forward.NormalizeAndGetLength();
 
-			agent->m_position += (agent->m_forward * (agent->m_movespeed * GetMasterDeltaSeconds()));
+			agent->m_position += (agent->m_forward * (agent->m_movespeed * GetGameClock()->GetDeltaSeconds()));
 		}
 	}
 

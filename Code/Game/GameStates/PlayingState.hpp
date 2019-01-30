@@ -39,6 +39,7 @@ public:
 	void DeleteMap();
 	void ExportSimulationData();
 
+	void GenerateOutputDirectory();
 	void FinalizeGeneralSimulationData();
 
 	Mesh* CreateTextMesh();
@@ -47,14 +48,11 @@ public:
 	//Widget* GetSelectedWidget(const std::vector<Widget*>& widgets);
 	
 public:
-
-	Stopwatch* m_gameTime = nullptr;
-	Widget* m_currentSelectedWidget = nullptr;
-
 	Camera* m_uiCamera = nullptr;
 	Map* m_map = nullptr;
 
 	Stopwatch* m_simulationTimer = nullptr;
 };
 
-void ToggleOptimized(Command& cmd);
+//void ToggleOptimized(Command& cmd);
+void TogglePaused(Command& cmd);

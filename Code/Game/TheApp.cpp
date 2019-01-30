@@ -73,12 +73,10 @@ void TheApp::Initialize()
 {
 	//register app commands
 	RegisterCommand("quit", CommandRegistration(Quit, ": Use to quit the program", "Quitting..."));
-	RegisterCommand("game_pause", CommandRegistration(TogglePaused, ": Pause the app", "Pausing..."));
 
 	//start the masterclock
 	Clock* masterClock = GetMasterClock();
 	masterClock->ClockSystemStartup();
-	masterClock = nullptr;	
 
 	//init mouse input settings
 	InputSystem::GetInstance()->GetMouse()->MouseLockToScreen(true);
@@ -234,24 +232,12 @@ void TheApp::InitializeGameResources()
 }
 
 //  =============================================================================
-bool TheApp::GetPauseState()
-{
-	return g_isAppPaused;
-}
-
-//  =============================================================================
 // command callbacks =========================================================================================
 //  =============================================================================
 void Quit(Command &cmd)
 {
 	DevConsolePrintf(cmd.m_commandInfo->m_successMessage.c_str());
 	g_isQuitting = true;
-}
-
-//  =============================================================================
-void TogglePaused(Command & cmd)
-{
-	g_isAppPaused = !g_isAppPaused;
 }
 
 //  =========================================================================================

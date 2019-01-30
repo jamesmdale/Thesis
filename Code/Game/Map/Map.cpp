@@ -212,14 +212,14 @@ void Map::Initialize()
 	m_threat = m_activeSimulationDefinition->m_startingThreat;
 
 	//setup timeres
-	m_bombardmentTimer = new Stopwatch(GetMasterClock());
+	m_bombardmentTimer = new Stopwatch(GetGameClock());
 	m_bombardmentTimer->SetTimer(1.f / m_activeSimulationDefinition->m_bombardmentRatePerSecond);
 
-	m_threatTimer = new Stopwatch(GetMasterClock());
+	m_threatTimer = new Stopwatch(GetGameClock());
 	m_threatTimer->SetTimer(1.f / m_activeSimulationDefinition->m_threatRatePerSecond);
 
 	//sort agents for the first time
-	m_sortTimer = new Stopwatch(g_sortTimerInSeconds, GetMasterClock());
+	m_sortTimer = new Stopwatch(g_sortTimerInSeconds, GetGameClock());
 
 	SortAgentsByX();
 	SortAgentsByY();
@@ -471,14 +471,14 @@ void Map::Reload(SimulationDefinition* definition)
 	m_threat = m_activeSimulationDefinition->m_startingThreat;
 
 	//setup timeres
-	m_bombardmentTimer = new Stopwatch(GetMasterClock());
+	m_bombardmentTimer = new Stopwatch(GetGameClock());
 	m_bombardmentTimer->SetTimer(1.f / m_activeSimulationDefinition->m_bombardmentRatePerSecond);
 
-	m_threatTimer = new Stopwatch(GetMasterClock());
+	m_threatTimer = new Stopwatch(GetGameClock());
 	m_threatTimer->SetTimer(1.f / m_activeSimulationDefinition->m_threatRatePerSecond);
 
 	//sort agents for the first time
-	m_sortTimer = new Stopwatch(g_sortTimerInSeconds, GetMasterClock());
+	m_sortTimer = new Stopwatch(g_sortTimerInSeconds, GetGameClock());
 
 	SortAgentsByX();
 	SortAgentsByY();	

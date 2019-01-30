@@ -61,16 +61,11 @@ void PlayingState::Initialize()
 	ORTHO_MIN = 0.f;
 
 	//register commands
-	RegisterCommand("toggle_optimization", CommandRegistration(ToggleOptimized, ": Toggle blanket optimizations on and off", ""));
+	//RegisterCommand("toggle_optimization", CommandRegistration(ToggleOptimized, ": Toggle blanket optimizations on and off", ""));
+	RegisterCommand("pause_game", CommandRegistration(TogglePaused, ": Toggle pause on and off", ""));
 
-	std::string newFolderName = Stringf("SIMULATION_TEST_%s", GetCurrentDateTime().c_str());
-	std::string newPath =  Stringf("%s%s", "Data\\ExportedSimulationData\\", newFolderName.c_str());
-	
-	bool success = CreateFolder(newPath.c_str());
-	ASSERT_OR_DIE(success, Stringf("UNABLE TO CREATE FOLDER (%s)", newPath.c_str()).c_str());
-
-	simDataOutputDirectory = Stringf("%s%s", newPath.c_str(), "\\");
-
+	//simulation setup
+	GenerateOutputDirectory();
 	g_currentSimulationDefinition = SimulationDefinition::s_simulationDefinitions[g_currentSimDefinitionIndex];
 
 	CreateMapForSimulation(g_currentSimulationDefinition);
@@ -87,12 +82,15 @@ void PlayingState::Initialize()
 //  =============================================================================
 void PlayingState::Update(float deltaSeconds)
 { 
-	m_map->Update(deltaSeconds);
-
-	if (m_simulationTimer->ResetAndDecrementIfElapsed())
+	if (!GetGameClock()->IsPaused())
 	{
-		isResetingSimulation = true;
-	}
+		m_map->Update(deltaSeconds);
+
+		if (m_simulationTimer->ResetAndDecrementIfElapsed())
+		{
+			isResetingSimulation = true;
+		}
+	}	
 }
 
 //  =============================================================================
@@ -103,6 +101,7 @@ void PlayingState::PreRender()
 //  =============================================================================
 void PlayingState::Render()
 {
+	//this timer determines how much time we have for all of our agent update.
 	SimpleTimer timer;
 	timer.Start();
 
@@ -113,6 +112,7 @@ void PlayingState::Render()
 	RenderGame();
 	RenderUI();
 
+	//this timer determines how much time we have for all of our agent update.
 	timer.Stop();
 	g_previousFrameRenderTime = timer.GetRunningTime();
 
@@ -122,7 +122,7 @@ void PlayingState::Render()
 //  =============================================================================
 void PlayingState::PostRender()
 {
-	if(g_isQuitting)
+	if (g_isQuitting)
 		return;
 
 	m_map->DeleteDeadEntities();
@@ -140,7 +140,7 @@ void PlayingState::PostRender()
 			SimulationDefinition* definition = SimulationDefinition::s_simulationDefinitions[g_currentSimDefinitionIndex];	
 
 			//if we are on the same map, leave the spawn points the same.
-			if (definition->m_mapDefinition == g_currentSimulationDefinition->m_mapDefinition)
+			if(definition->m_mapDefinition == g_currentSimulationDefinition->m_mapDefinition)
 			{
 				g_currentSimulationDefinition = definition;
 				ResetMapForSimulation(definition);
@@ -169,21 +169,22 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 {
 	InputSystem* theInput = InputSystem::GetInstance();
 
+	//movement should run on the master deltaseconds so we can move the camera even if the game is paused
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
-		m_camera->Translate(Vector3(Vector2::DOWN * 5.f * deltaSeconds));
+		m_camera->Translate(Vector3(Vector2::DOWN * 5.f * GetMasterDeltaSeconds()));
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW))
 	{
-		m_camera->Translate(Vector3(Vector2::UP * 5.f * deltaSeconds));
+		m_camera->Translate(Vector3(Vector2::UP * 5.f * GetMasterDeltaSeconds()));
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_RIGHT_ARROW))
 	{
-		m_camera->Translate(Vector3(Vector2::RIGHT * 5.f * deltaSeconds));
+		m_camera->Translate(Vector3(Vector2::RIGHT * 5.f * GetMasterDeltaSeconds()));
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_LEFT_ARROW))
 	{
-		m_camera->Translate(Vector3(Vector2::LEFT * 5.f * deltaSeconds));
+		m_camera->Translate(Vector3(Vector2::LEFT * 5.f * GetMasterDeltaSeconds()));
 	}
 
 	//if (theInput->IsKeyPressed(theInput->KEYBOARD_PAGEUP))
@@ -226,6 +227,12 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_F))
 	{
 		g_isDebugDataShown = !g_isDebugDataShown;
+	}
+
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_P))
+	{
+		//toggle pause
+		GetGameClock()->SetPaused(!GetGameClock()->IsPaused());
 	}
 	
 	return deltaSeconds; //new deltaSeconds
@@ -273,7 +280,7 @@ void PlayingState::InitializeSimulation(SimulationDefinition* definition)
 	Vector2 mapCenter = -1.f * m_map->m_mapWorldBounds.GetCenter();
 	m_camera->SetPosition(Vector3(mapCenter.x, mapCenter.y, 0.f));	
 
-	m_simulationTimer = new Stopwatch(GetMasterClock());
+	m_simulationTimer = new Stopwatch(GetGameClock());
 	m_simulationTimer->SetTimer(g_generalSimulationData->m_simulationDefinitionReference->m_totalProcessingTimeInSeconds);
 }
 
@@ -466,6 +473,18 @@ void PlayingState::ExportSimulationData()
 }
 
 //  =============================================================================
+void PlayingState::GenerateOutputDirectory()
+{
+	std::string newFolderName = Stringf("SIMULATION_TEST_%s", GetCurrentDateTime().c_str());
+	std::string newPath =  Stringf("%s%s", "Data\\ExportedSimulationData\\", newFolderName.c_str());
+
+	bool success = CreateFolder(newPath.c_str());
+	ASSERT_OR_DIE(success, Stringf("UNABLE TO CREATE FOLDER (%s)", newPath.c_str()).c_str());
+
+	simDataOutputDirectory = Stringf("%s%s", newPath.c_str(), "\\");
+}
+
+//  =============================================================================
 void PlayingState::FinalizeGeneralSimulationData()
 {
 	std::string optimizationString = "";
@@ -549,20 +568,32 @@ Mesh* PlayingState::CreateTextMesh()
 }
 
 // Commands =============================================================================
-void ToggleOptimized(Command& cmd)
+//void ToggleOptimized(Command& cmd)
+//{
+//	Game* theGame = Game::GetInstance();
+//
+//	//theGame->m_isOptimized = !theGame->m_isOptimized;
+//
+//	//if (theGame->m_isOptimized)
+//	//{
+//	//	DevConsolePrintf(Rgba::YELLOW, "Game is optimized!");
+//	//}
+//	//else
+//	//{
+//	//	DevConsolePrintf(Rgba::YELLOW, "Game is NOT optimized!");
+//	//}
+//
+//	theGame = nullptr;
+//}
+
+//  =========================================================================================
+void TogglePaused(Command& cmd)
 {
-	Game* theGame = Game::GetInstance();
+	GetGameClock()->SetPaused(!GetGameClock()->IsPaused());
+	
+	std::string pauseString = "";
 
-	//theGame->m_isOptimized = !theGame->m_isOptimized;
+	GetGameClock()->IsPaused() ? pauseString = "Game paused!" : pauseString = "Game unpaused!";
 
-	//if (theGame->m_isOptimized)
-	//{
-	//	DevConsolePrintf(Rgba::YELLOW, "Game is optimized!");
-	//}
-	//else
-	//{
-	//	DevConsolePrintf(Rgba::YELLOW, "Game is NOT optimized!");
-	//}
-
-	theGame = nullptr;
+	DevConsolePrintf(Rgba::GREEN, pauseString.c_str());
 }

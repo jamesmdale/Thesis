@@ -76,7 +76,8 @@ void Game::Initialize()
 
 	theRenderer->SetAmbientLightIntensity(0.15f);
 
-	g_gameClock = new Clock(GetMasterClock());
+	//setup game clock
+	m_gameClock = new Clock(GetMasterClock());
 
 	// add cameras
 	m_gameCamera = new Camera();
@@ -100,7 +101,6 @@ void Game::Initialize()
 	InitializeAgentDefinitions();
 	InitializeSimulationDefinitions();
 
-
 	// cleanup
 	theRenderer = nullptr;
 	theWindow = nullptr;
@@ -109,12 +109,7 @@ void Game::Initialize()
 //  =========================================================================================
 void Game::Update()
 {
-	float deltaSeconds = g_gameClock->GetDeltaSeconds();
-
-	if (g_theApp->GetPauseState())
-	{
-		deltaSeconds = 0.f;
-	}
+	float deltaSeconds = GetGameClock()->GetDeltaSeconds();
 
 	// update global menu data (handles transitions and timers) =============================================================================
 	GameState::UpdateGlobalGameState(deltaSeconds);
@@ -176,4 +171,10 @@ void Game::InitializeSimulationDefinitions()
 void ToggleGamePaused(Command& cmd)
 {
 	m_isPaused =  !m_isPaused;
+}
+
+//  =========================================================================================
+Clock* GetGameClock()
+{
+	return Game::GetInstance()->m_gameClock;
 }
