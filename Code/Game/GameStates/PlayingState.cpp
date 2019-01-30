@@ -1,3 +1,5 @@
+#include <map>
+#include <string>
 #include "Engine\Window\Window.hpp"
 #include "Engine\Debug\DebugRender.hpp"
 #include "Engine\Core\LightObject.hpp"
@@ -10,13 +12,12 @@
 #include "Engine\Renderer\Mesh.hpp"
 #include "Engine\Math\AABB2.hpp"
 #include "Engine\Time\SimpleTimer.hpp"
-#include <map>
-#include <string>
 #include "Game\GameStates\PlayingState.hpp"
 #include "Game\PointOfInterest.hpp"
 #include "Game\Agent.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
 #include "Game\SimulationData.hpp"
+#include "Game\DebugInputBox.hpp"
 
 float ORTHO_MAX = 0.f;
 float ORTHO_MIN = 0.f;
@@ -73,6 +74,9 @@ void PlayingState::Initialize()
 
 	//set per frame budget for 60fps
 	g_perFrameHPCBudget = SecondsToPerformanceCounter(1.0 / 70.0);
+
+	//generate debug input even if we don't really use it
+	DebugInputBox::CreateInstance();
 
 	//cleanup
 	theRenderer = nullptr;
@@ -208,28 +212,31 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	//	m_camera->SetProjectionOrtho(g_orthoZoom, CLIENT_ASPECT, -1000.f, 1000.f);
 	//}
 
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_R))
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_R) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_orthoZoom = Window::GetInstance()->GetClientHeight();
 		m_camera->SetProjectionOrtho(g_orthoZoom, CLIENT_ASPECT, -1000.f, 1000.f);
 	}
 
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_T))
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_T) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_isBlockedTileDataShown = !g_isBlockedTileDataShown;	
 	}
 
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_I))
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_I) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_isIdShown = !g_isIdShown;
 	}
 
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_F))
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_F) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_isDebugDataShown = !g_isDebugDataShown;
+		
+		//also, "Open" or "close" the debug input box accordingly
+		g_isDebugDataShown ? DebugInputBox::GetInstance()->Open() : DebugInputBox::GetInstance()->Close();
 	}
 
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_P))
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_P) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		//toggle pause
 		GetGameClock()->SetPaused(!GetGameClock()->IsPaused());
@@ -251,7 +258,11 @@ void PlayingState::RenderGame()
 //  =========================================================================================
 void PlayingState::RenderUI()
 {
-	//TODO("Render UI");
+	if (!g_isDebugDataShown)
+	{
+		return;
+	}
+
 	Renderer* theRenderer = Renderer::GetInstance()->GetInstance();
 	theRenderer->SetCamera(m_uiCamera);
 
@@ -533,34 +544,38 @@ void PlayingState::FinalizeGeneralSimulationData()
 	
 }
 
+//  =========================================================================================
 Mesh* PlayingState::CreateTextMesh()
 {
 	MeshBuilder* builder = new MeshBuilder();
 	Mesh* textMesh = nullptr;
 	Window* theWindow = Window::GetInstance();
 
-	//fps counter
-	if (g_isDebugDataShown)
-	{
-		AABB2 fpsBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.9f), Vector2(0.95f, 0.975f));
+	//fps counter	
+	AABB2 fpsBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.9f), Vector2(0.95f, 0.975f));
+	builder->CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("FPS: %f", GetUnclampedFPS()), Rgba::WHITE);
 
-		builder->CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("FPS: %f", GetUnclampedFPS()), Rgba::WHITE);
-	}
-
-	if (GetIsAgentUpdateBudgeted() && g_isDebugDataShown)
+	//agent update per frameinfo
+	if (GetIsAgentUpdateBudgeted())
 	{
 		AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.875f));
 
 		builder->CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);
 	}
 
+	//debug input
+	DebugInputBox* theDebugInputBox = DebugInputBox::GetInstance();
+	std::string inputText = Stringf("> %s", theDebugInputBox->GetInput().c_str());
+	builder->CreateText2DFromPoint( Vector2(10.f , 0.0f), theWindow->GetClientHeight() * 0.015, 1.f, inputText.c_str(), Rgba::WHITE );
+
+	//  ----------------------------------------------
 	//draw other things
+	//  ----------------------------------------------
 
 	if (builder->m_vertices.size() > 0)
 	{
 		textMesh = builder->CreateMesh<VertexPCU>();
 	}
-
 
 	delete(builder);
 	builder = nullptr;

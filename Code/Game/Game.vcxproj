@@ -295,6 +295,7 @@
     <ClCompile Include="Actions\Action.cpp" />
     <ClCompile Include="Agent.cpp" />
     <ClCompile Include="Bombardment.cpp" />
+    <ClCompile Include="DebugInputBox.cpp" />
     <ClCompile Include="Definitions\AgentDefinition.cpp" />
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.cpp" />
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimSetDefinition.cpp" />
@@ -333,6 +334,7 @@
     <ClInclude Include="Actions\Action.hpp" />
     <ClInclude Include="Agent.hpp" />
     <ClInclude Include="Bombardment.hpp" />
+    <ClInclude Include="DebugInputBox.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimSetDefinition.hpp" />
