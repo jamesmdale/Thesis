@@ -31,6 +31,8 @@ bool isResetingSimulation = false;
 //  =============================================================================
 PlayingState::~PlayingState()
 {
+	m_disectedAgent = nullptr;
+
 	delete(m_simulationTimer);
 	m_simulationTimer = nullptr;
 
@@ -64,6 +66,7 @@ void PlayingState::Initialize()
 	//register commands
 	//RegisterCommand("toggle_optimization", CommandRegistration(ToggleOptimized, ": Toggle blanket optimizations on and off", ""));
 	RegisterCommand("pause_game", CommandRegistration(TogglePaused, ": Toggle pause on and off", ""));
+	RegisterCommand("agent", CommandRegistration(DisectAgent, ": View information for given agent. (int agentId)", ""));
 
 	//simulation setup
 	GenerateOutputDirectory();
@@ -177,18 +180,22 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::DOWN * 5.f * GetMasterDeltaSeconds()));
+		ClearDisectedAgent();
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::UP * 5.f * GetMasterDeltaSeconds()));
+		ClearDisectedAgent();
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_RIGHT_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::RIGHT * 5.f * GetMasterDeltaSeconds()));
+		ClearDisectedAgent();
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_LEFT_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::LEFT * 5.f * GetMasterDeltaSeconds()));
+		ClearDisectedAgent();
 	}
 
 	//if (theInput->IsKeyPressed(theInput->KEYBOARD_PAGEUP))
@@ -233,7 +240,15 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 		g_isDebugDataShown = !g_isDebugDataShown;
 		
 		//also, "Open" or "close" the debug input box accordingly
-		g_isDebugDataShown ? DebugInputBox::GetInstance()->Open() : DebugInputBox::GetInstance()->Close();
+		if (g_isDebugDataShown)
+		{
+			DebugInputBox::GetInstance()->Open();
+		}
+		else
+		{
+			DebugInputBox::GetInstance()->Close();
+			m_disectedAgent = nullptr;
+		}		
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_P) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
@@ -568,6 +583,21 @@ Mesh* PlayingState::CreateTextMesh()
 	std::string inputText = Stringf("> %s", theDebugInputBox->GetInput().c_str());
 	builder->CreateText2DFromPoint( Vector2(10.f , 0.0f), theWindow->GetClientHeight() * 0.015, 1.f, inputText.c_str(), Rgba::WHITE );
 
+	//disected agent
+	if (m_disectedAgent != nullptr)
+	{
+		std::vector<std::string> agentInfo;
+		m_disectedAgent->ConstructInformationAsText(agentInfo);
+
+		float printHeight = 0.5f;
+
+		for (int agentInfoIndex = 0; agentInfoIndex < agentInfo.size(); ++agentInfoIndex)
+		{
+			builder->CreateText2DFromPoint( Vector2(theWindow->GetClientWidth() * 0.85f , theWindow->GetClientHeight() * printHeight), theWindow->GetClientHeight() * 0.010, 1.f, agentInfo[agentInfoIndex].c_str(), Rgba::WHITE );
+			printHeight -= 0.02;
+		}
+	}
+
 	//  ----------------------------------------------
 	//draw other things
 	//  ----------------------------------------------
@@ -580,6 +610,15 @@ Mesh* PlayingState::CreateTextMesh()
 	delete(builder);
 	builder = nullptr;
 	return textMesh;
+}
+
+//  =========================================================================================
+void PlayingState::ClearDisectedAgent()
+{
+	if (m_disectedAgent != nullptr)
+	{
+		m_disectedAgent = nullptr;
+	}
 }
 
 // Commands =============================================================================
@@ -611,4 +650,28 @@ void TogglePaused(Command& cmd)
 	GetGameClock()->IsPaused() ? pauseString = "Game paused!" : pauseString = "Game unpaused!";
 
 	DevConsolePrintf(Rgba::GREEN, pauseString.c_str());
+}
+
+//  =========================================================================================
+void DisectAgent(Command& cmd)
+{
+	GameState* currentState = GameState::GetCurrentGameState();
+	if (currentState->m_type != PLAYING_GAME_STATE)
+	{
+		DevConsolePrintf(Rgba::RED, "NO AGENTS INITIALIZED!");
+		return;
+	}
+
+	int agentId = cmd.GetNextInt();
+	if (agentId == INT_MAX)
+	{
+		DevConsolePrintf(Rgba::RED, "INVALID AGENT INDEX!");
+		return;
+	}
+
+	//cast to playing state to set disected agent
+	PlayingState* playingState = (PlayingState*)currentState;
+	playingState->m_disectedAgent = playingState->m_map->GetAgentById(agentId);
+
+	DevConsolePrintf(Rgba::GREEN, "Disecting agent index %i", agentId);
 }

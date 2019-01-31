@@ -51,6 +51,8 @@ public:
 	void QueueRepairActions(const UtilityInfo& info);
 	void QueueHealActions(const UtilityInfo& info);
 
+	std::string GetPlanTypeAsText();
+
 	//utility cost calculations
 	UtilityInfo GetHighestGatherArrowsUtility();
 	UtilityInfo GetHighestGatherLumberUtility();

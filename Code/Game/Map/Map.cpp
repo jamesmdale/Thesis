@@ -804,16 +804,22 @@ Tile* Map::GetTileAtCoordinate(const IntVector2& coordinate)
 //  =========================================================================================
 Agent* Map::GetAgentById(int agentId)
 {
-	//assume in order and just search
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
+	//invalid input
+	if (agentId > m_agentsOrderedByPriority.size() - 1 || agentId < 0)
 	{
-		if(agentId == m_agentsOrderedByXPosition[agentIndex]->m_id)
-			return m_agentsOrderedByXPosition[agentIndex];
+		return nullptr;
 	}
 
-	//if we never found the agent, return nullptr;
-	return nullptr;
+	//we know the agent exists. Search for them
+	for(int agentIndex = 0; agentIndex < m_agentsOrderedByPriority.size(); ++agentIndex)
+	{
+		if (m_agentsOrderedByPriority[agentIndex]->m_id == agentId)
+		{
+			return m_agentsOrderedByPriority[agentIndex];
+		}
+	}
 }
+
 
 //  =========================================================================================
 PointOfInterest* Map::GetPointOfInterestById(int poiId)

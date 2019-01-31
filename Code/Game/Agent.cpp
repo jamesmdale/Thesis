@@ -267,6 +267,37 @@ void Agent::UpdateHealPerformanceTime()
 }
 
 //  =========================================================================================
+void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
+{
+	//id
+	outStrings.push_back(Stringf("ID: %i", m_id));
+
+	//biases
+	outStrings.push_back(Stringf("Biases"));
+	outStrings.push_back(Stringf("CB: %f", m_combatBias));
+	outStrings.push_back(Stringf("RB: %f", m_repairBias));
+	outStrings.push_back(Stringf("HB: %f", m_healBias));
+
+	//efficiencies
+	outStrings.push_back(Stringf("Efficiencies"));
+	outStrings.push_back(Stringf("CE: %f", m_combatEfficiency));
+	outStrings.push_back(Stringf("RE: %f", m_repairEfficiency));
+	outStrings.push_back(Stringf("HE: %f", m_healEfficiency));
+
+	//inventory
+	outStrings.push_back(Stringf("Inventory"));
+	outStrings.push_back(Stringf("Arrows: %i", m_arrowCount));
+	outStrings.push_back(Stringf("Bandages: %i", m_bandageCount));
+	outStrings.push_back(Stringf("Lumber: %i", m_lumberCount));
+
+	//planner
+	outStrings.push_back(Stringf("Planner"));
+	outStrings.push_back(Stringf("Plan: %s", m_planner->GetPlanTypeAsText().c_str()));
+	outStrings.push_back(Stringf("Update Pr.: %i", m_updatePriority));
+}
+
+
+//  =========================================================================================
 void Agent::UpdateSpriteRenderDirection()
 {
 	PROFILER_PUSH();

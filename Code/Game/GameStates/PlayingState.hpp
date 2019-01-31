@@ -44,15 +44,16 @@ public:
 
 	Mesh* CreateTextMesh();
 
-	//bool GetInteractableWidgets(std::vector<Widget*>& outWidgets);
-	//Widget* GetSelectedWidget(const std::vector<Widget*>& widgets);
+	void ClearDisectedAgent();
 	
 public:
 	Camera* m_uiCamera = nullptr;
 	Map* m_map = nullptr;
 
 	Stopwatch* m_simulationTimer = nullptr;
+
+	Agent* m_disectedAgent = nullptr;
 };
 
-//void ToggleOptimized(Command& cmd);
 void TogglePaused(Command& cmd);
+void DisectAgent(Command& cmd);

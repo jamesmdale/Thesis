@@ -440,6 +440,39 @@ void Planner::QueueHealActions(const UtilityInfo& info)
 }
 
 //  =========================================================================================
+std::string Planner::GetPlanTypeAsText()
+{
+	std::string planAsText = "";
+	switch (m_currentPlan)
+	{
+	case NONE_PLAN_TYPE:
+		planAsText = "NONE";
+		break;
+	case GATHER_ARROWS_PLAN_TYPE:
+		planAsText = "GATHER ARROWS";
+		break;
+	case GATHER_LUMBER_PLAN_TYPE:
+		planAsText = "GATHER LUMBER";
+		break;
+	case GATHER_BANDAGES_PLAN_TYPE:
+		planAsText = "GATHER BANDAGES";
+		break;
+	case SHOOT_PLAN_TYPE:
+		planAsText = "SHOOT";
+		break;
+	case REPAIR_PLAN_TYPE:
+		planAsText = "REPAIR";
+		break;
+	case HEAL_PLAN_TYPE:
+		planAsText = "HEAL";
+		break;
+	}
+
+	return planAsText;
+		
+}
+
+//  =========================================================================================
 // Get utilities
 //  =========================================================================================
 UtilityInfo Planner::GetHighestGatherArrowsUtility()

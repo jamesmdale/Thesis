@@ -62,6 +62,7 @@ public:
 	void QuickSortAgentByPriority(std::vector<Agent*>& agents, int startIndex, int endIndex);
 	int QuickSortPivot(std::vector<Agent*>& agents, int startIndex, int endIndex);
 	void SwapAgents(int indexI, int indexJ, eAgentSortType type);
+	Agent* GetAgentById(int agentId);
 
 	//Conversion functions for Tile Coordinates to World Coordinates
 	IntVector2 GetTileCoordinateOfPosition(const Vector2& position);
@@ -76,11 +77,10 @@ public:
 	Grid<int>* GetAsGrid();
 	bool IsTileBlockingAtCoordinate(const IntVector2& coordinate);
 	Tile* GetTileAtCoordinate(const IntVector2& coordinate);
-	Agent* GetAgentById(int agentId);
 
 	//point of interest helpers
 	PointOfInterest* GeneratePointOfInterest(int poiType);
-	PointOfInterest* GetPointOfInterestById(int poiId);	
+	PointOfInterest* GetPointOfInterestById(int poiId);
 
 	//bombardment collision
 	void DetectBombardmentToAgentCollision(Bombardment* bombardment);

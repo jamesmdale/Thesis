@@ -56,6 +56,8 @@ public:
 	void UpdateRepairPerformanceTime();
 	void UpdateHealPerformanceTime();
 
+	void ConstructInformationAsText(std::vector<std::string>& outStrings);
+
 public:
 	int m_updatePriority = 1;
 
