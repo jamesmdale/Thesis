@@ -42,7 +42,10 @@ public:
 	void GenerateOutputDirectory();
 	void FinalizeGeneralSimulationData();
 
+	//render helpers	
 	Mesh* CreateTextMesh();
+	Mesh* CreateDisectedAgentPathMesh();
+	
 
 	void ClearDisectedAgent();
 	

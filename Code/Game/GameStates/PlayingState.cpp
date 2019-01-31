@@ -281,15 +281,36 @@ void PlayingState::RenderUI()
 	Renderer* theRenderer = Renderer::GetInstance()->GetInstance();
 	theRenderer->SetCamera(m_uiCamera);
 
-	Mesh* textMesh = CreateTextMesh();
 
+	//handle text
+	Mesh* textMesh = CreateTextMesh();
 	if (textMesh != nullptr)
 	{
 		theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("text"));
 		theRenderer->DrawMesh(textMesh);
 	}	
 
+	//because the path uses the world space and not screen space (ui camera), we need to set back to the main camera
 	theRenderer->SetCamera(m_camera);
+
+	//handle path
+	Mesh* pathMesh = nullptr;
+	if (m_disectedAgent != nullptr)
+	{
+		if (m_disectedAgent->m_currentPath.size() > 0)
+		{
+			Mesh* pathMesh = CreateDisectedAgentPathMesh();
+			theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("default"));
+			theRenderer->DrawMesh(pathMesh);
+		}	
+	}
+
+	//cleanup created meshes
+	if (pathMesh != nullptr)
+	{
+		delete(pathMesh);
+		pathMesh = nullptr;
+	}
 
 	delete(textMesh);
 	textMesh = nullptr;
@@ -562,26 +583,31 @@ void PlayingState::FinalizeGeneralSimulationData()
 //  =========================================================================================
 Mesh* PlayingState::CreateTextMesh()
 {
-	MeshBuilder* builder = new MeshBuilder();
+	MeshBuilder builder = MeshBuilder();
 	Mesh* textMesh = nullptr;
 	Window* theWindow = Window::GetInstance();
 
 	//fps counter	
 	AABB2 fpsBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.9f), Vector2(0.95f, 0.975f));
-	builder->CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("FPS: %f", GetUnclampedFPS()), Rgba::WHITE);
+	builder.CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("FPS: %f", GetUnclampedFPS()), Rgba::WHITE);
+
+	//cam position information
+	AABB2 camPosBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.75f), Vector2(0.95f, 0.85f));
+	Vector3 camPosition = m_camera->m_transform->GetWorldPosition();
+	builder.CreateText2DInAABB2( camPosBox.GetCenter(), camPosBox.GetDimensions(), 1.f, Stringf("Cam Pos: %f,%f", camPosition.x, camPosition.y));
 
 	//agent update per frameinfo
 	if (GetIsAgentUpdateBudgeted())
 	{
 		AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.875f));
 
-		builder->CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);
+		builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);
 	}
 
 	//debug input
 	DebugInputBox* theDebugInputBox = DebugInputBox::GetInstance();
 	std::string inputText = Stringf("> %s", theDebugInputBox->GetInput().c_str());
-	builder->CreateText2DFromPoint( Vector2(10.f , 0.0f), theWindow->GetClientHeight() * 0.015, 1.f, inputText.c_str(), Rgba::WHITE );
+	builder.CreateText2DFromPoint( Vector2(10.f , 0.0f), theWindow->GetClientHeight() * 0.015, 1.f, inputText.c_str(), Rgba::WHITE );
 
 	//disected agent
 	if (m_disectedAgent != nullptr)
@@ -593,7 +619,7 @@ Mesh* PlayingState::CreateTextMesh()
 
 		for (int agentInfoIndex = 0; agentInfoIndex < agentInfo.size(); ++agentInfoIndex)
 		{
-			builder->CreateText2DFromPoint( Vector2(theWindow->GetClientWidth() * 0.85f , theWindow->GetClientHeight() * printHeight), theWindow->GetClientHeight() * 0.010, 1.f, agentInfo[agentInfoIndex].c_str(), Rgba::WHITE );
+			builder.CreateText2DFromPoint( Vector2(theWindow->GetClientWidth() * 0.85f , theWindow->GetClientHeight() * printHeight), theWindow->GetClientHeight() * 0.010, 1.f, agentInfo[agentInfoIndex].c_str(), Rgba::WHITE );
 			printHeight -= 0.02;
 		}
 	}
@@ -602,14 +628,38 @@ Mesh* PlayingState::CreateTextMesh()
 	//draw other things
 	//  ----------------------------------------------
 
-	if (builder->m_vertices.size() > 0)
+	if (builder.m_vertices.size() > 0)
 	{
-		textMesh = builder->CreateMesh<VertexPCU>();
+		textMesh = builder.CreateMesh<VertexPCU>();
 	}
 
-	delete(builder);
-	builder = nullptr;
 	return textMesh;
+}
+
+//  =========================================================================================
+Mesh* PlayingState::CreateDisectedAgentPathMesh()
+{
+	MeshBuilder builder = MeshBuilder();
+	Mesh* pathMesh = nullptr;
+
+	//we know the agent is set so we don't have to check for nullptr case
+	for (int pathIndex = 0; pathIndex < m_disectedAgent->m_currentPath.size() - 1; ++pathIndex)
+	{
+		IntVector2 tileCoords = IntVector2(m_disectedAgent->m_currentPath[pathIndex]);
+		IntVector2 nextTileCoords = IntVector2(m_disectedAgent->m_currentPath[pathIndex + 1]);
+
+		Vector2 tileCenter = m_map->GetTileAtCoordinate(tileCoords)->GetBounds().GetCenter();
+		Vector2 nextTileCenter = m_map->GetTileAtCoordinate(nextTileCoords)->GetBounds().GetCenter();
+
+		builder.CreateLine2D(m_map->GetTileAtCoordinate(tileCoords)->GetBounds().GetCenter(), m_map->GetTileAtCoordinate(nextTileCoords)->GetBounds().GetCenter(), Rgba::PINK);
+	}
+
+	if (builder.m_vertices.size() > 0)
+	{
+		pathMesh = builder.CreateMesh<VertexPCU>();
+	}
+
+	return pathMesh;
 }
 
 //  =========================================================================================
