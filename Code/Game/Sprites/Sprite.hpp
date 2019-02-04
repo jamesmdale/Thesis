@@ -3,9 +3,9 @@
 #include <string>
 #include <map>
 #include "Engine\Core\Image.hpp"
-#include "Game\Definitions\SpriteDefinitions\SpriteDefinition.hpp"
 #include "Engine\Math\Vector2.hpp"
 #include "Engine\Renderer\Texture.hpp"
+#include "Game\Definitions\SpriteDefinitions\SpriteDefinition.hpp"
 
 class Sprite
 {

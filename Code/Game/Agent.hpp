@@ -5,12 +5,14 @@
 #include "Engine\Core\EngineCommon.hpp"
 #include "Engine\Core\Transform2D.hpp"
 #include "Engine\Math\AABB2.hpp"
+#include "Engine\Math\Disc2.hpp"
 
 //forward declarations
 class Planner;
 class Map;
 class PlayingState;
 class Agent;
+class Stopwatch;
 
 //typedefs
 typedef bool (*ActionCallback)(Agent* agent, const Vector2& goalDestination, int interactEntityId);
@@ -49,8 +51,6 @@ public:
 	bool GetPathToDestination(const Vector2& goalDestination);
 	bool GetIsAtPosition(const Vector2& goalDestination);
 
-	AABB2 GetBounds();
-
 	//stats
 	void UpdateCombatPerformanceTime();
 	void UpdateRepairPerformanceTime();
@@ -63,6 +63,8 @@ public:
 
 	int m_id = -1;
 	int m_health = 100;
+	bool m_isFirstLoopThroughAction = true;
+	Stopwatch* m_actionTimer = nullptr;
 
 	// bias ----------------------------------------------
 	float m_combatBias = 0.5f;
@@ -85,11 +87,12 @@ public:
 	int m_lumberCount = 0;
 
 	// position logic ----------------------------------------------
+	//AABB2 m_spriteRenderBounds;
 	Vector2 m_position;
 	Vector2 m_forward;
 	Vector2 m_intermediateGoalPosition;	//used for temp locations while pathing
 	Vector2 m_currentActionGoalPosition;
-	Transform2D m_transform;
+	//Transform2D m_transform;
 	float m_movespeed = 1.f;
 
 	//goal logic ----------------------------------------------
@@ -106,10 +109,7 @@ public:
 	uint16_t m_indexInSortedYList = UINT16_MAX;
 	uint16_t m_indexInPriorityList = UINT16_MAX;
 
-	//optimization members
-
-	//std::vector<Agent*> m_subordinateAgents;
-	//Agent* m_commandingAgent = nullptr;
+	Disc2 m_physicsDisc;
 };
 
 

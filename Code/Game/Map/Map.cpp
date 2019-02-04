@@ -70,7 +70,7 @@ Map::~Map()
 	//cleanup reference pointers
 	m_mapDefinition = nullptr;
 	m_activeSimulationDefinition = nullptr;
-	m_gameState = nullptr;
+	m_playingState = nullptr;
 
 	//cleanuip timers
 	delete(m_sortTimer);
@@ -274,13 +274,14 @@ void Map::UpdateAgents(float deltaSeconds)
 		for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
 		{
 			m_agentsOrderedByXPosition[agentIndex]->Update(deltaSeconds);
+			DetectAgentToTileCollision(m_agentsOrderedByXPosition[agentIndex]);
 		}
 	}
 	else
 	{
 		UpdateAgentsBudgeted(deltaSeconds);
 	}
-	
+
 	//check optimization flags
 	//sort for Y drawing for render AND for next frame's agent update
 	if (GetIsOptimized())
@@ -317,6 +318,7 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 
 			//do udpate work
 			m_agentsOrderedByPriority[agentIndex]->Update(deltaSeconds);
+			//DetectAgentToTileCollision(m_agentsOrderedByPriority[agentIndex]);
 
 			agentUpdateTimer.Stop();
 			uint64_t totalUpdateTime = agentUpdateTimer.GetRunningTime();
@@ -336,7 +338,9 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 		{
 			//update by one
 			m_agentsOrderedByPriority[agentIndex]->QuickUpdate(deltaSeconds);
-		}				
+		}		
+
+		DetectAgentToTileCollision(m_agentsOrderedByPriority[agentIndex]);
 	}
 
 	//sort if we are optimized
@@ -409,7 +413,7 @@ void Map::Reload(SimulationDefinition* definition)
 {
 	// Cleanup Step ----------------------------------------------
 	m_activeSimulationDefinition = definition;
-	m_gameState = nullptr;
+	m_playingState = nullptr;
 
 	//cleanuip timers
 	delete(m_sortTimer);
@@ -517,23 +521,12 @@ void Map::CreateMapMesh()
 //  =========================================================================================
 Mesh* Map::CreateDynamicAgentMesh()
 {
-	MeshBuilder* builder = new MeshBuilder();
+	MeshBuilder builder = MeshBuilder();
 
 	//create mesh for static tiles and buildings
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
 	{
 		Sprite sprite = *m_agentsOrderedByXPosition[agentIndex]->m_animationSet->GetCurrentSprite(m_agentsOrderedByXPosition[agentIndex]->m_spriteDirection);
-
-		float dimensions = 1.f;
-
-		Vector2 spritePivot = sprite.m_definition->m_pivot;
-		IntVector2 spriteDimensions = sprite.GetDimensions();
-
-		AABB2 bounds;
-		bounds.mins.x = 0.f - (spritePivot.x) * dimensions;
-		bounds.maxs.x = bounds.mins.x + 1.f * dimensions;
-		bounds.mins.y = 0.f - (spritePivot.y) * dimensions;
-		bounds.maxs.y = bounds.mins.y + 1.f * dimensions;
 
 		Rgba agentColor = Rgba::WHITE;
 		switch (m_agentsOrderedByXPosition[agentIndex]->m_planner->m_currentPlan)
@@ -558,15 +551,23 @@ Mesh* Map::CreateDynamicAgentMesh()
 			break;
 		}
 
-		builder->CreateTexturedQuad2D(m_agentsOrderedByXPosition[agentIndex]->m_position, bounds.GetDimensions(), Vector2(sprite.GetNormalizedUV().mins.x, sprite.GetNormalizedUV().maxs.y), Vector2(sprite.GetNormalizedUV().maxs.x, sprite.GetNormalizedUV().mins.y), agentColor);
+		//AABB2 bounds = m_agentsOrderedByXPosition[agentIndex]->m_spriteRenderBounds;
+		Vector2 agentSize = Vector2::ONE;
+
+		if (g_isDebugDataShown)
+		{
+			if(m_agentsOrderedByXPosition[agentIndex] == m_playingState->m_disectedAgent)
+				agentSize = Vector2(1.75f, 1.75f);
+		}	
+
+		builder.CreateTexturedQuad2D(m_agentsOrderedByXPosition[agentIndex]->m_position,
+			agentSize, 
+			Vector2(sprite.GetNormalizedUV().mins.x, sprite.GetNormalizedUV().maxs.y), 
+			Vector2(sprite.GetNormalizedUV().maxs.x, sprite.GetNormalizedUV().mins.y), 
+			agentColor);
 	}
 
-	 Mesh* agentMesh = builder->CreateMesh<VertexPCU>();
-
-	//cleanup
-	delete(builder);
-	builder = nullptr;
-
+	Mesh* agentMesh = builder.CreateMesh<VertexPCU>();
 	return agentMesh;
 }
 
@@ -574,7 +575,7 @@ Mesh* Map::CreateDynamicAgentMesh()
 //  =============================================================================
 Mesh* Map::CreateTextMesh()
 {
-	MeshBuilder* builder = new MeshBuilder();
+	MeshBuilder builder = MeshBuilder();
 	Mesh* textMesh = nullptr;
 
 	//agent ids
@@ -582,19 +583,19 @@ Mesh* Map::CreateTextMesh()
 	{
 		for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
 		{
-			builder->CreateText2DInAABB2(Vector2(m_agentsOrderedByXPosition[agentIndex]->m_position.x, m_agentsOrderedByXPosition[agentIndex]->m_position.y + 0.7), Vector2(0.25f, 0.25f), 1.f, Stringf("%i", m_agentsOrderedByXPosition[agentIndex]->m_id), Rgba::WHITE);
+			builder.CreateText2DInAABB2(Vector2(m_agentsOrderedByXPosition[agentIndex]->m_position.x, m_agentsOrderedByXPosition[agentIndex]->m_position.y + 0.7), Vector2(0.25f, 0.25f), 1.f, Stringf("%i", m_agentsOrderedByXPosition[agentIndex]->m_id), Rgba::WHITE);
 		}
 	}
 
+	//  ----------------------------------------------
 	//draw other things
+	//  ----------------------------------------------
 
-	if (builder->m_vertices.size() > 0)
+	if (builder.m_vertices.size() > 0)
 	{
-		textMesh = builder->CreateMesh<VertexPCU>();
+		textMesh = builder.CreateMesh<VertexPCU>();
 	}	
 
-	delete(builder);
-	builder = nullptr;
 	return textMesh;
 }
 
@@ -857,6 +858,140 @@ void Map::DetectBombardmentToPOICollision(Bombardment* bombardment)
 			m_pointsOfInterest[poiIndex]->TakeDamage(g_bombardmentDamage);
 		}
 	}
+}
+
+//  =========================================================================================
+void Map::DetectAgentToTileCollision(Agent* agent)
+{
+	IntVector2 agentTileIndex = GetTileCoordinateOfPosition(agent->m_position);
+	Vector2 agentPosition = agent->m_position;
+	bool didPushOutCorner = false;
+	bool didPushOutAxis = false;
+
+	//handle northeast
+	IntVector2 tileDirection = IntVector2(1,1);
+	IntVector2 tileCoord = agentTileIndex + tileDirection;
+	didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHEAST_TILE_DIRECTION);
+
+	if (!didPushOutCorner)
+	{
+		//handle southeast
+		tileDirection = IntVector2(1,-1);
+		tileCoord = agentTileIndex + tileDirection;
+		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHEAST_TILE_DIRECTION);
+	}
+
+	if (!didPushOutCorner)
+	{
+		//handle northwest
+		tileDirection = IntVector2(-1,1);
+		tileCoord = agentTileIndex + tileDirection;
+		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHWEST_TILE_DIRECTION);
+	}
+
+	if (!didPushOutCorner)
+	{
+		//handle southwest
+		tileDirection = IntVector2(-1,-1);
+		tileCoord = agentTileIndex + tileDirection;
+		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHWEST_TILE_DIRECTION);
+	}
+ 
+	// handle up,down,left,right push out (because we've done corners, we can skip scenarios where we have both) ----------------------------------------------
+	//handle north
+	tileDirection = IntVector2(0,1);
+	tileCoord = agentTileIndex + tileDirection;
+	didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, NORTH_TILE_DIRECTION);
+
+	//handle south
+	if (!didPushOutAxis)
+	{
+		//handle southeast
+		tileDirection = IntVector2(0,-1);
+		tileCoord = agentTileIndex + tileDirection;
+		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, SOUTH_TILE_DIRECTION);
+	}
+
+	//handle east
+	if (!didPushOutAxis)
+	{
+		//handle southeast
+		tileDirection = IntVector2(1,0);
+		tileCoord = agentTileIndex + tileDirection;
+		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, EAST_TILE_DIRECTION);
+	}
+
+	//handle west
+	if (!didPushOutAxis)
+	{
+		//handle southeast
+		tileDirection = IntVector2(-1,0);
+		tileCoord = agentTileIndex + tileDirection;
+		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, WEST_TILE_DIRECTION);
+	}
+
+	if (didPushOutAxis || didPushOutCorner)
+	{
+		int i = 0;
+	}
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection)
+{
+	//early outs
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if(tile == nullptr)
+		return false;
+
+	if(tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	Vector2 agentCenter = agent->m_position;
+
+		Vector2 collisionPoint;
+		switch(tileDirection)
+		{
+		case EAST_TILE_DIRECTION:
+			collisionPoint = Vector2((float)tileCoordinate.x, agentCenter.y);
+			break;
+		case WEST_TILE_DIRECTION:
+			collisionPoint = Vector2((float)tileCoordinate.x + 1, agentCenter.y);
+			break;
+		case NORTH_TILE_DIRECTION:
+			collisionPoint = Vector2(agentCenter.x, (float)tileCoordinate.y);
+			break;
+		case SOUTH_TILE_DIRECTION:
+			collisionPoint = Vector2(agentCenter.x, (float)tileCoordinate.y + 1.f);
+			break;
+		case NORTHEAST_TILE_DIRECTION:
+			collisionPoint = Vector2((float)tileCoordinate.x, (float)tileCoordinate.y);
+			break;
+		case NORTHWEST_TILE_DIRECTION:
+			collisionPoint = Vector2((float)tileCoordinate.x + 1.f, (float)tileCoordinate.y);
+			break;
+		case SOUTHEAST_TILE_DIRECTION:
+			collisionPoint = Vector2((float)tileCoordinate.x, (float)tileCoordinate.y + 1.f);
+			break;
+		case SOUTHWEST_TILE_DIRECTION:
+			collisionPoint = Vector2((float)tileCoordinate.x + 1.f, (float)tileCoordinate.y + 1.f);
+			break;
+		}
+
+		bool isColliding =  agent->m_physicsDisc.IsPointInside(collisionPoint);
+		if(isColliding)
+		{
+			float displacement = GetDistance(agentCenter, collisionPoint);
+
+			float amountToPush = agent->m_physicsDisc.radius - displacement;
+			Vector2 pushOutDirection = (agentCenter - collisionPoint).GetNormalized();
+
+			agent->m_position += pushOutDirection * (amountToPush);
+			agent->m_physicsDisc.center = agent->m_position;
+			//agent->m_transform.SetLocalPosition(agent->m_position);
+		}	
+
+		return isColliding;
 }
 
 //  =========================================================================================

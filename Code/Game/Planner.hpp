@@ -28,6 +28,18 @@ struct UtilityInfo
 	int targetEntityId = -1;
 };
 
+struct UtilityHistory 
+{
+	float m_lastGatherArrows = 0.0f;
+	float m_lastGatherLumber = 0.0f;
+	float m_lastGatherBandages = 0.0f;
+	float m_lastShoot = 0.0f;
+	float m_lastRepair = 0.0f;
+	float m_lastHeal = 0.0f;
+	float m_lastMove = 0.0f;	
+	ePlanTypes m_chosenOutcome = NUM_PLAN_TYPE;
+};
+
 class Planner
 {
 public:
@@ -93,6 +105,8 @@ public:
 	Map* m_map = nullptr;
 	Agent* m_agent = nullptr;
 	ePlanTypes m_currentPlan;
+
+	UtilityHistory m_utilityHistory;
 
 	//utility data
 	static UtilityStorage* m_distanceUtilityStorage;

@@ -178,6 +178,8 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = GATHER_ARROWS_PLAN_TYPE;
 	}
+	//debug info
+	m_utilityHistory.m_lastGatherArrows = compareUtilityInfo.utility;
 		
 	//utility for gathering lumber
 	compareUtilityInfo = GetHighestGatherLumberUtility();
@@ -190,6 +192,8 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = GATHER_LUMBER_PLAN_TYPE;
 	}
+	//debug info
+	m_utilityHistory.m_lastGatherLumber = compareUtilityInfo.utility;
 
 	//utility for gathering bandages
 	/*compareUtilityInfo = GetHighestGatherBandagesUtility();
@@ -218,6 +222,9 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = SHOOT_PLAN_TYPE;
 	}
+	//debug info
+	m_utilityHistory.m_lastShoot = compareUtilityInfo.utility;
+	
 
 	//utility for repairing buildings
 	compareUtilityInfo = GetHighestRepairUtility();
@@ -234,6 +241,8 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = REPAIR_PLAN_TYPE;
 	}
+	//debug info
+	m_utilityHistory.m_lastRepair = compareUtilityInfo.utility;
 
 	//utility for healing agents
 	/*compareUtilityInfo = GetHighestHealUtility();
@@ -249,6 +258,9 @@ void Planner::UpdatePlan()
 	}*/
 
 	m_currentPlan = chosenOutcome;
+	
+	//debug
+	m_utilityHistory.m_chosenOutcome = chosenOutcome;
 
 	QueueActionsFromCurrentPlan(m_currentPlan, highestUtilityInfo);
 
@@ -479,13 +491,13 @@ UtilityInfo Planner::GetHighestGatherArrowsUtility()
 {
 	UtilityInfo highestGatherArrowsUtility;
 
-	if (GetIsOptimized())
-	{
+	/*if (GetIsOptimized())
+	{*/
 		if (m_agent->m_arrowCount == g_maxResourceCarryAmount)
 		{
 			return highestGatherArrowsUtility;
 		}
-	}
+	//}
 
 	if (m_map->m_armories.size() > 0)
 	{
@@ -507,13 +519,13 @@ UtilityInfo Planner::GetHighestGatherLumberUtility()
 {
 	UtilityInfo highestGatherLumberUtility;
 
-	if (GetIsOptimized())
-	{
+	/*if (GetIsOptimized())
+	{*/
 		if (m_agent->m_lumberCount == g_maxResourceCarryAmount)
 		{
 			return highestGatherLumberUtility;
 		}
-	}
+	//}
 
 	if (m_map->m_lumberyards.size() > 0)
 	{
@@ -535,13 +547,13 @@ UtilityInfo Planner::GetHighestGatherBandagesUtility()
 {
 	UtilityInfo highestGatherBandagesUtility;
 
-	if (GetIsOptimized())
-	{
+	/*if (GetIsOptimized())
+	{*/
 		if (m_agent->m_bandageCount == g_maxResourceCarryAmount)
 		{
 			return highestGatherBandagesUtility;
 		}
-	}
+	//}
 
 	if (m_map->m_medStations.size() > 0)
 	{
@@ -563,13 +575,13 @@ UtilityInfo Planner::GetHighestShootUtility()
 {
 	UtilityInfo info;
 
-	if (GetIsOptimized())
-	{
+	/*if (GetIsOptimized())
+	{*/
 		if (m_map->m_threat == 0 || m_agent->m_arrowCount == 0)
 		{
 			return info;
 		}
-	}
+	//}
 
 	Vector2 nearestWallPosition = (Vector2)GetNearestTileCoordinateOfMapEdgeFromCoordinate((IntVector2)m_agent->m_position);
 
@@ -606,13 +618,13 @@ UtilityInfo Planner::GetHighestRepairUtility()
 {
 	UtilityInfo highestRepairUtility;
 
-	if (GetIsOptimized())
-	{
+	//if (GetIsOptimized())
+	//{
 		if (m_agent->m_lumberCount == 0)
 		{
 			return highestRepairUtility;
 		}
-	}
+	//}
 
 	for (int buildingIndex = 0; buildingIndex < (int)m_map->m_pointsOfInterest.size(); ++buildingIndex)
 	{
@@ -715,15 +727,15 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 	float distanceUtility = CalculateDistanceUtility(normalizedDistance);
 
 
-	//building health ----------------------------------------------
+	//resource gather utility ----------------------------------------------
 	float normalizedResourceAmount = inventoryCountPerType/g_maxResourceCarryAmount;
 
-	//apply health utility formula for utility value
-	float healthUtility = CalculateAgentGatherUtility(normalizedResourceAmount);
+	//apply gather utility formula for utility value
+	float gatherUtility = CalculateAgentGatherUtility(normalizedResourceAmount);
 
 
 	// combine distance and health utilities for final utility ----------------------------------------------
-	float adjustedUtility = distanceUtility * healthUtility;
+	float adjustedUtility = distanceUtility * gatherUtility;
 	info.utility = adjustedUtility;
 
 	return info;

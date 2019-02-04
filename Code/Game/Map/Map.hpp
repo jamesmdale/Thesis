@@ -18,6 +18,19 @@ class Mesh;
 class PlayingState;
 class SimulationDefinition;
 
+enum eTileDirection
+{
+	EAST_TILE_DIRECTION,
+	WEST_TILE_DIRECTION,
+	NORTH_TILE_DIRECTION,
+	SOUTH_TILE_DIRECTION,
+	NORTHEAST_TILE_DIRECTION,
+	NORTHWEST_TILE_DIRECTION,
+	SOUTHEAST_TILE_DIRECTION,
+	SOUTHWEST_TILE_DIRECTION,
+	NUM_TILE_DIRECTIONS
+};
+
 enum eAgentSortType
 {
 	X_AGENT_SORT_TYPE,
@@ -86,6 +99,10 @@ public:
 	void DetectBombardmentToAgentCollision(Bombardment* bombardment);
 	void DetectBombardmentToPOICollision(Bombardment* bombardment);
 
+	//agent to tile collision
+	void DetectAgentToTileCollision(Agent* agent);
+	bool PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection);
+	
 public:
 	std::string m_name;
 	IntVector2 m_dimensions;
@@ -117,7 +134,7 @@ public:
 	Stopwatch* m_threatTimer = nullptr;
 	Stopwatch* m_sortTimer = nullptr;
 
-	PlayingState* m_gameState = nullptr;
+	PlayingState* m_playingState = nullptr;
 
 	float m_threat = 500.f;
 

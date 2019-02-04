@@ -28,7 +28,7 @@ public:
 	virtual float UpdateFromInput(float deltaSeconds) override;
 
 	void RenderGame();
-	void RenderUI();
+	void RenderDebugUI();
 
 	//simulations
 	void InitializeSimulation(SimulationDefinition* definition);
@@ -43,9 +43,9 @@ public:
 	void FinalizeGeneralSimulationData();
 
 	//render helpers	
-	Mesh* CreateTextMesh();
-	Mesh* CreateDisectedAgentPathMesh();
-	
+	Mesh* CreateUIDebugTextMesh();
+	Mesh* CreateWorldDebugTextMesh();
+	Mesh* CreateDisectedAgentPathMesh();	
 
 	void ClearDisectedAgent();
 	
@@ -55,8 +55,11 @@ public:
 
 	Stopwatch* m_simulationTimer = nullptr;
 
+	bool m_isCameraLockedToAgent = false;
 	Agent* m_disectedAgent = nullptr;
 };
 
 void TogglePaused(Command& cmd);
 void DisectAgent(Command& cmd);
+void ToggleBlockedData(Command& cmd);
+void ToggleAgentIds(Command& cmd);

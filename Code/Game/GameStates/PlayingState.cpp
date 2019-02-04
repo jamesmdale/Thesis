@@ -57,7 +57,7 @@ void PlayingState::Initialize()
 	m_camera = new Camera();
 	m_camera->SetColorTarget(theRenderer->GetDefaultRenderTarget());
 	m_camera->SetOrtho(0.f, 32.f, 0.f, 18.f, -1000.f, 1000.f);
-	m_camera->SetView(Matrix44::IDENTITY);
+	m_camera->SetView(Matrix44::IDENTITY);	
 
 	g_orthoZoom = 1.f;
 	ORTHO_MAX = 20.f;
@@ -67,6 +67,8 @@ void PlayingState::Initialize()
 	//RegisterCommand("toggle_optimization", CommandRegistration(ToggleOptimized, ": Toggle blanket optimizations on and off", ""));
 	RegisterCommand("pause_game", CommandRegistration(TogglePaused, ": Toggle pause on and off", ""));
 	RegisterCommand("agent", CommandRegistration(DisectAgent, ": View information for given agent. (int agentId)", ""));
+	RegisterCommand("toggle_ids", CommandRegistration(ToggleAgentIds, ": View agent ids", ""));
+	RegisterCommand("toggle_blocks", CommandRegistration(ToggleBlockedData, ": View tile physics data", ""));
 
 	//simulation setup
 	GenerateOutputDirectory();
@@ -80,6 +82,9 @@ void PlayingState::Initialize()
 
 	//generate debug input even if we don't really use it
 	DebugInputBox::CreateInstance();
+
+	//move camera to starting location
+	m_camera->SetPosition(Vector3::ZERO);
 
 	//cleanup
 	theRenderer = nullptr;
@@ -103,6 +108,11 @@ void PlayingState::Update(float deltaSeconds)
 //  =============================================================================
 void PlayingState::PreRender()
 {
+	if (m_isCameraLockedToAgent)
+	{
+		//have the camera follow the agent
+		m_camera->SetPosition(Vector3(m_disectedAgent->m_position) * 0.5f);
+	}
 }
 
 //  =============================================================================
@@ -117,7 +127,7 @@ void PlayingState::Render()
 	Game::GetInstance()->m_forwardRenderingPath2D->Render(m_renderScene2D);
 
 	RenderGame();
-	RenderUI();
+	RenderDebugUI();
 
 	//this timer determines how much time we have for all of our agent update.
 	timer.Stop();
@@ -141,6 +151,7 @@ void PlayingState::PostRender()
 
 		g_currentSimDefinitionIndex++;
 		isResetingSimulation = false;
+		m_disectedAgent = nullptr;
 
 		if (g_currentSimDefinitionIndex < SimulationDefinition::s_simulationDefinitions.size())
 		{
@@ -180,61 +191,78 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::DOWN * 5.f * GetMasterDeltaSeconds()));
-		ClearDisectedAgent();
+		m_isCameraLockedToAgent = false;
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::UP * 5.f * GetMasterDeltaSeconds()));
-		ClearDisectedAgent();
+		m_isCameraLockedToAgent = false;
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_RIGHT_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::RIGHT * 5.f * GetMasterDeltaSeconds()));
-		ClearDisectedAgent();
+		m_isCameraLockedToAgent = false;
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_LEFT_ARROW))
 	{
 		m_camera->Translate(Vector3(Vector2::LEFT * 5.f * GetMasterDeltaSeconds()));
-		ClearDisectedAgent();
+		m_isCameraLockedToAgent = false;
 	}
 
-	//if (theInput->IsKeyPressed(theInput->KEYBOARD_PAGEUP))
-	//{
-	//	g_orthoZoom -= deltaSeconds * ZOOM_RATE;
-	//	if(g_orthoZoom < ORTHO_MIN)
-	//	{
-	//		g_orthoZoom = ORTHO_MIN;
-	//	}
-	//	m_camera->SetProjectionOrtho(g_orthoZoom, CLIENT_ASPECT, -1000.f, 1000.f);
-	//}
+	// cycle through agents ----------------------------------------------
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
+	{
+		if (m_disectedAgent == nullptr)
+		{
+			m_disectedAgent = m_map->GetAgentById(0);
+		}
+		else
+		{
+			int currentAgentId = m_disectedAgent->m_id;
+			m_disectedAgent = m_map->GetAgentById(currentAgentId + 1);
+			if (m_disectedAgent == nullptr)
+			{
+				m_map->GetAgentById(0);
+			}
+		}
+	}
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
+	{
+		if (m_disectedAgent == nullptr)
+		{
+			m_disectedAgent = m_map->GetAgentById(0);
+		}
+		else
+		{
+			int currentAgentId = m_disectedAgent->m_id;
+			m_disectedAgent = m_map->GetAgentById(currentAgentId - 1);
+			if (m_disectedAgent == nullptr)
+			{
+				m_map->GetAgentById(0);
+			}
+		}
+	}
 
-	//if (theInput->IsKeyPressed(theInput->KEYBOARD_PAGEDOWN))
-	//{
-	//	g_orthoZoom += deltaSeconds * ZOOM_RATE;
-	//	if(g_orthoZoom > ORTHO_MAX)
-	//	{
-	//		g_orthoZoom = ORTHO_MAX;
-	//	}
-
-	//	m_camera->SetProjectionOrtho(g_orthoZoom, CLIENT_ASPECT, -1000.f, 1000.f);
-	//}
-
+	// reset camera ----------------------------------------------
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_R) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_orthoZoom = Window::GetInstance()->GetClientHeight();
 		m_camera->SetProjectionOrtho(g_orthoZoom, CLIENT_ASPECT, -1000.f, 1000.f);
 	}
 
+	// show tile data ----------------------------------------------
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_T) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_isBlockedTileDataShown = !g_isBlockedTileDataShown;	
 	}
 
+	// show agentids ----------------------------------------------
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_I) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_isIdShown = !g_isIdShown;
 	}
 
+	// toggle debug ----------------------------------------------
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_F) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		g_isDebugDataShown = !g_isDebugDataShown;
@@ -248,9 +276,11 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 		{
 			DebugInputBox::GetInstance()->Close();
 			m_disectedAgent = nullptr;
+			m_isCameraLockedToAgent = false;
 		}		
 	}
 
+	// pause ----------------------------------------------
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_P) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		//toggle pause
@@ -271,7 +301,7 @@ void PlayingState::RenderGame()
 }
 
 //  =========================================================================================
-void PlayingState::RenderUI()
+void PlayingState::RenderDebugUI()
 {
 	if (!g_isDebugDataShown)
 	{
@@ -281,17 +311,25 @@ void PlayingState::RenderUI()
 	Renderer* theRenderer = Renderer::GetInstance()->GetInstance();
 	theRenderer->SetCamera(m_uiCamera);
 
-
 	//handle text
-	Mesh* textMesh = CreateTextMesh();
+	Mesh* textMesh = CreateUIDebugTextMesh();
 	if (textMesh != nullptr)
 	{
 		theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("text"));
 		theRenderer->DrawMesh(textMesh);
+		delete(textMesh);
 	}	
 
 	//because the path uses the world space and not screen space (ui camera), we need to set back to the main camera
 	theRenderer->SetCamera(m_camera);
+
+	textMesh = CreateWorldDebugTextMesh();
+	if (textMesh != nullptr)
+	{
+		theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("text"));
+		theRenderer->DrawMesh(textMesh);
+		delete(textMesh);
+	}	
 
 	//handle path
 	Mesh* pathMesh = nullptr;
@@ -300,20 +338,19 @@ void PlayingState::RenderUI()
 		if (m_disectedAgent->m_currentPath.size() > 0)
 		{
 			Mesh* pathMesh = CreateDisectedAgentPathMesh();
-			theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("default"));
-			theRenderer->DrawMesh(pathMesh);
+
+			if (pathMesh != nullptr)
+			{
+				theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("default"));
+				theRenderer->DrawMesh(pathMesh);
+				delete(pathMesh);
+				pathMesh = nullptr;
+			}				
 		}	
-	}
 
-	//cleanup created meshes
-	if (pathMesh != nullptr)
-	{
-		delete(pathMesh);
-		pathMesh = nullptr;
+		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_physicsDisc, Rgba::PINK, 10);
+		//theRenderer->DrawAABB(m_disectedAgent->m, Rgba::PINK);
 	}
-
-	delete(textMesh);
-	textMesh = nullptr;
 }
 
 //  =============================================================================
@@ -337,14 +374,14 @@ void PlayingState::CreateMapForSimulation(SimulationDefinition* definition)
 	//map creation
 	m_map = new Map(definition, "TestMap", m_renderScene2D);	
 	m_map->Initialize();
-	m_map->m_gameState = this;
+	m_map->m_playingState = this;
 }
 
 //  =============================================================================
 void PlayingState::ResetMapForSimulation(SimulationDefinition* definition)
 {
 	m_map->Reload(definition);
-	m_map->m_gameState = this;
+	m_map->m_playingState = this;
 }
 
 //  =============================================================================
@@ -581,35 +618,39 @@ void PlayingState::FinalizeGeneralSimulationData()
 }
 
 //  =========================================================================================
-Mesh* PlayingState::CreateTextMesh()
+Mesh* PlayingState::CreateUIDebugTextMesh()
 {
 	MeshBuilder builder = MeshBuilder();
 	Mesh* textMesh = nullptr;
 	Window* theWindow = Window::GetInstance();
 
-	//fps counter	
+	// fps counter ----------------------------------------------		
 	AABB2 fpsBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.9f), Vector2(0.95f, 0.975f));
 	builder.CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("FPS: %f", GetUnclampedFPS()), Rgba::WHITE);
 
-	//cam position information
-	AABB2 camPosBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.75f), Vector2(0.95f, 0.85f));
+	//cam position information ----------------------------------------------
+	AABB2 camPosBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.85f), Vector2(0.95f, 0.9f));
 	Vector3 camPosition = m_camera->m_transform->GetWorldPosition();
 	builder.CreateText2DInAABB2( camPosBox.GetCenter(), camPosBox.GetDimensions(), 1.f, Stringf("Cam Pos: %f,%f", camPosition.x, camPosition.y));
 
-	//agent update per frameinfo
+	//agent update per frameinfo ----------------------------------------------
 	if (GetIsAgentUpdateBudgeted())
 	{
-		AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.875f));
-
+		AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.85f));
 		builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);
 	}
+	
+	//threat ----------------------------------------------
+	AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.85f));
+	builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Threat: %i/%i", (int)m_map->m_threat, (int)g_maxThreat), Rgba::WHITE);
 
-	//debug input
+
+	//debug input ----------------------------------------------
 	DebugInputBox* theDebugInputBox = DebugInputBox::GetInstance();
 	std::string inputText = Stringf("> %s", theDebugInputBox->GetInput().c_str());
 	builder.CreateText2DFromPoint( Vector2(10.f , 0.0f), theWindow->GetClientHeight() * 0.015, 1.f, inputText.c_str(), Rgba::WHITE );
 
-	//disected agent
+	//disected agent ----------------------------------------------
 	if (m_disectedAgent != nullptr)
 	{
 		std::vector<std::string> agentInfo;
@@ -624,10 +665,35 @@ Mesh* PlayingState::CreateTextMesh()
 		}
 	}
 
-	//  ----------------------------------------------
-	//draw other things
-	//  ----------------------------------------------
+	// create mesh ----------------------------------------------
+	if (builder.m_vertices.size() > 0)
+	{
+		textMesh = builder.CreateMesh<VertexPCU>();
+	}
 
+	return textMesh;
+}
+
+//  =========================================================================================
+Mesh* PlayingState::CreateWorldDebugTextMesh()
+{
+	MeshBuilder builder = MeshBuilder();
+	Mesh* textMesh = nullptr;
+	Window* theWindow = Window::GetInstance();
+
+	//building health ----------------------------------------------
+	for (int armoryIndex = 0; armoryIndex < m_map->m_armories.size(); ++armoryIndex)
+	{
+		AABB2 armoryBounds = m_map->m_armories[armoryIndex]->GetWorldBounds();
+		builder.CreateText2DInAABB2( armoryBounds.GetCenter(), armoryBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_armories[armoryIndex]->m_health), Rgba::WHITE);
+	}
+	for (int lumberyardIndex = 0; lumberyardIndex < m_map->m_lumberyards.size(); ++lumberyardIndex)
+	{
+		AABB2 lumberyardBounds = m_map->m_lumberyards[lumberyardIndex]->GetWorldBounds();
+		builder.CreateText2DInAABB2( lumberyardBounds.GetCenter(), lumberyardBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_lumberyards[lumberyardIndex]->m_health), Rgba::WHITE);
+	}
+
+	// create mesh ----------------------------------------------
 	if (builder.m_vertices.size() > 0)
 	{
 		textMesh = builder.CreateMesh<VertexPCU>();
@@ -669,6 +735,8 @@ void PlayingState::ClearDisectedAgent()
 	{
 		m_disectedAgent = nullptr;
 	}
+
+	m_isCameraLockedToAgent = false;
 }
 
 // Commands =============================================================================
@@ -712,16 +780,37 @@ void DisectAgent(Command& cmd)
 		return;
 	}
 
+	PlayingState* playingState = (PlayingState*)currentState;
+
 	int agentId = cmd.GetNextInt();
 	if (agentId == INT_MAX)
 	{
 		DevConsolePrintf(Rgba::RED, "INVALID AGENT INDEX!");
+		playingState->ClearDisectedAgent();
 		return;
 	}
 
-	//cast to playing state to set disected agent
-	PlayingState* playingState = (PlayingState*)currentState;
 	playingState->m_disectedAgent = playingState->m_map->GetAgentById(agentId);
 
+	if (playingState->m_disectedAgent == nullptr)
+	{
+		DevConsolePrintf(Rgba::RED, "INVALID AGENT INDEX!");
+		playingState->ClearDisectedAgent();
+		return;
+	}
+
+	playingState->m_isCameraLockedToAgent = true;
 	DevConsolePrintf(Rgba::GREEN, "Disecting agent index %i", agentId);
+}
+
+//  =========================================================================================
+void ToggleBlockedData(Command & cmd)
+{
+	g_isBlockedTileDataShown = !g_isBlockedTileDataShown;	
+}
+
+//  =========================================================================================
+void ToggleAgentIds(Command& cmd)
+{
+	g_isIdShown = !g_isIdShown;
 }

@@ -4,9 +4,6 @@
 #include "Engine\Window\Window.hpp"
 
 
-
-
-//#include AudioSystem
 SimulationDefinition* g_currentSimulationDefinition = nullptr;
 
 SimulationData* g_generalSimulationData = nullptr;
@@ -53,7 +50,7 @@ float g_skewForCurrentPlan = 0.05f;
 
 //poi globals
 float g_baseResourceRefillTimePerSecond = 0.5f;
-int g_maxResourceCarryAmount = 5;
+int g_maxResourceCarryAmount = 1;
 
 //action performance globals
 float g_baseRepairAmountPerPerformance = 5.f;

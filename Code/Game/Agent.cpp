@@ -14,9 +14,6 @@
 #include "Engine\Profiler\Profiler.hpp"
 #include "Engine\File\CSVWriter.hpp"
 
-bool isFirstLoopThroughAction = true;
-Stopwatch* actionTimer = nullptr;
-
 //  =========================================================================================
 Agent::Agent()
 {
@@ -25,19 +22,33 @@ Agent::Agent()
 //  =========================================================================================
 Agent::Agent(Vector2 startingPosition, IsoSpriteAnimSet* animationSet, Map* mapReference)
 {
-	m_position = startingPosition;
-	m_animationSet = animationSet;
-	m_planner = new Planner(mapReference, this);
-
-	m_intermediateGoalPosition = m_position;
-
-	m_animationSet->SetCurrentAnim("idle");
-
+	//set id according to how many we've made
 	m_id = mapReference->m_agentsOrderedByXPosition.size();
 
-	actionTimer = new Stopwatch(GetGameClock());
+	//setup position and planner
+	m_position = startingPosition;
+	m_planner = new Planner(mapReference, this);
+	m_intermediateGoalPosition = m_position;
+	m_actionTimer = new Stopwatch(GetGameClock());
 
+	//generate personality
 	GenerateRandomStats();
+	
+	//setup physics
+	m_physicsDisc.radius = 0.25f;
+	m_physicsDisc.center = m_position;
+
+	//precompute sprite data
+	m_animationSet = animationSet;
+	m_animationSet->SetCurrentAnim("idle");
+	Sprite sprite = *m_animationSet->GetCurrentSprite(m_spriteDirection);
+	Vector2 spritePivot = sprite.m_definition->m_pivot;
+	IntVector2 spriteDimensions = sprite.GetDimensions();
+
+	//m_spriteRenderBounds.mins.x = 0.f - (spritePivot.x) * 1.f;
+	//m_spriteRenderBounds.maxs.x = m_spriteRenderBounds.mins.x + 1.f * 1.f;
+	//m_spriteRenderBounds.mins.y = 0.f - (spritePivot.y) * 1.f;
+	//m_spriteRenderBounds.maxs.y = m_spriteRenderBounds.mins.y + 1.f * 1.f;
 }
 
 //  =========================================================================================
@@ -45,6 +56,9 @@ Agent::~Agent()
 {
 	delete(m_planner);
 	m_planner = nullptr;
+
+	delete(m_actionTimer);
+	m_actionTimer = nullptr;
 
 	m_animationSet = nullptr;
 }
@@ -106,7 +120,8 @@ void Agent::QuickUpdate(float deltaSeconds)
 		m_forward = m_intermediateGoalPosition - m_position;
 		m_forward.NormalizeAndGetLength();
 
-		m_position += (m_forward * (m_movespeed * GetGameClock()->GetDeltaSeconds() * 0.5f));
+		//move even slower if we can't get here
+		m_position += (m_forward * (m_movespeed * GetGameClock()->GetDeltaSeconds() * 0.1f));
 	}
 
 	TODO("Later add more criteria to better define this data");
@@ -119,23 +134,11 @@ void Agent::QuickUpdate(float deltaSeconds)
 //  =========================================================================================
 void Agent::Render()
 {
-	PROFILER_PUSH();
+	/*PROFILER_PUSH();
 	Renderer* theRenderer = Renderer::GetInstance();
 
 	Sprite sprite = *m_animationSet->GetCurrentSprite(m_spriteDirection);
-
-	float dimensions = 1.f;
-
 	Texture* texture = sprite.GetSpriteTexture();
-	Vector2 spritePivot = sprite.m_definition->m_pivot;
-
-	IntVector2 spriteDimensions = sprite.GetDimensions();
-
-	AABB2 bounds;
-	bounds.mins.x = 0.f - (spritePivot.x) * dimensions;
-	bounds.maxs.x = bounds.mins.x + 1.f * dimensions;
-	bounds.mins.y = 0.f - (spritePivot.y) * dimensions;
-	bounds.maxs.y = bounds.mins.y + 1.f * dimensions;
 
 	Rgba agentColor = Rgba::WHITE;
 	switch (m_planner->m_currentPlan)
@@ -152,10 +155,10 @@ void Agent::Render()
 	}
 
 	theRenderer->SetShader(theRenderer->CreateOrGetShader("agents"));
-	theRenderer->DrawTexturedAABB(m_transform.GetWorldMatrix(), bounds, *theRenderer->CreateOrGetTexture(sprite.m_definition->m_diffuseSource), Vector2(sprite.GetNormalizedUV().mins.x, sprite.GetNormalizedUV().maxs.y), Vector2(sprite.GetNormalizedUV().maxs.x, sprite.GetNormalizedUV().mins.y), agentColor);
+	theRenderer->DrawTexturedAABB(m_transform.GetWorldMatrix(), m_spriteRenderBounds, *theRenderer->CreateOrGetTexture(sprite.m_definition->m_diffuseSource), Vector2(sprite.GetNormalizedUV().mins.x, sprite.GetNormalizedUV().maxs.y), Vector2(sprite.GetNormalizedUV().maxs.x, sprite.GetNormalizedUV().mins.y), agentColor);
 	theRenderer->SetShader(theRenderer->CreateOrGetShader("default"));
 
-	theRenderer = nullptr;
+	theRenderer = nullptr;*/
 }
 
 //  =========================================================================================
@@ -234,35 +237,20 @@ bool Agent::GetIsAtPosition(const Vector2 & goalDestination)
 }
 
 //  =============================================================================
-AABB2 Agent::GetBounds()
-{
-	return AABB2();
-}
-
-//  =============================================================================
 void Agent::UpdateCombatPerformanceTime()
 {
-	if(m_combatEfficiency == 1.f)
-		m_calculatedCombatPerformancePerSecond = 1.f;
-	else
 		m_calculatedCombatPerformancePerSecond = g_minActionPerformanceRatePerSecond / (1.f - m_combatEfficiency);
 }
 
 //  =============================================================================
 void Agent::UpdateRepairPerformanceTime()
 {
-	if(m_repairEfficiency == 1.f)
-		m_calculatedRepairPerformancePerSecond = 1.f;
-	else
 	m_calculatedRepairPerformancePerSecond = g_minActionPerformanceRatePerSecond / (1.f - m_repairEfficiency);
 }
 
 //  =============================================================================
 void Agent::UpdateHealPerformanceTime()
 {
-	if(m_healEfficiency == 1.f)
-		m_calculatedHealPerformancePerSecond = 1.f;
-	else
 	m_calculatedHealPerformancePerSecond = g_minActionPerformanceRatePerSecond / (1.f - m_healEfficiency);
 }
 
@@ -294,6 +282,11 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 	outStrings.push_back(Stringf("Planner"));
 	outStrings.push_back(Stringf("Plan: %s", m_planner->GetPlanTypeAsText().c_str()));
 	outStrings.push_back(Stringf("Update Pr.: %i", m_updatePriority));
+	outStrings.push_back(Stringf("Gather Arr. Util.: %f", m_planner->m_utilityHistory.m_lastGatherArrows));
+	outStrings.push_back(Stringf("Gather Lum. Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
+	outStrings.push_back(Stringf("Shoot. Util.: %f", m_planner->m_utilityHistory.m_lastShoot));
+	outStrings.push_back(Stringf("Repair Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
+	outStrings.push_back(Stringf("Chosen Outcome.: %i", (int)m_planner->m_utilityHistory.m_chosenOutcome));
 }
 
 
@@ -383,30 +376,28 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 	PROFILER_PUSH();
 
 	//used to handle any extra logic that must occur on first loop
-	if (isFirstLoopThroughAction)
+	if (agent->m_isFirstLoopThroughAction)
 	{
 		//do first pass logic
 		agent->m_currentPath.clear();
 		agent->m_currentPathIndex = UINT8_MAX;
-		isFirstLoopThroughAction = false;
+		agent->m_isFirstLoopThroughAction = false;
 	}
 
 	UNUSED(interactEntityId);
 
-	bool isComplete = false;
-
 	TODO("might optimize not doing this every frame later");
 	agent->m_animationSet->SetCurrentAnim("walk");
 
-	// early outs ----------------------------------------------
+	// early out
 	if (agent->m_planner->m_map->GetTileCoordinateOfPosition(agent->m_position) == agent->m_planner->m_map->GetTileCoordinateOfPosition(goalDestination))
 	{
 		//reset first loop action
-		isFirstLoopThroughAction = true;
+		agent->m_isFirstLoopThroughAction = true;
 		agent->m_currentPathIndex = UINT8_MAX;
+		agent->m_physicsDisc.center = agent->m_position;
 		return true;
-	}
-		
+	}		
 
 	//if we don't have a path to the destination or have completed our previous path, get a new path
 	if (agent->m_currentPath.size() == 0 || agent->m_currentPathIndex == UINT8_MAX)
@@ -424,6 +415,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 		agent->m_forward.NormalizeAndGetLength();
 
 		agent->m_position += (agent->m_forward * (agent->m_movespeed * GetGameClock()->GetDeltaSeconds()));
+		agent->m_physicsDisc.center = agent->m_position;
 	}		
 	else
 	{
@@ -434,7 +426,8 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 			--agent->m_currentPathIndex;
 
 			//reset first loop action
-			isFirstLoopThroughAction = true;
+			agent->m_isFirstLoopThroughAction = true;
+			agent->m_physicsDisc.center = agent->m_position;
 			return true;
 		}
 		else
@@ -448,12 +441,12 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 			agent->m_forward.NormalizeAndGetLength();
 
 			agent->m_position += (agent->m_forward * (agent->m_movespeed * GetGameClock()->GetDeltaSeconds()));
+			agent->m_physicsDisc.center = agent->m_position;
 		}
 	}
 
-	agent->m_transform.SetLocalPosition(agent->m_position);
-
-	return isComplete;
+	//we aren't finish moving
+	return false;
 }
 
 //  =========================================================================================
@@ -462,17 +455,17 @@ bool ShootAction(Agent* agent, const Vector2& goalDestination, int interactEntit
 	PROFILER_PUSH();
 
 	//used to handle any extra logic that must occur on first loop
-	if (isFirstLoopThroughAction)
+	if (agent->m_isFirstLoopThroughAction)
 	{
 		//do first pass logic
-		isFirstLoopThroughAction = false;
-		actionTimer->SetTimer(agent->m_calculatedCombatPerformancePerSecond);		
+		agent->m_isFirstLoopThroughAction = false;
+		agent->m_actionTimer->SetTimer(agent->m_calculatedCombatPerformancePerSecond);		
 	}
 
 	agent->m_animationSet->SetCurrentAnim("shoot");
 
 	//if we are at our destination, we are ready to shoot	
-	if (actionTimer->DecrementAll() > 0)
+	if (agent->m_actionTimer->DecrementAll() > 0)
 	{
 		//launch arrow in agent forward
 		agent->m_planner->m_map->m_threat = ClampInt(agent->m_planner->m_map->m_threat - g_baseShootDamageAmountPerPerformance, 0, g_maxThreat);
@@ -483,7 +476,7 @@ bool ShootAction(Agent* agent, const Vector2& goalDestination, int interactEntit
 	if (agent->m_arrowCount == 0 || agent->m_planner->m_map->m_threat == 0)
 	{
 		//reset first loop action
-		isFirstLoopThroughAction = true;
+		agent->m_isFirstLoopThroughAction = true;
 		return true;
 	}
 		
@@ -496,13 +489,13 @@ bool RepairAction(Agent* agent, const Vector2& goalDestination, int interactEnti
 	PROFILER_PUSH();
 
 	//used to handle any extra logic that must occur on first loop
-	if (isFirstLoopThroughAction)
+	if (agent->m_isFirstLoopThroughAction)
 	{
 		PointOfInterest* targetPoi = agent->m_planner->m_map->GetPointOfInterestById(interactEntityId);
 		agent->m_forward = targetPoi->GetWorldBounds().GetCenter() - agent->m_position;
 		//do first pass logic
-		actionTimer->SetTimer(agent->m_calculatedRepairPerformancePerSecond);
-		isFirstLoopThroughAction = false;
+		agent->m_actionTimer->SetTimer(agent->m_calculatedRepairPerformancePerSecond);
+		agent->m_isFirstLoopThroughAction = false;
 	}
 
 	agent->m_animationSet->SetCurrentAnim("cast");
@@ -510,7 +503,7 @@ bool RepairAction(Agent* agent, const Vector2& goalDestination, int interactEnti
 	//if we are at our destination, we are ready to repair
 	PointOfInterest* targetPoi = agent->m_planner->m_map->GetPointOfInterestById(interactEntityId);
 	
-	if (actionTimer->DecrementAll() > 0)
+	if (agent->m_actionTimer->DecrementAll() > 0)
 	{
 		targetPoi->m_health = ClampInt(targetPoi->m_health + g_baseRepairAmountPerPerformance, 0, 100);
 		agent->m_lumberCount--;
@@ -519,7 +512,7 @@ bool RepairAction(Agent* agent, const Vector2& goalDestination, int interactEnti
 	if (agent->m_lumberCount == 0 || targetPoi->m_health == 100)
 	{
 		//reset first loop action
-		isFirstLoopThroughAction = true;
+		agent->m_isFirstLoopThroughAction = true;
 		return true;
 	}		
 
@@ -532,18 +525,18 @@ bool HealAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 	PROFILER_PUSH();
 
 	//used to handle any extra logic that must occur on first loop
-	if (isFirstLoopThroughAction)
+	if (agent->m_isFirstLoopThroughAction)
 	{
 		Agent* targetAgent = agent->m_planner->m_map->GetAgentById(interactEntityId);
 		agent->m_forward = targetAgent->m_position - agent->m_position;
 
 		//do first pass logic
-		actionTimer->SetTimer(1.f);
-		isFirstLoopThroughAction = false;
+		agent->m_actionTimer->SetTimer(1.f);
+		agent->m_isFirstLoopThroughAction = false;
 	}
 
 	//reset first loop action
-	isFirstLoopThroughAction = true;
+	agent->m_isFirstLoopThroughAction = true;
 	return true;	
 }
 
