@@ -799,6 +799,10 @@ bool Map::IsTileBlockingAtCoordinate(const IntVector2& coordinate)
 //  =========================================================================================
 Tile* Map::GetTileAtCoordinate(const IntVector2& coordinate)
 {
+	//handle bad coordinates
+	if(coordinate.x >= m_dimensions.x || coordinate.x < 0 || coordinate.y >= m_dimensions.y || coordinate.y < 0)
+		return nullptr;
+
 	return m_tiles[coordinate.x + (coordinate.y * m_dimensions.x)];
 }
 
@@ -820,7 +824,6 @@ Agent* Map::GetAgentById(int agentId)
 		}
 	}
 }
-
 
 //  =========================================================================================
 PointOfInterest* Map::GetPointOfInterestById(int poiId)
@@ -863,21 +866,21 @@ void Map::DetectBombardmentToPOICollision(Bombardment* bombardment)
 //  =========================================================================================
 void Map::DetectAgentToTileCollision(Agent* agent)
 {
-	IntVector2 agentTileIndex = GetTileCoordinateOfPosition(agent->m_position);
+	IntVector2 agentTileCoord = GetTileCoordinateOfPosition(agent->m_position);
 	Vector2 agentPosition = agent->m_position;
 	bool didPushOutCorner = false;
 	bool didPushOutAxis = false;
 
 	//handle northeast
 	IntVector2 tileDirection = IntVector2(1,1);
-	IntVector2 tileCoord = agentTileIndex + tileDirection;
+	IntVector2 tileCoord = agentTileCoord + tileDirection;
 	didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHEAST_TILE_DIRECTION);
 
 	if (!didPushOutCorner)
 	{
 		//handle southeast
 		tileDirection = IntVector2(1,-1);
-		tileCoord = agentTileIndex + tileDirection;
+		tileCoord = agentTileCoord + tileDirection;
 		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHEAST_TILE_DIRECTION);
 	}
 
@@ -885,7 +888,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 	{
 		//handle northwest
 		tileDirection = IntVector2(-1,1);
-		tileCoord = agentTileIndex + tileDirection;
+		tileCoord = agentTileCoord + tileDirection;
 		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHWEST_TILE_DIRECTION);
 	}
 
@@ -893,14 +896,14 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 	{
 		//handle southwest
 		tileDirection = IntVector2(-1,-1);
-		tileCoord = agentTileIndex + tileDirection;
+		tileCoord = agentTileCoord + tileDirection;
 		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHWEST_TILE_DIRECTION);
 	}
  
 	// handle up,down,left,right push out (because we've done corners, we can skip scenarios where we have both) ----------------------------------------------
 	//handle north
 	tileDirection = IntVector2(0,1);
-	tileCoord = agentTileIndex + tileDirection;
+	tileCoord = agentTileCoord + tileDirection;
 	didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, NORTH_TILE_DIRECTION);
 
 	//handle south
@@ -908,7 +911,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 	{
 		//handle southeast
 		tileDirection = IntVector2(0,-1);
-		tileCoord = agentTileIndex + tileDirection;
+		tileCoord = agentTileCoord + tileDirection;
 		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, SOUTH_TILE_DIRECTION);
 	}
 
@@ -917,7 +920,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 	{
 		//handle southeast
 		tileDirection = IntVector2(1,0);
-		tileCoord = agentTileIndex + tileDirection;
+		tileCoord = agentTileCoord + tileDirection;
 		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, EAST_TILE_DIRECTION);
 	}
 
@@ -926,7 +929,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 	{
 		//handle southeast
 		tileDirection = IntVector2(-1,0);
-		tileCoord = agentTileIndex + tileDirection;
+		tileCoord = agentTileCoord + tileDirection;
 		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, WEST_TILE_DIRECTION);
 	}
 
@@ -987,8 +990,7 @@ bool Map::PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int
 			Vector2 pushOutDirection = (agentCenter - collisionPoint).GetNormalized();
 
 			agent->m_position += pushOutDirection * (amountToPush);
-			agent->m_physicsDisc.center = agent->m_position;
-			//agent->m_transform.SetLocalPosition(agent->m_position);
+			agent->UpdatePhysicsData();
 		}	
 
 		return isColliding;
@@ -1130,7 +1132,7 @@ IntVector2 Map::GetTileCoordinateOfPosition(const Vector2& position)
 	float clientWidth = Window::GetInstance()->GetClientWidth();
 
 	Vector2 positionInCoordinateSpace = position * g_divideTileSize;
-	IntVector2 tileCoordinate = IntVector2(RoundToNearestInt(positionInCoordinateSpace.x), RoundToNearestInt(positionInCoordinateSpace.y));
+	IntVector2 tileCoordinate = IntVector2(RoundDownToInt(positionInCoordinateSpace.x), RoundDownToInt(positionInCoordinateSpace.y));
 	return tileCoordinate;
 }
 
@@ -1163,23 +1165,22 @@ bool Map::CheckIsCoordianteValid(const IntVector2 & coordinate)
 Vector2 Map::GetRandomNonBlockedPositionInMapBounds()
 {
 	bool isNonBlocked = false;
-	Vector2 randomPoint = Vector2::NEGATIVE_ONE;
+	IntVector2 randomCoord;
 
 	while (isNonBlocked == false)
 	{
-		AABB2 validBounds = m_mapWorldBounds;
-		validBounds.maxs = Vector2(validBounds.maxs.x - g_tileSize, validBounds.maxs.y - g_tileSize);
+		//we know outer edges are no good so might as well skip
+		randomCoord = IntVector2(GetRandomIntInRange(1.f, m_dimensions.x - 1), GetRandomIntInRange(1.f, m_dimensions.y - 1));
 
-		randomPoint = validBounds.GetRandomPointInBounds();
-		IntVector2 correspondingTileCoordinate = GetTileCoordinateOfPosition(randomPoint);
+		Tile* correspondingTileCoordinate = GetTileAtCoordinate(randomCoord);
 	
-		if (m_tiles[correspondingTileCoordinate.x + (correspondingTileCoordinate.y * m_dimensions.x)]->m_tileDefinition->m_allowsWalking)
+		if (correspondingTileCoordinate->m_tileDefinition->m_allowsWalking)
 		{
 			isNonBlocked = true;
 		}	
 	}
 
-	return randomPoint;
+	return Vector2(0.5f, 0.5f) + Vector2(randomCoord);
 }
 
 //  =========================================================================================

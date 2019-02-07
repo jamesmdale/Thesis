@@ -94,9 +94,6 @@
     <ClCompile Include="PointOfInterest.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="EncounterState.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
     <ClCompile Include="Actions\Action.cpp">
       <Filter>General</Filter>
     </ClCompile>
@@ -157,7 +154,6 @@
     <ClInclude Include="Sprites\Sprite.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="PointOfInterest.hpp" />
-    <ClInclude Include="EncounterState.hpp" />
     <ClInclude Include="Actions\Action.hpp" />
     <ClInclude Include="Planner.hpp" />
     <ClInclude Include="Bombardment.hpp" />

@@ -1,5 +1,7 @@
 <SimulationDefinitions>
 
+
+
     <SimulationDefinition
   name="default_optimized"
   mapName="30x30"
@@ -15,10 +17,10 @@
   isBudgeted="false"
   />
 
-    <SimulationDefinition
+      <SimulationDefinition
   name="default_optimized"
   mapName="20x20"
-  numAgents="3"
+  numAgents="1"
   numArmories="1"
   numLumberyards="1"
   numMedStations="0"
@@ -26,9 +28,10 @@
   threatRatePerSecond = "10.0"
   startingThreat="100"
   processTimerInSeconds="180"
-  isOptimized="false" 
+  isOptimized="true" 
   isBudgeted="false"
   />
+
 
    <SimulationDefinition
   name="default"

@@ -50,6 +50,7 @@ public:
 	//pathing
 	bool GetPathToDestination(const Vector2& goalDestination);
 	bool GetIsAtPosition(const Vector2& goalDestination);
+	void UpdatePhysicsData();
 
 	//stats
 	void UpdateCombatPerformanceTime();
@@ -87,13 +88,15 @@ public:
 	int m_lumberCount = 0;
 
 	// position logic ----------------------------------------------
-	//AABB2 m_spriteRenderBounds;
+	float m_movespeed = 1.f;
+
 	Vector2 m_position;
 	Vector2 m_forward;
 	Vector2 m_intermediateGoalPosition;	//used for temp locations while pathing
 	Vector2 m_currentActionGoalPosition;
-	//Transform2D m_transform;
-	float m_movespeed = 1.f;
+	
+	Disc2 m_pathDisc;
+	Disc2 m_physicsDisc;
 
 	//goal logic ----------------------------------------------
 	std::vector<Vector2> m_currentPath;
@@ -109,7 +112,8 @@ public:
 	uint16_t m_indexInSortedYList = UINT16_MAX;
 	uint16_t m_indexInPriorityList = UINT16_MAX;
 
-	Disc2 m_physicsDisc;
+	
+	
 };
 
 

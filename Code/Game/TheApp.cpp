@@ -18,9 +18,9 @@
 #include "Engine\File\File.hpp"
 #include "Engine\Core\LogSystem.hpp"
 #include "Engine\File\CSVWriter.hpp"
-#include "Game\SimulationData.hpp"
 #include <thread>
 #include <fstream>
+#include "Game\SimulationData.hpp"
 #include "Game\Definitions\SpriteDefinitions\SpriteDefinition.hpp"
 #include "Game\Definitions\SpriteDefinitions\IsoSpriteDefinition.hpp"
 #include "Game\Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp"
@@ -79,9 +79,9 @@ void TheApp::Initialize()
 	masterClock->ClockSystemStartup();
 
 	//init mouse input settings
-	InputSystem::GetInstance()->GetMouse()->MouseLockToScreen(true);
-	InputSystem::GetInstance()->GetMouse()->MouseShowCursor(false);
-	InputSystem::GetInstance()->GetMouse()->SetMouseMode(MOUSE_RELATIVE_MODE);	
+	InputSystem::GetInstance()->GetMouse()->MouseLockToScreen(false);
+	InputSystem::GetInstance()->GetMouse()->MouseShowCursor(true);
+	InputSystem::GetInstance()->GetMouse()->SetMouseMode(MOUSE_ABSOLUTE_MODE);	
 
 	Game::CreateInstance();
 	Game::GetInstance()->Initialize();

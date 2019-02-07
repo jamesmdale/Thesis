@@ -37,6 +37,7 @@ public:
 
 	IntVector2 m_startingCoordinate;
 	IntVector2 m_accessCoordinate;
+	Vector2 m_accessPosition;
 	ePointOfInterestType m_type;
 
 	Stopwatch* m_refillTimer = new Stopwatch();

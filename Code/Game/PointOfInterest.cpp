@@ -13,6 +13,8 @@ PointOfInterest::PointOfInterest(ePointOfInterestType poiType, const IntVector2&
 	m_startingCoordinate = startingCoordinate;
 	m_accessCoordinate = accessCoordinate;
 
+	m_accessPosition = Vector2(0.5f, 0.5f) + Vector2(m_accessCoordinate);
+
 	m_map = mapReference;
 
 	m_id = m_map->m_pointsOfInterest.size();

@@ -583,7 +583,7 @@ UtilityInfo Planner::GetHighestShootUtility()
 		}
 	//}
 
-	Vector2 nearestWallPosition = (Vector2)GetNearestTileCoordinateOfMapEdgeFromCoordinate((IntVector2)m_agent->m_position);
+	Vector2 nearestWallPosition = Vector2(0.5f, 0.5f) + (Vector2)GetNearestTileCoordinateOfMapEdgeFromCoordinate((IntVector2)m_agent->m_position);
 
 	// distance to nearest wall squared ----------------------------------------------
 	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, nearestWallPosition);
@@ -650,7 +650,7 @@ UtilityInfo Planner::GetRepairUtilityPerBuilding(PointOfInterest* poi)
 {
 	UtilityInfo info;
 	info.utility = 0.f;
-	info.endPosition = (Vector2)poi->m_accessCoordinate;
+	info.endPosition = poi->m_accessPosition;
 	info.targetEntityId = poi->m_id;
 
 	//easy out if building is at full health
@@ -660,7 +660,7 @@ UtilityInfo Planner::GetRepairUtilityPerBuilding(PointOfInterest* poi)
 	}
 
 	// distance to building squared ----------------------------------------------
-	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, (Vector2)poi->m_accessCoordinate);
+	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, poi->m_accessPosition);
 	
 	//get max distance
 	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(m_map->GetDimensions()));
@@ -691,7 +691,7 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 {
 	UtilityInfo info;
 	info.utility = 0.f;
-	info.endPosition = (Vector2)poi->m_accessCoordinate;
+	info.endPosition = poi->m_accessPosition;
 	info.targetEntityId = poi->m_id;
 
 	int inventoryCountPerType = 0;
@@ -715,7 +715,7 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 	}
 
 	// distance to building squared ----------------------------------------------
-	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, (Vector2)poi->m_accessCoordinate);
+	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, poi->m_accessPosition);
 
 	//get max distance
 	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(m_map->GetDimensions()));

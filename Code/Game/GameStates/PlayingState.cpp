@@ -188,22 +188,22 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	InputSystem* theInput = InputSystem::GetInstance();
 
 	//movement should run on the master deltaseconds so we can move the camera even if the game is paused
-	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW) && !theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		m_camera->Translate(Vector3(Vector2::DOWN * 5.f * GetMasterDeltaSeconds()));
 		m_isCameraLockedToAgent = false;
 	}
-	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW) && !theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		m_camera->Translate(Vector3(Vector2::UP * 5.f * GetMasterDeltaSeconds()));
 		m_isCameraLockedToAgent = false;
 	}
-	if (theInput->IsKeyPressed(theInput->KEYBOARD_RIGHT_ARROW))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_RIGHT_ARROW) && !theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		m_camera->Translate(Vector3(Vector2::RIGHT * 5.f * GetMasterDeltaSeconds()));
 		m_isCameraLockedToAgent = false;
 	}
-	if (theInput->IsKeyPressed(theInput->KEYBOARD_LEFT_ARROW))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_LEFT_ARROW) && !theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		m_camera->Translate(Vector3(Vector2::LEFT * 5.f * GetMasterDeltaSeconds()));
 		m_isCameraLockedToAgent = false;
@@ -348,8 +348,9 @@ void PlayingState::RenderDebugUI()
 			}				
 		}	
 
-		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_physicsDisc, Rgba::PINK, 10);
-		//theRenderer->DrawAABB(m_disectedAgent->m, Rgba::PINK);
+		theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("default"));
+		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_physicsDisc, Rgba::ORANGE, 10);
+		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_pathDisc, Rgba::PINK, 10);
 	}
 }
 
@@ -644,7 +645,6 @@ Mesh* PlayingState::CreateUIDebugTextMesh()
 	AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.85f));
 	builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Threat: %i/%i", (int)m_map->m_threat, (int)g_maxThreat), Rgba::WHITE);
 
-
 	//debug input ----------------------------------------------
 	DebugInputBox* theDebugInputBox = DebugInputBox::GetInstance();
 	std::string inputText = Stringf("> %s", theDebugInputBox->GetInput().c_str());
@@ -708,22 +708,28 @@ Mesh* PlayingState::CreateDisectedAgentPathMesh()
 	MeshBuilder builder = MeshBuilder();
 	Mesh* pathMesh = nullptr;
 
-	//we know the agent is set so we don't have to check for nullptr case
-	for (int pathIndex = 0; pathIndex < m_disectedAgent->m_currentPath.size() - 1; ++pathIndex)
+	//get player to first position
+	Vector2 agentPosition = m_disectedAgent->m_position;
+
+	//get current index
+	uint8_t pathIndex = m_disectedAgent->m_currentPathIndex;
+	if(pathIndex == UINT8_MAX)
+		pathIndex = m_disectedAgent->m_currentPath.size() -1 ;
+
+	//build player to next position in path index
+	Vector2 nextTileCenter = m_disectedAgent->m_currentPath[pathIndex];
+	builder.CreateLine2D(agentPosition, nextTileCenter, Rgba::PINK);
+
+	if (m_disectedAgent->m_currentPath.size() != 1)
 	{
-		IntVector2 tileCoords = IntVector2(m_disectedAgent->m_currentPath[pathIndex]);
-		IntVector2 nextTileCoords = IntVector2(m_disectedAgent->m_currentPath[pathIndex + 1]);
+		//we know the agent is set so we don't have to check for nullptr case
+		for (int pathIndex = 1; pathIndex < m_disectedAgent->m_currentPath.size() - 1; ++pathIndex)
+		{
+			builder.CreateLine2D(m_disectedAgent->m_currentPath[pathIndex], m_disectedAgent->m_currentPath[pathIndex + 1], Rgba::PINK);
+		}
+	}	
 
-		Vector2 tileCenter = m_map->GetTileAtCoordinate(tileCoords)->GetBounds().GetCenter();
-		Vector2 nextTileCenter = m_map->GetTileAtCoordinate(nextTileCoords)->GetBounds().GetCenter();
-
-		builder.CreateLine2D(m_map->GetTileAtCoordinate(tileCoords)->GetBounds().GetCenter(), m_map->GetTileAtCoordinate(nextTileCoords)->GetBounds().GetCenter(), Rgba::PINK);
-	}
-
-	if (builder.m_vertices.size() > 0)
-	{
-		pathMesh = builder.CreateMesh<VertexPCU>();
-	}
+	pathMesh = builder.CreateMesh<VertexPCU>();	
 
 	return pathMesh;
 }

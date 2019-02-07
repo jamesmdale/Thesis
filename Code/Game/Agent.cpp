@@ -38,6 +38,9 @@ Agent::Agent(Vector2 startingPosition, IsoSpriteAnimSet* animationSet, Map* mapR
 	m_physicsDisc.radius = 0.25f;
 	m_physicsDisc.center = m_position;
 
+	m_pathDisc.radius = 0.30f;
+	m_pathDisc.center = m_position;
+
 	//precompute sprite data
 	m_animationSet = animationSet;
 	m_animationSet->SetCurrentAnim("idle");
@@ -227,13 +230,26 @@ bool Agent::GetPathToDestination(const Vector2& goalDestination)
 	return isDestinationFound;
 }
 
+////  =========================================================================================
+//bool Agent::GetIsAtPosition(const Vector2 & goalDestination)
+//{
+//	if (m_planner->m_map->GetTileCoordinateOfPosition(m_position) != m_planner->m_map->GetTileCoordinateOfPosition(goalDestination))
+//		return false;
+//	else
+//		return true;
+//}
+
 //  =========================================================================================
-bool Agent::GetIsAtPosition(const Vector2 & goalDestination)
+bool Agent::GetIsAtPosition(const Vector2& position)
 {
-	if (m_planner->m_map->GetTileCoordinateOfPosition(m_position) != m_planner->m_map->GetTileCoordinateOfPosition(goalDestination))
-		return false;
-	else
-		return true;
+	return m_pathDisc.IsPointInside(position);
+}
+
+//  =========================================================================================
+void Agent::UpdatePhysicsData()
+{
+	m_physicsDisc.center = m_position;
+	m_pathDisc.center = m_position;
 }
 
 //  =============================================================================
@@ -281,6 +297,7 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 	//planner
 	outStrings.push_back(Stringf("Planner"));
 	outStrings.push_back(Stringf("Plan: %s", m_planner->GetPlanTypeAsText().c_str()));
+	outStrings.push_back(Stringf("Path Steps: %i", m_currentPath.size()));
 	outStrings.push_back(Stringf("Update Pr.: %i", m_updatePriority));
 	outStrings.push_back(Stringf("Gather Arr. Util.: %f", m_planner->m_utilityHistory.m_lastGatherArrows));
 	outStrings.push_back(Stringf("Gather Lum. Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
@@ -390,12 +407,12 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 	agent->m_animationSet->SetCurrentAnim("walk");
 
 	// early out
-	if (agent->m_planner->m_map->GetTileCoordinateOfPosition(agent->m_position) == agent->m_planner->m_map->GetTileCoordinateOfPosition(goalDestination))
+	if (agent->GetIsAtPosition(goalDestination))
 	{
 		//reset first loop action
 		agent->m_isFirstLoopThroughAction = true;
 		agent->m_currentPathIndex = UINT8_MAX;
-		agent->m_physicsDisc.center = agent->m_position;
+		agent->UpdatePhysicsData();
 		return true;
 	}		
 
@@ -407,7 +424,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 	}	
 
 	//We have a path, follow it.
-	if (agent->m_planner->m_map->GetTileCoordinateOfPosition(agent->m_position) != agent->m_planner->m_map->GetTileCoordinateOfPosition(agent->m_currentPath[agent->m_currentPathIndex]))
+	if(!agent->GetIsAtPosition(agent->m_currentPath[agent->m_currentPathIndex]))
 	{
 		agent->m_intermediateGoalPosition = agent->m_currentPath[agent->m_currentPathIndex];
 
@@ -415,7 +432,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 		agent->m_forward.NormalizeAndGetLength();
 
 		agent->m_position += (agent->m_forward * (agent->m_movespeed * GetGameClock()->GetDeltaSeconds()));
-		agent->m_physicsDisc.center = agent->m_position;
+		agent->UpdatePhysicsData();
 	}		
 	else
 	{
@@ -427,7 +444,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 
 			//reset first loop action
 			agent->m_isFirstLoopThroughAction = true;
-			agent->m_physicsDisc.center = agent->m_position;
+			agent->UpdatePhysicsData();
 			return true;
 		}
 		else
@@ -441,7 +458,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 			agent->m_forward.NormalizeAndGetLength();
 
 			agent->m_position += (agent->m_forward * (agent->m_movespeed * GetGameClock()->GetDeltaSeconds()));
-			agent->m_physicsDisc.center = agent->m_position;
+			agent->UpdatePhysicsData();
 		}
 	}
 
