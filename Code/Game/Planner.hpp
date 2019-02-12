@@ -72,7 +72,7 @@ public:
 
 	UtilityInfo GetHighestShootUtility();
 	UtilityInfo GetHighestRepairUtility();
-	UtilityInfo GetHighestHealUtility();
+	UtilityInfo GetHealSelfUtility();
 
 	UtilityInfo GetRepairUtilityPerBuilding(PointOfInterest* poi);
 	UtilityInfo GetGatherUitlityPerBuilding(PointOfInterest* poi);

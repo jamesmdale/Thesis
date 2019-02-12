@@ -21,6 +21,7 @@ void SimulationData::Initialize(SimulationDefinition* simulationDefinition)
 	m_simulationDefinitionReference = simulationDefinition;
 }
 
+//  =========================================================================================
 void SimulationData::CreateComprehensiveDataSet()
 {
 	//title cell

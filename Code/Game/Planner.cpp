@@ -167,7 +167,7 @@ void Planner::UpdatePlan()
 	UtilityInfo highestUtilityInfo = GetIdleUtilityInfo();
 	UtilityInfo compareUtilityInfo;
 
-	//utility for gathering arrows
+	//utility for gathering arrows ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherArrowsUtility();
 	if (m_currentPlan == GATHER_ARROWS_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
@@ -181,7 +181,7 @@ void Planner::UpdatePlan()
 	//debug info
 	m_utilityHistory.m_lastGatherArrows = compareUtilityInfo.utility;
 		
-	//utility for gathering lumber
+	//utility for gathering lumber ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherLumberUtility();
 	if (m_currentPlan == GATHER_LUMBER_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
@@ -195,8 +195,8 @@ void Planner::UpdatePlan()
 	//debug info
 	m_utilityHistory.m_lastGatherLumber = compareUtilityInfo.utility;
 
-	//utility for gathering bandages
-	/*compareUtilityInfo = GetHighestGatherBandagesUtility();
+	// utility for gathering bandages ----------------------------------------------
+	compareUtilityInfo = GetHighestGatherBandagesUtility();
 	if (m_currentPlan == GATHER_BANDAGES_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -205,9 +205,9 @@ void Planner::UpdatePlan()
 	{
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = GATHER_BANDAGES_PLAN_TYPE;
-	}*/
+	}
 
-	//utility for shooting	
+	//utility for shooting	 ----------------------------------------------
 	compareUtilityInfo = GetHighestShootUtility();
 
 	if(compareUtilityInfo.utility != 0.f)
@@ -226,7 +226,7 @@ void Planner::UpdatePlan()
 	m_utilityHistory.m_lastShoot = compareUtilityInfo.utility;
 	
 
-	//utility for repairing buildings
+	//utility for repairing buildings ----------------------------------------------
 	compareUtilityInfo = GetHighestRepairUtility();
 
 	if(compareUtilityInfo.utility != 0.f)
@@ -244,9 +244,12 @@ void Planner::UpdatePlan()
 	//debug info
 	m_utilityHistory.m_lastRepair = compareUtilityInfo.utility;
 
-	//utility for healing agents
-	/*compareUtilityInfo = GetHighestHealUtility();
-	SkewUtilityForBias(compareUtilityInfo, m_agent->m_healBias);
+	//utility for healing agents  ----------------------------------------------
+	compareUtilityInfo = GetHealSelfUtility();
+
+	if(compareUtilityInfo.utility != 0.f)
+		SkewUtilityForBias(compareUtilityInfo, m_agent->m_healBias);
+
 	if (m_currentPlan == HEAL_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -255,8 +258,11 @@ void Planner::UpdatePlan()
 	{
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = HEAL_PLAN_TYPE;
-	}*/
+	}
+	//debug info
+	m_utilityHistory.m_lastHeal = compareUtilityInfo.utility;
 
+	// set final plan ----------------------------------------------
 	m_currentPlan = chosenOutcome;
 	
 	//debug
@@ -325,7 +331,7 @@ void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo
 		QueueRepairActions(info);
 		break;
 	case HEAL_PLAN_TYPE:
-		QueueShootActions(info);
+		QueueHealActions(info);
 		break;
 	default:
 		//idle QueueIdleAction(info);
@@ -639,10 +645,27 @@ UtilityInfo Planner::GetHighestRepairUtility()
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetHighestHealUtility()
+UtilityInfo Planner::GetHealSelfUtility()
 {
-	UtilityInfo info;
-	return info;
+	UtilityInfo healUtilityInfo;
+
+	//if (GetIsOptimized())
+	//{
+	if (m_agent->m_bandageCount == 0)
+	{
+		return healUtilityInfo;
+	}
+	//}
+
+	//building health ----------------------------------------------
+	float normalizedHealth = m_agent->m_health/g_maxHealth;
+
+	float agentUtility = CalculateAgentHealthUtility(normalizedHealth);
+	healUtilityInfo.utility = agentUtility;
+	healUtilityInfo.targetEntityId = m_agent->m_id;
+	healUtilityInfo.endPosition = m_agent->m_position;
+
+	return healUtilityInfo;
 }
 
 //  =============================================================================
@@ -742,9 +765,27 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetHealUtilityPerAgent(Agent * agent)
+UtilityInfo Planner::GetHealUtilityPerAgent(Agent* agent)
 {
 	UtilityInfo info;
+	info.utility = 0.f;
+	info.endPosition = agent->m_position;
+	info.targetEntityId = agent->m_id;
+
+	//easy out if agent is at full health or if we don't have bandages
+	if (agent->m_health == g_maxHealth || m_agent->m_bandageCount == 0)
+	{
+		return info;
+	}
+
+	//building health ----------------------------------------------
+	float normalizedHealth = agent->m_health/g_maxHealth;
+
+	//apply health utility formula for utility value
+	float healthUtility = CalculateAgentHealthUtility(normalizedHealth);
+
+	info.utility = healthUtility;
+
 	return info;
 }
 

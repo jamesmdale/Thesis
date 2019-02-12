@@ -167,7 +167,6 @@ void Map::Initialize()
 
 		m_pointsOfInterest.push_back(poiLocation);
 		m_armories.push_back(poiLocation);
-		poiLocation = nullptr;
 	}
 
 	//create lumberyards
@@ -179,7 +178,17 @@ void Map::Initialize()
 		poiLocation->m_map = this;
 
 		m_pointsOfInterest.push_back(poiLocation);
-		poiLocation = nullptr;
+	}
+
+	//create lumberyards
+	for (int medStationIndex = 0; medStationIndex < m_activeSimulationDefinition->m_numMedStations; ++medStationIndex)
+	{
+		//add random point of interest
+		PointOfInterest* poiLocation = GeneratePointOfInterest(MED_STATION_POI_TYPE);
+		m_medStations.push_back(poiLocation);
+		poiLocation->m_map = this;
+
+		m_pointsOfInterest.push_back(poiLocation);
 	}
 
 	IntVector2 dimensions = GetDimensions();
@@ -532,13 +541,13 @@ Mesh* Map::CreateDynamicAgentMesh()
 		switch (m_agentsOrderedByXPosition[agentIndex]->m_planner->m_currentPlan)
 		{
 		case GATHER_ARROWS_PLAN_TYPE:
-			agentColor = Rgba::ORANGE;
+			agentColor = Rgba::LIGHT_RED;
 			break;
 		case GATHER_LUMBER_PLAN_TYPE:
 			agentColor = Rgba::LIGHT_BLUE;
 			break;
 		case GATHER_BANDAGES_PLAN_TYPE:
-			agentColor = Rgba::GREEN;
+			agentColor = Rgba::LIGHT_YELLOW;
 			break;
 		case SHOOT_PLAN_TYPE:
 			agentColor = Rgba::RED;
@@ -547,7 +556,7 @@ Mesh* Map::CreateDynamicAgentMesh()
 			agentColor = Rgba::BLUE;
 			break;
 		case HEAL_PLAN_TYPE:
-			agentColor = Rgba::GREEN;
+			agentColor = Rgba::YELLOW;
 			break;
 		}
 

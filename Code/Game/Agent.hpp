@@ -93,7 +93,6 @@ public:
 	Vector2 m_position;
 	Vector2 m_forward;
 	Vector2 m_intermediateGoalPosition;	//used for temp locations while pathing
-	Vector2 m_currentActionGoalPosition;
 	
 	Disc2 m_pathDisc;
 	Disc2 m_physicsDisc;
@@ -110,10 +109,7 @@ public:
 	Planner* m_planner = nullptr;
 	uint16_t m_indexInSortedXList = UINT16_MAX;
 	uint16_t m_indexInSortedYList = UINT16_MAX;
-	uint16_t m_indexInPriorityList = UINT16_MAX;
-
-	
-	
+	uint16_t m_indexInPriorityList = UINT16_MAX;	
 };
 
 

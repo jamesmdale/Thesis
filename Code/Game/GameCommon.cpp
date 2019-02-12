@@ -55,6 +55,7 @@ int g_maxResourceCarryAmount = 1;
 //action performance globals
 float g_baseRepairAmountPerPerformance = 5.f;
 float g_baseShootDamageAmountPerPerformance = 5.f;
+float g_baseHealAmountPerPerformance = 5.f;
 float g_minActionPerformanceRatePerSecond = 0.25f;
 
 float g_minSkillEfficiency = 0.1f;

@@ -1,14 +1,12 @@
 <SimulationDefinitions>
 
-
-
     <SimulationDefinition
   name="default_optimized"
   mapName="30x30"
   numAgents="20"
   numArmories="3"
   numLumberyards="3"
-  numMedStations="0"
+  numMedStations="3"
   bombardmentRatePerSecond="3.0"
   threatRatePerSecond = "1.0"
   startingThreat="400"
@@ -23,7 +21,7 @@
   numAgents="1"
   numArmories="1"
   numLumberyards="1"
-  numMedStations="0"
+  numMedStations="1"
   bombardmentRatePerSecond="5.0"
   threatRatePerSecond = "10.0"
   startingThreat="100"

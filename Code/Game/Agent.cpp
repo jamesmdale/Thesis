@@ -544,13 +544,25 @@ bool HealAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 	//used to handle any extra logic that must occur on first loop
 	if (agent->m_isFirstLoopThroughAction)
 	{
-		Agent* targetAgent = agent->m_planner->m_map->GetAgentById(interactEntityId);
-		agent->m_forward = targetAgent->m_position - agent->m_position;
-
 		//do first pass logic
-		agent->m_actionTimer->SetTimer(1.f);
+		agent->m_actionTimer->SetTimer(agent->m_calculatedHealPerformancePerSecond);
 		agent->m_isFirstLoopThroughAction = false;
 	}
+
+	agent->m_animationSet->SetCurrentAnim("stand");
+
+	if (agent->m_actionTimer->DecrementAll() > 0)
+	{
+		agent->m_health = ClampInt(agent->m_health + g_baseHealAmountPerPerformance, 0, 100);
+		agent->m_bandageCount--;
+	}
+
+	if (agent->m_bandageCount == 0 || agent->m_health == 100)
+	{
+		//reset first loop action
+		agent->m_isFirstLoopThroughAction = true;
+		return true;
+	}		
 
 	//reset first loop action
 	agent->m_isFirstLoopThroughAction = true;

@@ -82,6 +82,7 @@ extern int g_maxResourceCarryAmount;
 //action performance globals
 extern float g_baseRepairAmountPerPerformance;
 extern float g_baseShootDamageAmountPerPerformance;
+extern float g_baseHealAmountPerPerformance;
 extern float g_minActionPerformanceRatePerSecond;
 
 extern float g_minSkillEfficiency;
