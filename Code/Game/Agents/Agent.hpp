@@ -59,7 +59,12 @@ public:
 
 	void ConstructInformationAsText(std::vector<std::string>& outStrings);
 
+	void TestFunction();
+
 public:
+
+	//
+
 	int m_updatePriority = 1;
 
 	int m_id = -1;

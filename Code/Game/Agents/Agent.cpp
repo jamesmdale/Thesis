@@ -307,6 +307,11 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 	outStrings.push_back(Stringf("Chosen Outcome.: %i", (int)m_planner->m_utilityHistory.m_chosenOutcome));
 }
 
+//  =========================================================================================
+void Agent::TestFunction()
+{
+}
+
 
 //  =========================================================================================
 void Agent::UpdateSpriteRenderDirection()
