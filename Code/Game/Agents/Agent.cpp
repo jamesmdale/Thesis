@@ -308,12 +308,6 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 }
 
 //  =========================================================================================
-void Agent::MainBranchTestFunction()
-{
-}
-
-
-//  =========================================================================================
 void Agent::UpdateSpriteRenderDirection()
 {
 	PROFILER_PUSH();
