@@ -88,7 +88,7 @@ void Planner::ProcessActionStack(float deltaSeconds)
 	//get action at the top of the queue
 	if (m_actionStack.size() > 0)
 	{
-		ActionData* goal = m_actionStack.top();
+		ActionCallbackData* goal = m_actionStack.top();
 
 		//run action
 		bool isComplete = goal->m_action(m_agent, goal->m_finalGoalPosition, goal->m_interactEntityId);
@@ -128,7 +128,7 @@ void Planner::ProcessActionStack(float deltaSeconds)
 }
 
 //  =========================================================================================
-void Planner::AddActionToStack(ActionData* actionData)
+void Planner::AddActionToStack(ActionCallbackData* actionData)
 {
 	m_actionStack.push(actionData);
 }
@@ -341,7 +341,7 @@ void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo
 	//decide if we have to queue a MoveAction
 	if (!m_agent->GetIsAtPosition(info.endPosition))
 	{
-		ActionData* data = new ActionData();
+		ActionCallbackData* data = new ActionCallbackData();
 		data->m_action = MoveAction;
 		data->m_finalGoalPosition = info.endPosition;
 
@@ -394,7 +394,7 @@ void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo
 //  =============================================================================
 void Planner::QueueGatherArrowsAction(const UtilityInfo& info)
 {
-	ActionData* gatherActionData = new ActionData();
+	ActionCallbackData* gatherActionData = new ActionCallbackData();
 	gatherActionData->m_action = GatherAction;
 	gatherActionData->m_finalGoalPosition = info.endPosition;
 	gatherActionData->m_interactEntityId = info.targetEntityId;
@@ -405,7 +405,7 @@ void Planner::QueueGatherArrowsAction(const UtilityInfo& info)
 //  =========================================================================================
 void Planner::QueueGatherLumberAction(const UtilityInfo& info)
 {
-	ActionData* gatherActionData = new ActionData();
+	ActionCallbackData* gatherActionData = new ActionCallbackData();
 	gatherActionData->m_action = GatherAction;
 	gatherActionData->m_finalGoalPosition = info.endPosition;
 	gatherActionData->m_interactEntityId = info.targetEntityId;
@@ -416,7 +416,7 @@ void Planner::QueueGatherLumberAction(const UtilityInfo& info)
 //  =========================================================================================
 void Planner::QueueGatherBandagesAction(const UtilityInfo& info)
 {
-	ActionData* gatherActionData = new ActionData();
+	ActionCallbackData* gatherActionData = new ActionCallbackData();
 	gatherActionData->m_action = GatherAction;
 	gatherActionData->m_finalGoalPosition = info.endPosition;
 	gatherActionData->m_interactEntityId = info.targetEntityId;
@@ -427,7 +427,7 @@ void Planner::QueueGatherBandagesAction(const UtilityInfo& info)
 //  =========================================================================================
 void Planner::QueueShootActions(const UtilityInfo& info)
 {
-	ActionData* shootActionData = new ActionData();
+	ActionCallbackData* shootActionData = new ActionCallbackData();
 	shootActionData->m_action = ShootAction;
 	shootActionData->m_finalGoalPosition = info.endPosition;
 	shootActionData->m_interactEntityId = info.targetEntityId;
@@ -438,7 +438,7 @@ void Planner::QueueShootActions(const UtilityInfo& info)
 //  =========================================================================================
 void Planner::QueueRepairActions(const UtilityInfo& info)
 {
-	ActionData* repairActionData = new ActionData();
+	ActionCallbackData* repairActionData = new ActionCallbackData();
 	repairActionData->m_action = RepairAction;
 	repairActionData->m_finalGoalPosition = info.endPosition;
 	repairActionData->m_interactEntityId = info.targetEntityId;
@@ -449,7 +449,7 @@ void Planner::QueueRepairActions(const UtilityInfo& info)
 //  =========================================================================================
 void Planner::QueueHealActions(const UtilityInfo& info)
 {
-	ActionData* healActionData = new ActionData();
+	ActionCallbackData* healActionData = new ActionCallbackData();
 	healActionData->m_action = HealAction;
 	healActionData->m_finalGoalPosition = info.endPosition;
 	healActionData->m_interactEntityId = info.targetEntityId;

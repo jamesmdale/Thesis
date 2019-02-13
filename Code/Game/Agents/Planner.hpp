@@ -3,7 +3,7 @@
 #include "Game\UtilityHelpers\UtilityStorage.hpp"
 #include <stack>
 
-struct ActionData;
+struct ActionCallbackData;
 class Agent;
 class Map;
 class PointOfInterest;
@@ -48,7 +48,7 @@ public:
 
 	//queue management
 	void ProcessActionStack(float deltaSeconds);
-	void AddActionToStack(ActionData* actionData);
+	void AddActionToStack(ActionCallbackData* actionData);
 	void ClearStack();
 	inline size_t GetActionStackSize() { return m_actionStack.size(); }
 
@@ -102,8 +102,6 @@ public:
 	bool GetDoesHaveTopActionGoalPosition(Vector2& outPosition);
 
 public:
-	Map* m_map = nullptr;
-	Agent* m_agent = nullptr;
 	ePlanTypes m_currentPlan;
 
 	UtilityHistory m_utilityHistory;
@@ -116,6 +114,6 @@ public:
 	static UtilityStorage* m_shootUtilityStorageUtility;
 
 private:
-	std::stack<ActionData*> m_actionStack;
+	std::stack<ActionCallbackData*> m_actionStack;
 };
 

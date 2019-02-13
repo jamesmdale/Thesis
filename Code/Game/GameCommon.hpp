@@ -76,12 +76,12 @@ extern uint64_t g_agentUpdateBudgetThisFrame;
 extern int g_agentsUpdatedThisFrame;
 
 //general globals
-extern int g_maxHealth;
+extern uint8 g_maxHealth;
 extern float g_skewForCurrentPlan;
 
 //poi globals
 extern float g_baseResourceRefillTimePerSecond;
-extern int g_maxResourceCarryAmount;
+extern uint8 g_maxResourceCarryAmount;
 
 //action performance globals
 extern float g_baseRepairAmountPerPerformance;
@@ -94,14 +94,14 @@ extern float g_minSkillEfficiency;
 //bombardment globals
 extern float g_bombardmentExplosionTime;
 extern float g_bombardmentExplosionSize;
-extern int g_bombardmentDamage;
+extern uint8 g_bombardmentDamage;
 
 //optimization globalks
 extern float g_sortTimerInSeconds;
 extern float g_agentCopyDestinationPositionRadius;
 
 //  threat globals
-extern float g_maxThreat;
+extern uint16 g_maxThreat;
 
 //convenience directions
 extern IntVector2 MAP_NORTH;
