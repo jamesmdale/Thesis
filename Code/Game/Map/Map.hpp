@@ -59,17 +59,17 @@ public:
 	IntVector2 GetDimensions() { return m_dimensions; }
 	float GetMapDistanceSquared(){ return (m_dimensions.x * m_dimensions.y) * (m_dimensions.x * m_dimensions.y);}
 
-	//optimized mesh generation
+	//optimized mesh generation  ----------------------------------------------
 	void CreateMapMesh();
 
 	Mesh* CreateDynamicAgentMesh();
 	Mesh* CreateDynamicBombardmentMesh();	
 	Mesh* CreateTextMesh();
 
-	//Cleanup functions
+	//Cleanup functions  ----------------------------------------------
 	void DeleteDeadEntities();
 
-	//agent sorting
+	//agent sorting  ----------------------------------------------
 	void SortAgentsByX();
 	void SortAgentsByY();
 	void QuickSortAgentByPriority(std::vector<Agent*>& agents, int startIndex, int endIndex);
@@ -77,11 +77,11 @@ public:
 	void SwapAgents(int indexI, int indexJ, eAgentSortType type);
 	Agent* GetAgentById(int agentId);
 
-	//Conversion functions for Tile Coordinates to World Coordinates
+	//Conversion functions for Tile Coordinates to World Coordinates  ----------------------------------------------
 	IntVector2 GetTileCoordinateOfPosition(const Vector2& position);
 	Vector2 GetWorldPositionOfMapCoordinate(const IntVector2& coordinate);
 
-	//helpers
+	//helpers  ----------------------------------------------
 	bool CheckIsPositionValid(const Vector2& position);
 	bool CheckIsCoordianteValid(const IntVector2& coordinate);
 	Vector2 GetRandomNonBlockedPositionInMapBounds();
@@ -91,15 +91,15 @@ public:
 	bool IsTileBlockingAtCoordinate(const IntVector2& coordinate);
 	Tile* GetTileAtCoordinate(const IntVector2& coordinate);
 
-	//point of interest helpers
+	//point of interest helpers  ----------------------------------------------
 	PointOfInterest* GeneratePointOfInterest(int poiType);
 	PointOfInterest* GetPointOfInterestById(int poiId);
 
-	//bombardment collision
+	//bombardment collision  ----------------------------------------------
 	void DetectBombardmentToAgentCollision(Bombardment* bombardment);
 	void DetectBombardmentToPOICollision(Bombardment* bombardment);
 
-	//agent to tile collision
+	//agent to tile collision  ----------------------------------------------
 	void DetectAgentToTileCollision(Agent* agent);
 	bool PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection);
 	

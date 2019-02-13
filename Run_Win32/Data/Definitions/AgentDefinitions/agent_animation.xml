@@ -54,5 +54,14 @@
    <frame src="agent.die1" duration="0.16" />
    <frame src="agent.die0" duration="0.16" />
 </anim>
+<anim id="agent.heal">
+   <frame src="agent.die0" duration="0.14" />
+   <frame src="agent.die1" duration="0.14" />
+   <frame src="agent.die2" duration="0.14" />
+   <frame src="agent.die3" duration="0.14" />
+   <frame src="agent.die2" duration="0.14" />
+   <frame src="agent.die1" duration="0.14" />
+   <frame src="agent.die0" duration="0.14" />
+</anim>
 
 

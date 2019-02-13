@@ -1,4 +1,4 @@
-#include "Game\Bombardment.hpp"
+#include "Game\Entities\Bombardment.hpp"
 #include "Game\Game.hpp"
 #include "Game\GameCommon.hpp"
 #include "Engine\Profiler\Profiler.hpp"

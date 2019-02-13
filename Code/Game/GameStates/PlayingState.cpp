@@ -13,11 +13,11 @@
 #include "Engine\Math\AABB2.hpp"
 #include "Engine\Time\SimpleTimer.hpp"
 #include "Game\GameStates\PlayingState.hpp"
-#include "Game\PointOfInterest.hpp"
-#include "Game\Agent.hpp"
+#include "Game\Entities\PointOfInterest.hpp"
+#include "Game\Agents\Agent.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
 #include "Game\SimulationData.hpp"
-#include "Game\DebugInputBox.hpp"
+#include "Game\UI\DebugInputBox.hpp"
 
 float ORTHO_MAX = 0.f;
 float ORTHO_MIN = 0.f;

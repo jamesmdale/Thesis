@@ -23,4 +23,7 @@
    <set id="stand">
        <anim id="agent.stand" />
    </set>
+   <set id="heal">
+       <anim id="agent.heal" />
+   </set>
 </animset>

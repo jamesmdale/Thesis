@@ -5,11 +5,11 @@
 #include "Game\SimulationData.hpp"
 #include "Game\Map\MapGenStep.hpp"
 #include "Game\GameCommon.hpp"
-#include "Game\PointOfInterest.hpp"
-#include "Game\Agent.hpp"
-#include "Game\Planner.hpp"
+#include "Game\Entities\PointOfInterest.hpp"
+#include "Game\Agents\Agent.hpp"
+#include "Game\Agents\Planner.hpp"
 #include "Game\Map\Tile.hpp"
-#include "Game\Bombardment.hpp"
+#include "Game\Entities\Bombardment.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Game\SimulationData.hpp"
 #include "Engine\Window\Window.hpp"
@@ -541,22 +541,22 @@ Mesh* Map::CreateDynamicAgentMesh()
 		switch (m_agentsOrderedByXPosition[agentIndex]->m_planner->m_currentPlan)
 		{
 		case GATHER_ARROWS_PLAN_TYPE:
-			agentColor = Rgba::LIGHT_RED;
+			agentColor = GATHER_ARROWS_TINT;
 			break;
 		case GATHER_LUMBER_PLAN_TYPE:
-			agentColor = Rgba::LIGHT_BLUE;
+			agentColor = GATHER_LUMBER_TINT;
 			break;
 		case GATHER_BANDAGES_PLAN_TYPE:
-			agentColor = Rgba::LIGHT_YELLOW;
+			agentColor = GATHER_BANDAGES_TINT;
 			break;
 		case SHOOT_PLAN_TYPE:
-			agentColor = Rgba::RED;
+			agentColor = SHOOT_TINT;
 			break;
 		case REPAIR_PLAN_TYPE:
-			agentColor = Rgba::BLUE;
+			agentColor = REPAIR_TINT;
 			break;
 		case HEAL_PLAN_TYPE:
-			agentColor = Rgba::YELLOW;
+			agentColor = HEAL_TINT;
 			break;
 		}
 

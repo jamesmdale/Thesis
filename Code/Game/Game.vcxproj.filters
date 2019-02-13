@@ -61,9 +61,6 @@
     <ClCompile Include="Map\Map.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="Agent.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.cpp">
       <Filter>General</Filter>
     </ClCompile>
@@ -91,18 +88,6 @@
     <ClCompile Include="Definitions\AgentDefinition.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="PointOfInterest.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="Actions\Action.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="Planner.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="Bombardment.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
     <ClCompile Include="SimulationData.cpp">
       <Filter>General</Filter>
     </ClCompile>
@@ -112,7 +97,19 @@
     <ClCompile Include="UtilityHelpers\UtilityStorage.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="DebugInputBox.cpp">
+    <ClCompile Include="Agents\Agent.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Agents\Planner.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\DebugInputBox.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Entities\Bombardment.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Entities\PointOfInterest.cpp">
       <Filter>General</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,7 +140,6 @@
     <ClInclude Include="Definitions\MapDefinition.hpp" />
     <ClInclude Include="Map\Tile.hpp" />
     <ClInclude Include="Map\Map.hpp" />
-    <ClInclude Include="Agent.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimSetDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteDefinition.hpp" />
@@ -153,13 +149,13 @@
     <ClInclude Include="Sprites\IsoSpriteAnimSet.hpp" />
     <ClInclude Include="Sprites\Sprite.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
-    <ClInclude Include="PointOfInterest.hpp" />
-    <ClInclude Include="Actions\Action.hpp" />
-    <ClInclude Include="Planner.hpp" />
-    <ClInclude Include="Bombardment.hpp" />
     <ClInclude Include="SimulationData.hpp" />
     <ClInclude Include="Definitions\SimulationDefinition.hpp" />
     <ClInclude Include="UtilityHelpers\UtilityStorage.hpp" />
-    <ClInclude Include="DebugInputBox.hpp" />
+    <ClInclude Include="Agents\Agent.hpp" />
+    <ClInclude Include="Agents\Planner.hpp" />
+    <ClInclude Include="UI\DebugInputBox.hpp" />
+    <ClInclude Include="Entities\Bombardment.hpp" />
+    <ClInclude Include="Entities\PointOfInterest.hpp" />
   </ItemGroup>
 </Project>

@@ -1,9 +1,9 @@
 #include "Engine\Profiler\Profiler.hpp"
-#include "Game\Planner.hpp"
+#include "Game\Agents\Planner.hpp"
 #include "Game\Map\Map.hpp"
-#include "Game\Agent.hpp"
-#include "Game\PointOfInterest.hpp"
-#include "Game\Agent.hpp"
+#include "Game\Agents\Agent.hpp"
+#include "Game\Entities\PointOfInterest.hpp"
+#include "Game\Agents\Agent.hpp"
 #include "Game\GameCommon.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 

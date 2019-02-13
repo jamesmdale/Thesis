@@ -1,10 +1,10 @@
-#include "Game\Agent.hpp"
+#include "Game\Agents\Agent.hpp"
 #include "Game\Game.hpp"
 #include "Game\GameStates\GameState.hpp"
 #include "Game\Map\Map.hpp"
-#include "Game\Planner.hpp";
+#include "Game\Agents\Planner.hpp";
 #include "Game\GameCommon.hpp"
-#include "Game\PointOfInterest.hpp"
+#include "Game\Entities\PointOfInterest.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Engine\Core\Transform2D.hpp"
 #include "Engine\Math\MathUtils.hpp"
@@ -275,6 +275,7 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 {
 	//id
 	outStrings.push_back(Stringf("ID: %i", m_id));
+	outStrings.push_back(Stringf("Health: %i", m_health));
 
 	//biases
 	outStrings.push_back(Stringf("Biases"));
@@ -487,6 +488,9 @@ bool ShootAction(Agent* agent, const Vector2& goalDestination, int interactEntit
 		//launch arrow in agent forward
 		agent->m_planner->m_map->m_threat = ClampInt(agent->m_planner->m_map->m_threat - g_baseShootDamageAmountPerPerformance, 0, g_maxThreat);
 		agent->m_arrowCount--;
+
+		ASSERT_OR_DIE(agent->m_arrowCount >= 0, "AGENT ARROW COUNT NEGATIVE!!");
+
 		agent->m_animationSet->GetCurrentAnim()->PlayFromStart();
 	}	
 
@@ -524,6 +528,8 @@ bool RepairAction(Agent* agent, const Vector2& goalDestination, int interactEnti
 	{
 		targetPoi->m_health = ClampInt(targetPoi->m_health + g_baseRepairAmountPerPerformance, 0, 100);
 		agent->m_lumberCount--;
+
+		ASSERT_OR_DIE(agent->m_lumberCount >= 0, "AGENT LUMBER COUNT NEGATIVE!!");
 	}
 
 	if (agent->m_lumberCount == 0 || targetPoi->m_health == 100)
@@ -549,12 +555,14 @@ bool HealAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 		agent->m_isFirstLoopThroughAction = false;
 	}
 
-	agent->m_animationSet->SetCurrentAnim("stand");
+	agent->m_animationSet->SetCurrentAnim("heal");
 
 	if (agent->m_actionTimer->DecrementAll() > 0)
 	{
 		agent->m_health = ClampInt(agent->m_health + g_baseHealAmountPerPerformance, 0, 100);
 		agent->m_bandageCount--;
+
+		ASSERT_OR_DIE(agent->m_bandageCount >= 0, "AGENT BANDAGE COUNT NEGATIVE!!");
 	}
 
 	if (agent->m_bandageCount == 0 || agent->m_health == 100)

@@ -84,9 +84,17 @@ IntVector2 UI_RIGHT = IntVector2(-1, 0);
 IntVector2 UI_LEFT = IntVector2(1, 0);
 
 //TINT
-Rgba ARMORY_TINT = Rgba(1.f, 0.f, 0.f, 0.3f);
-Rgba LUMBER_TINT = Rgba(0.f, 1.f, 0.f, 0.3f);
-Rgba MED_TINT = Rgba(0.f, 0.f, 1.f, 0.3f);
+Rgba ARMORY_TINT = Rgba(255, 0, 0, 150);
+Rgba LUMBER_TINT = Rgba(0, 255, 0, 75);
+Rgba MED_TINT = Rgba(0, 0, 255, 75);
+
+Rgba GATHER_ARROWS_TINT = Rgba(255, 160, 160, 255);
+Rgba GATHER_LUMBER_TINT= Rgba(140, 140, 255, 255);
+Rgba GATHER_BANDAGES_TINT= Rgba(160, 255, 160, 255);
+
+Rgba SHOOT_TINT = Rgba(255, 0, 0, 255);
+Rgba REPAIR_TINT = Rgba(0, 0, 255, 255);
+Rgba HEAL_TINT = Rgba(0, 255, 0, 255);
 
 //  =============================================================================
 // Methods =============================================================================

@@ -13,6 +13,10 @@
 #define QueueActionPathingDataAnalysis
 #define DistanceMemoizationDataAnalysis
 
+//data organization switches
+#define ArrayOfStructs
+#define StructOfArrays
+
 class SimulationData;
 class SimulationDefinition;
 
@@ -114,3 +118,12 @@ extern IntVector2 UI_LEFT;
 extern Rgba ARMORY_TINT;
 extern Rgba LUMBER_TINT;
 extern Rgba MED_TINT;
+
+//agent tints
+extern Rgba GATHER_ARROWS_TINT;
+extern Rgba GATHER_LUMBER_TINT;
+extern Rgba GATHER_BANDAGES_TINT;
+
+extern Rgba SHOOT_TINT;
+extern Rgba REPAIR_TINT;
+extern Rgba HEAL_TINT;

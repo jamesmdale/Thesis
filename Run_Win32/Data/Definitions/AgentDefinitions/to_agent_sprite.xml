@@ -3,43 +3,43 @@
 <!--	Cast up  -->
 
 <sprite id="agent.cast.up0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,0,64,64" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.up1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,0,128,64" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.up2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,0,192,64" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.up3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,0,256,64" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.up4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,0,320,64" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.up5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,0,384,64" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.up6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,0,448,64" />
 	<pivot xy="0,0.5" />
@@ -48,43 +48,43 @@
 <!--	Cast left  -->
 
 <sprite id="agent.cast.left0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,64,64,128" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.left1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,64,128,128" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.left2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,64,192,128" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.left3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,64,256,128" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.left4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,64,320,128" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.left5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,64,384,128" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.left6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,64,448,128" />
 	<pivot xy="0,0.5" />
@@ -93,43 +93,43 @@
 <!--	Cast Down  -->
 
 <sprite id="agent.cast.down0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,128,64,192" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.down1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,128,128,192" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.down2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,128,192,192" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.down3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,128,256,192" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.down4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,128,320,192" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.down5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,128,384,192" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.down6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,128,448,192" />
 	<pivot xy="0,0.5" />
@@ -138,43 +138,43 @@
 <!--	Cast Right  -->
 
 <sprite id="agent.cast.right0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,192,64,256" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.right1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,192,128,256" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.right2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,192,192,256" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.right3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,192,256,256" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.right4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,192,320,256" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.right5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,192,384,256" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.cast.right6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,192,448,256" />
 	<pivot xy="0,0.5" />
@@ -184,55 +184,55 @@
   <!--	Walk up  -->
 
 <sprite id="agent.walk.up0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,512,64,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,512,128,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,512,192,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,512,256,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,512,320,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,512,384,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,512,448,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,512,512,576" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.up8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,512,576,576" />
 	<pivot xy="0,0.5" />
@@ -241,55 +241,55 @@
  <!--	Walk left  -->
 
 <sprite id="agent.walk.left0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,576,64,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,576,128,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,576,192,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,576,256,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,576,320,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,576,384,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,576,448,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,576,512,640" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.left8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,576,576,640" />
 	<pivot xy="0,0.5" />
@@ -298,55 +298,55 @@
  <!--	Walk Down  -->
 
 <sprite id="agent.walk.down0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,640,64,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,640,128,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,640,192,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,640,256,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,640,320,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,640,384,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,640,448,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,640,512,704" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.down8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,640,576,704" />
 	<pivot xy="0,0.5" />
@@ -355,55 +355,55 @@
  <!--	Walk Right  -->
 
 <sprite id="agent.walk.right0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,704,64,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,704,128,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,704,192,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,704,256,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,704,320,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,704,384,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,704,448,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,704,512,768" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.walk.right8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,704,576,768" />
 	<pivot xy="0,0.5" />
@@ -413,79 +413,79 @@
   <!--	Shoot up  -->
 
 <sprite id="agent.shoot.up0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,1024,64,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,1024,128,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,1024,192,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,1024,256,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,1024,320,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,1024,384,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,1024,448,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,1024,512,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,1024,576,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up9">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="576,1024,640,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up10">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="640,1024,704,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up11">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="704,1024,768,1088" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.up12">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="768,1024,832,1088" />
 	<pivot xy="0,0.5" />
@@ -495,79 +495,79 @@
   <!--	Shoot left  -->
 
 <sprite id="agent.shoot.left0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,1088,64,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,1088,128,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,1088,192,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,1088,256,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,1088,320,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,1088,384,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,1088,448,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,1088,512,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,1088,576,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left9">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="576,1088,640,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left10">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="640,1088,704,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left11">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="704,1088,768,1152" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.left12">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="768,1088,832,1152" />
 	<pivot xy="0,0.5" />
@@ -576,79 +576,79 @@
  <!--	Shoot down  -->
 
 <sprite id="agent.shoot.down0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,1152,64,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,1152,128,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,1152,192,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,1152,256,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,1152,320,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,1152,384,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,1152,448,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,1152,512,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,1152,576,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down9">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="576,1152,640,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down10">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="640,1152,704,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down11">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="704,1152,768,1216" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.down12">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="768,1152,832,1216" />
 	<pivot xy="0,0.5" />
@@ -656,234 +656,234 @@
 
  <!--	Shoot right  -->
 <sprite id="agent.shoot.right0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,1216,64,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,1216,128,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,1216,192,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,1216,256,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,1216,320,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,1216,384,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right6">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="384,1216,448,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right7">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="448,1216,512,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right8">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="512,1216,576,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right9">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="576,1216,640,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right10">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="640,1216,704,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right11">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="704,1216,768,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 <sprite id="agent.shoot.right12">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="768,1216,832,1280" />
 	<pivot xy="0,0.5" />
 </sprite>
 
 
-  <!--	Dead up  -->
-<sprite id="agent.dead.up0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+  <!--	die up  -->
+<sprite id="agent.die.up0">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,1280,64,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.up1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.up1">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,1280,128,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.up2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.up2">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,1280,192,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.up3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.up3">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,1280,256,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.up4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.up4">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,1280,320,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.up5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.up5">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,1280,384,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
 
-  <!--	Dead left  -->
-<sprite id="agent.dead.left0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+  <!--	die left  -->
+<sprite id="agent.die.left0">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,1280,64,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.left1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.left1">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,1280,128,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.left2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.left2">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,1280,192,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.left3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.left3">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,1280,256,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.left4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.left4">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,1280,320,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.left5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
-	<ppu count="64" />
-	<uv layout="pixel" uvs="320,1280,384,1344" />
-	<pivot xy="0,0.5" />
-</sprite>
-
-
-  <!--	Dead down  -->
-<sprite id="agent.dead.down0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
-	<ppu count="64" />
-	<uv layout="pixel" uvs="0,1280,64,1344" />
-	<pivot xy="0,0.5" />
-</sprite>
-<sprite id="agent.dead.down1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
-	<ppu count="64" />
-	<uv layout="pixel" uvs="64,1280,128,1344" />
-	<pivot xy="0,0.5" />
-</sprite>
-<sprite id="agent.dead.down2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
-	<ppu count="64" />
-	<uv layout="pixel" uvs="128,1280,192,1344" />
-	<pivot xy="0,0.5" />
-</sprite>
-<sprite id="agent.dead.down3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
-	<ppu count="64" />
-	<uv layout="pixel" uvs="192,1280,256,1344" />
-	<pivot xy="0,0.5" />
-</sprite>
-<sprite id="agent.dead.down4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
-	<ppu count="64" />
-	<uv layout="pixel" uvs="256,1280,320,1344" />
-	<pivot xy="0,0.5" />
-</sprite>
-<sprite id="agent.dead.down5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.left5">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,1280,384,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
 
 
-  <!--	Dead right  -->
-<sprite id="agent.dead.right0">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+  <!--	die down  -->
+<sprite id="agent.die.down0">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="0,1280,64,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.right1">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.down1">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="64,1280,128,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.right2">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.down2">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="128,1280,192,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.right3">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.down3">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="192,1280,256,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.right4">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.down4">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="256,1280,320,1344" />
 	<pivot xy="0,0.5" />
 </sprite>
-<sprite id="agent.dead.right5">
-	<diffuse src="Data\Images\Agents\Female_1.png" />
+<sprite id="agent.die.down5">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
+	<ppu count="64" />
+	<uv layout="pixel" uvs="320,1280,384,1344" />
+	<pivot xy="0,0.5" />
+</sprite>
+
+
+  <!--	die right  -->
+<sprite id="agent.die.right0">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
+	<ppu count="64" />
+	<uv layout="pixel" uvs="0,1280,64,1344" />
+	<pivot xy="0,0.5" />
+</sprite>
+<sprite id="agent.die.right1">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
+	<ppu count="64" />
+	<uv layout="pixel" uvs="64,1280,128,1344" />
+	<pivot xy="0,0.5" />
+</sprite>
+<sprite id="agent.die.right2">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
+	<ppu count="64" />
+	<uv layout="pixel" uvs="128,1280,192,1344" />
+	<pivot xy="0,0.5" />
+</sprite>
+<sprite id="agent.die.right3">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
+	<ppu count="64" />
+	<uv layout="pixel" uvs="192,1280,256,1344" />
+	<pivot xy="0,0.5" />
+</sprite>
+<sprite id="agent.die.right4">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
+	<ppu count="64" />
+	<uv layout="pixel" uvs="256,1280,320,1344" />
+	<pivot xy="0,0.5" />
+</sprite>
+<sprite id="agent.die.right5">
+	<diffuse src="Data\Images\Agents\Male_1.png" />
 	<ppu count="64" />
 	<uv layout="pixel" uvs="320,1280,384,1344" />
 	<pivot xy="0,0.5" />

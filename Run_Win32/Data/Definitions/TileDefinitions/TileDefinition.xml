@@ -2,7 +2,7 @@
   
   <TileDefinition
   name="Grass"
-  baseSpriteCoords="0,1"
+  baseSpriteCoords="0,4"
   baseSpriteTint="180,180,180"
   allowsWalking="true"
   spriteSheetName="Terrain_8x8.png"

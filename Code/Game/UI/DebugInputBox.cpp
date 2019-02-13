@@ -1,4 +1,4 @@
-#include "Game\DebugInputBox.hpp"
+#include "Game\UI\DebugInputBox.hpp"
 #include "Engine\Core\EngineCommon.hpp"
 #include "Engine\Core\WindowsCommon.hpp"
 #include "Engine\Window\Window.hpp"

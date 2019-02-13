@@ -292,10 +292,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actions\Action.cpp" />
-    <ClCompile Include="Agent.cpp" />
-    <ClCompile Include="Bombardment.cpp" />
-    <ClCompile Include="DebugInputBox.cpp" />
+    <ClCompile Include="Agents\Agent.cpp" />
+    <ClCompile Include="Entities\Bombardment.cpp" />
+    <ClCompile Include="UI\DebugInputBox.cpp" />
     <ClCompile Include="Definitions\AgentDefinition.cpp" />
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.cpp" />
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimSetDefinition.cpp" />
@@ -316,8 +315,8 @@
     <ClCompile Include="Map\MapGenStep_FillAndEdge.cpp" />
     <ClCompile Include="Map\MapGenStep_FromFile.cpp" />
     <ClCompile Include="Map\MapGenStep_Mutate.cpp" />
-    <ClCompile Include="Planner.cpp" />
-    <ClCompile Include="PointOfInterest.cpp" />
+    <ClCompile Include="Agents\Planner.cpp" />
+    <ClCompile Include="Entities\PointOfInterest.cpp" />
     <ClCompile Include="SimulationData.cpp" />
     <ClCompile Include="Definitions\SimulationDefinition.cpp" />
     <ClCompile Include="Sprites\IsoSprite.cpp" />
@@ -330,10 +329,9 @@
     <ClCompile Include="UtilityHelpers\UtilityStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actions\Action.hpp" />
-    <ClInclude Include="Agent.hpp" />
-    <ClInclude Include="Bombardment.hpp" />
-    <ClInclude Include="DebugInputBox.hpp" />
+    <ClInclude Include="Agents\Agent.hpp" />
+    <ClInclude Include="Entities\Bombardment.hpp" />
+    <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimSetDefinition.hpp" />
@@ -354,8 +352,8 @@
     <ClInclude Include="Map\MapGenStep_FillAndEdge.hpp" />
     <ClInclude Include="Map\MapGenStep_FromFile.hpp" />
     <ClInclude Include="Map\MapGenStep_Mutate.hpp" />
-    <ClInclude Include="Planner.hpp" />
-    <ClInclude Include="PointOfInterest.hpp" />
+    <ClInclude Include="Agents\Planner.hpp" />
+    <ClInclude Include="Entities\PointOfInterest.hpp" />
     <ClInclude Include="SimulationData.hpp" />
     <ClInclude Include="Definitions\SimulationDefinition.hpp" />
     <ClInclude Include="Sprites\IsoSprite.hpp" />
