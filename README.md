@@ -6,7 +6,9 @@ Controls:
 - R                         = Reset Camera Position
 - T                         = Show Tile Data
 - I                         = Show Agent Id
-- F                         = Show Debug Data
+- CTRL + F                  = Show Debug Data
+- CTRL + P		    = Pause Sim
+- CTRL+ UP or DOWN (While debug data shown) = Cycle through agent details
 
 
 Optimizations:
