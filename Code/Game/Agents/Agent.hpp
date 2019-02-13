@@ -59,6 +59,8 @@ public:
 
 	void ConstructInformationAsText(std::vector<std::string>& outStrings);
 
+	void MainBranchTestFunction();
+
 public:
 	int m_updatePriority = 1;
 
