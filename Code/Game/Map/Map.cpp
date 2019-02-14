@@ -38,7 +38,7 @@ Map::Map(SimulationDefinition* simulationDefinition, const std::string & mapName
 		{		
 			Tile* newTile = new Tile();
 
-			newTile->m_tileCoords = Vector2(xCoordinate, yCoordinate);
+			newTile->m_tileCoords = IntVector2(xCoordinate, yCoordinate);
 			newTile->m_tileDefinition = TileDefinition::s_tileDefinitions[m_mapDefinition->m_defaultTile->m_name];
 
 			newTile->Initialize();
@@ -1148,7 +1148,7 @@ IntVector2 Map::GetTileCoordinateOfPosition(const Vector2& position)
 //  =========================================================================================
 Vector2 Map::GetWorldPositionOfMapCoordinate(const IntVector2& position)
 {
-	Vector2 worldPosition = m_tiles[position.x + (position.y * m_dimensions.x)]->GetTileCoordinates();
+	Vector2 worldPosition = m_tiles[position.x + (position.y * m_dimensions.x)]->GetTileWorldPosition();
 	return worldPosition;
 }
 

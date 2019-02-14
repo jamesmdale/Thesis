@@ -1,6 +1,7 @@
 #include "Game/Map/MapGenStep_FillAndEdge.hpp"
 #include "Game/Map/Map.hpp"
 
+//  =========================================================================================
 MapGenStep_FillAndEdge::MapGenStep_FillAndEdge( const tinyxml2::XMLElement& generationStepElement )
 	: MapGenStep( generationStepElement )
 {
@@ -16,6 +17,7 @@ MapGenStep_FillAndEdge::MapGenStep_FillAndEdge( const tinyxml2::XMLElement& gene
 	m_edgeThickness = ParseXmlAttribute( generationStepElement, "edgeThickness", m_edgeThickness );
 }
 
+//  =========================================================================================
 void MapGenStep_FillAndEdge::Run( Map& map )
 {
 	//edge

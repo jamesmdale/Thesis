@@ -2,6 +2,7 @@
 #include "Engine\Core\ErrorWarningAssert.hpp"
 #include "Game/Map/Map.hpp"
 
+//  =========================================================================================
 MapGenStep_CellularAutomata::MapGenStep_CellularAutomata( const tinyxml2::XMLElement& generationStepElement )
 	: MapGenStep( generationStepElement )
 {
@@ -28,6 +29,7 @@ MapGenStep_CellularAutomata::MapGenStep_CellularAutomata( const tinyxml2::XMLEle
 	}
 }
 
+//  =========================================================================================
 void MapGenStep_CellularAutomata::Run( Map& map )
 {
 	std::vector<int> tileIndexesToChange;
@@ -79,10 +81,11 @@ void MapGenStep_CellularAutomata::Run( Map& map )
 	}
 }
 
+//  =========================================================================================
 std::vector<int> MapGenStep_CellularAutomata::GetNeighboringTiles(int currentTileIndex, const Map& map)
 {
 	std::vector<int> neighboringTilesIndexes;	
-	Vector2 currentTileCoords = map.m_tiles[currentTileIndex]->m_tileCoords;
+	Vector2 currentTileCoords = map.m_tiles[currentTileIndex]->GetTileWorldPosition();
 
 	Vector2 eastTile = Vector2(currentTileCoords.x + 1, currentTileCoords.y);
 	int eastIndex = (eastTile.x * map.m_dimensions.y) + eastTile.y;
