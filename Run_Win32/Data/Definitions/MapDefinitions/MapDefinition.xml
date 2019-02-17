@@ -1,4 +1,10 @@
 <MapDefinitions>
+	<MapDefinition name="50x50" defaultTile="Grass" width="50" height="50">
+		<GenerationSteps iterations="1" chanceToRun="1.0">
+			<FillAndEdge fillTile="Grass" edgeTile="Wall"></FillAndEdge>
+    	</GenerationSteps>
+	</MapDefinition>
+
 	<MapDefinition name="30x30" defaultTile="Grass" width="30" height="30">
 		<GenerationSteps iterations="1" chanceToRun="1.0">
 			<FillAndEdge fillTile="Grass" edgeTile="Wall"></FillAndEdge>

@@ -2,16 +2,16 @@
 
     <SimulationDefinition
   name="default_optimized"
-  mapName="30x30"
-  numAgents="20"
-  numArmories="3"
-  numLumberyards="3"
-  numMedStations="3"
-  bombardmentRatePerSecond="3.0"
-  threatRatePerSecond = "1.0"
+  mapName="50x50"
+  numAgents="500"
+  numArmories="15"
+  numLumberyards="15"
+  numMedStations="15"
+  bombardmentRatePerSecond="5.0"
+  threatRatePerSecond = "5.0"
   startingThreat="400"
   processTimerInSeconds="180"
-  isOptimized="false" 
+  isOptimized="true" 
   isBudgeted="false"
   />
 
