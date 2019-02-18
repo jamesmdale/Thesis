@@ -82,7 +82,7 @@ void MapGenStep_CellularAutomata::Run( Map& map )
 std::vector<int> MapGenStep_CellularAutomata::GetNeighboringTiles(int currentTileIndex, const Map& map)
 {
 	std::vector<int> neighboringTilesIndexes;	
-	Vector2 currentTileCoords = map.m_tiles[currentTileIndex]->m_tileCoords;
+	Vector2 currentTileCoords = map.m_tiles[currentTileIndex]->GetWorldCoordinates();
 
 	Vector2 eastTile = Vector2(currentTileCoords.x + 1, currentTileCoords.y);
 	int eastIndex = (eastTile.x * map.m_dimensions.y) + eastTile.y;

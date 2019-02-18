@@ -331,6 +331,7 @@
   <ItemGroup>
     <ClInclude Include="Agents\Agent.hpp" />
     <ClInclude Include="Entities\Bombardment.hpp" />
+    <ClInclude Include="Pathing\ThesisAStar.hpp" />
     <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp" />

@@ -27,6 +27,52 @@ bool GetIsAgentUpdateBudgeted();
 //#include "Engine/Core/EngineCommon.hpp"
 
 //sim data
+constexpr uint16 MAX_NUM_AGENTS = UINT16_MAX;
+constexpr uint8 MAX_AGENT_PATH_LENGTH = 50;
+constexpr float PHYSICS_DISC_RADIUS = 0.25;
+
+//camera data
+const Vector2 g_bottomLeftOrtho = Vector2( -1.f, -1.f);
+const Vector2 g_topRightOrtho = Vector2(1.f, 1.f);
+const Vector2 g_center = Vector2((g_bottomLeftOrtho.x + g_topRightOrtho.x) * .5f, (g_bottomLeftOrtho.y + g_topRightOrtho.y) * .5f);
+const Rgba g_backgroundColor = Rgba(1.f, 1.f, 1.f, 1.f);
+
+const float g_tilePercentageOfWindow = 0.025f;
+
+//game related globals
+extern float g_tileSize;
+extern float g_divideTileSize;
+
+extern float g_maxCoordinateDistanceSquared;
+
+//general globals
+constexpr int g_maxHealth = 100;
+constexpr float g_skewForCurrentPlan = 0.05f;
+ 
+ //poi globals
+constexpr float g_baseResourceRefillTimePerSecond = 0.5f;
+constexpr int g_maxResourceCarryAmount = 1;
+
+ //action performance globals
+constexpr float g_baseRepairAmountPerPerformance = 5.f;
+constexpr float g_baseShootDamageAmountPerPerformance = 5.f;
+constexpr float g_baseHealAmountPerPerformance = 5.f;
+constexpr float g_minActionPerformanceRatePerSecond = 0.25f;
+
+constexpr float g_minSkillEfficiency = 0.1f;
+
+ //bombardment globals
+constexpr float g_bombardmentExplosionTime = 1.f;
+constexpr float g_bombardmentExplosionSize = 1.f;
+constexpr int g_bombardmentDamage = 10.f;
+ 
+ //optimization globals
+constexpr float g_sortTimerInSeconds = 0.5f;
+constexpr float g_agentCopyDestinationPositionRadius = 0.5f;
+
+ //threat globals
+constexpr float g_maxThreat = 500.f;
+
 extern SimulationDefinition* g_currentSimulationDefinition;
 
 extern SimulationData* g_generalSimulationData;
@@ -47,26 +93,13 @@ extern uint g_numQueueActionPathCalls;
 
 extern int g_currentSimDefinitionIndex;
 
-//camera data
-const Vector2 g_bottomLeftOrtho = Vector2( -1.f, -1.f);
-const Vector2 g_topRightOrtho = Vector2(1.f, 1.f);
-const Vector2 g_center = Vector2((g_bottomLeftOrtho.x + g_topRightOrtho.x) * .5f, (g_bottomLeftOrtho.y + g_topRightOrtho.y) * .5f);
-const Rgba g_backgroundColor = Rgba(1.f, 1.f, 1.f, 1.f);
-
-const float g_tilePercentageOfWindow = 0.025f;
-
 //debug globals
 extern bool g_isDebug;
 extern bool g_isQuitting;
 extern bool g_isIdShown;
 extern bool g_isDebugDataShown;
-
-//game related globals
-extern float g_tileSize;
-extern float g_divideTileSize;
 extern float g_halfTileSize;
 extern bool g_isBlockedTileDataShown;
-extern float g_maxCoordinateDistanceSquared;
 
 //time globals
 extern uint64_t g_perFrameHPCBudget;
@@ -74,34 +107,6 @@ extern uint64_t g_previousFrameRenderTime;
 extern uint64_t g_previousFrameNonAgentUpdateTime;
 extern uint64_t g_agentUpdateBudgetThisFrame;
 extern int g_agentsUpdatedThisFrame;
-
-//general globals
-extern uint8 g_maxHealth;
-extern float g_skewForCurrentPlan;
-
-//poi globals
-extern float g_baseResourceRefillTimePerSecond;
-extern uint8 g_maxResourceCarryAmount;
-
-//action performance globals
-extern float g_baseRepairAmountPerPerformance;
-extern float g_baseShootDamageAmountPerPerformance;
-extern float g_baseHealAmountPerPerformance;
-extern float g_minActionPerformanceRatePerSecond;
-
-extern float g_minSkillEfficiency;
-
-//bombardment globals
-extern float g_bombardmentExplosionTime;
-extern float g_bombardmentExplosionSize;
-extern uint8 g_bombardmentDamage;
-
-//optimization globalks
-extern float g_sortTimerInSeconds;
-extern float g_agentCopyDestinationPositionRadius;
-
-//  threat globals
-extern uint16 g_maxThreat;
 
 //convenience directions
 extern IntVector2 MAP_NORTH;

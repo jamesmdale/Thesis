@@ -5,6 +5,12 @@
 
 struct ActionCallbackData;
 class Agent;
+struct AgentInfo;
+struct PositionData;
+struct PathData;
+struct Personality;
+struct ActionData;
+
 class Map;
 class PointOfInterest;
 enum eAgentSortType;
@@ -43,17 +49,17 @@ struct UtilityHistory
 class Planner
 {
 public:
-	Planner(Map* mapReference, Agent* agentReference);
+	Planner();
 	~Planner();
 
 	//queue management
-	void ProcessActionStack(float deltaSeconds);
+	void ProcessActionStack(const uint16 agentIndex, float deltaSeconds);
 	void AddActionToStack(ActionCallbackData* actionData);
 	void ClearStack();
 	inline size_t GetActionStackSize() { return m_actionStack.size(); }
 
 	//planning
-	void UpdatePlan();	
+	void UpdatePlan(uint16 agentIndex);	
 	void QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo& info);
 
 	void QueueGatherArrowsAction(const UtilityInfo& info);
@@ -96,14 +102,19 @@ public:
 
 	//optimizations
 	bool FindAgentAndCopyPath(const Vector2& endPostion);
-	void CopyPath(Agent* toAgent, Agent* fromAgent, uint8_t startingIndex);
-	Agent* GetAgentFromSortedList(uint16_t agentIndex, eAgentSortType sortType);
+	void CopyPath(PathData& toAgentPathData, PathData& fromAgentPathData, uint8_t startingIndex);
+	uint16 GetAgentIndexFromSortedList(uint16_t agentIndex, eAgentSortType sortType);
 
 	bool GetDoesHaveTopActionGoalPosition(Vector2& outPosition);
 
-public:
-	ePlanTypes m_currentPlan;
+private:
+	std::stack<ActionCallbackData*> m_actionStack;
 
+public:
+	static Agent* s_agentsPlannerReference;
+	static Map* s_mapPlannerReference;
+
+	ePlanTypes m_currentPlan;
 	UtilityHistory m_utilityHistory;
 
 	//utility data
@@ -112,8 +123,5 @@ public:
 	static UtilityStorage* m_agentHealthUitilityStorage;
 	static UtilityStorage* m_agentGatherUtilityStorage;
 	static UtilityStorage* m_shootUtilityStorageUtility;
-
-private:
-	std::stack<ActionCallbackData*> m_actionStack;
 };
 

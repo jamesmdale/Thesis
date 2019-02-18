@@ -33,7 +33,7 @@ public:
 	int m_id = -1;
 	int m_health = 100;
 
-	Agent* m_agentCurrentlyServing = nullptr;
+	uint16 m_agentCurrentlyServingIndex = UINT16_MAX;
 
 	IntVector2 m_startingCoordinate;
 	IntVector2 m_accessCoordinate;

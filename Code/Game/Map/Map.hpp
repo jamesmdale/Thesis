@@ -113,9 +113,9 @@ public:
 	AABB2 m_mapWorldBounds;
 
 	//lists
-	std::vector<Agent*> m_agentsOrderedByPriority;
-	std::vector<Agent*> m_agentsOrderedByXPosition;
-	std::vector<Agent*> m_agentsOrderedByYPosition;
+	std::vector<uint16> m_agentIndexesOrderedByPriority;
+	std::vector<uint16> m_agentIndexesOrderedByXPosition;
+	std::vector<uint16> m_agentIndexesOrderedByYPosition;
 
 	std::vector<PointOfInterest*> m_pointsOfInterest;
 

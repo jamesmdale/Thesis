@@ -7,6 +7,10 @@
 #include "Game\GameCommon.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 
+Agent* m_plannerAgentsReference = nullptr;
+Map* s_mapPlannerReference = nullptr;
+
+//declarations for utility storage members
 UtilityStorage* Planner::m_distanceUtilityStorage = nullptr;
 UtilityStorage* Planner::m_buildingHealthUtilityStorage = nullptr;
 UtilityStorage* Planner::m_agentHealthUitilityStorage = nullptr;
@@ -20,11 +24,8 @@ int iterationsOfQueueActions = 0;
 uint64_t averageTimeForQueueActions = 0.0;
 
 //  =========================================================================================
-Planner::Planner(Map* mapReference, Agent* agentReference)
+Planner::Planner()
 {
-	m_map = mapReference;
-	m_agent = agentReference;
-
 	if (GetIsOptimized())
 	{
 		m_distanceUtilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
@@ -32,8 +33,7 @@ Planner::Planner(Map* mapReference, Agent* agentReference)
 		m_agentHealthUitilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
 		m_agentGatherUtilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
 		m_shootUtilityStorageUtility = new UtilityStorage(0.f, 1.f, 20.f);
-	}
-	
+	}	
 }
 
 //  =========================================================================================
@@ -41,9 +41,6 @@ Planner::Planner(Map* mapReference, Agent* agentReference)
 //  =========================================================================================
 Planner::~Planner()
 {
-	m_map = nullptr;
-	m_agent = nullptr;
-
 	if (GetIsOptimized())
 	{
 		delete(m_distanceUtilityStorage);
@@ -61,10 +58,12 @@ Planner::~Planner()
 		delete(m_shootUtilityStorageUtility);
 		m_shootUtilityStorageUtility = nullptr;
 	}
+
+	s_agentsPlannerReference = nullptr;
 }
 
 //  =========================================================================================
-void Planner::ProcessActionStack(float deltaSeconds)
+void Planner::ProcessActionStack(const uint16 agentIndex, float deltaSeconds)
 {
 	PROFILER_PUSH();
 	
@@ -82,7 +81,7 @@ void Planner::ProcessActionStack(float deltaSeconds)
 
 	if (m_actionStack.size() == 0)
 	{
-		UpdatePlan();
+		UpdatePlan(agentIndex);
 	}
 
 	//get action at the top of the queue
@@ -91,7 +90,7 @@ void Planner::ProcessActionStack(float deltaSeconds)
 		ActionCallbackData* goal = m_actionStack.top();
 
 		//run action
-		bool isComplete = goal->m_action(m_agent, goal->m_finalGoalPosition, goal->m_interactEntityId);
+		bool isComplete = goal->m_action(s_agentsPlannerReference, agentIndex, goal->m_finalGoalPosition, goal->m_interactEntityId);
 
 		if (isComplete)
 		{
@@ -145,7 +144,7 @@ void Planner::ClearStack()
 //  =========================================================================================
 //  Planning
 //  =========================================================================================
-void Planner::UpdatePlan()
+void Planner::UpdatePlan(uint16 agentIndex)
 {
 #ifdef UpdatePlanAnalysis
 	// profiling ----------------------------------------------
@@ -161,6 +160,10 @@ void Planner::UpdatePlan()
 
 	PROFILER_PUSH();
 	ClearStack();
+
+	PositionData& positionData = s_agentsPlannerReference->m_positionData[agentIndex];
+	Personality& personalityData = s_agentsPlannerReference->m_personality[agentIndex];
+	ActionData& actionData = s_agentsPlannerReference->m_actionData[agentIndex];	
 
 	//set preset to 
 	ePlanTypes chosenOutcome = NONE_PLAN_TYPE;
@@ -211,7 +214,7 @@ void Planner::UpdatePlan()
 	compareUtilityInfo = GetHighestShootUtility();
 
 	if(compareUtilityInfo.utility != 0.f)
-		SkewUtilityForBias(compareUtilityInfo, m_agent->m_combatBias);
+		SkewUtilityForBias(compareUtilityInfo, personalityData.m_combatBias);
 
 	if (m_currentPlan == SHOOT_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
@@ -230,7 +233,7 @@ void Planner::UpdatePlan()
 	compareUtilityInfo = GetHighestRepairUtility();
 
 	if(compareUtilityInfo.utility != 0.f)
-		SkewUtilityForBias(compareUtilityInfo, m_agent->m_repairBias);
+		SkewUtilityForBias(compareUtilityInfo, personalityData.m_repairBias);
 
 	if (m_currentPlan == REPAIR_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
@@ -248,7 +251,7 @@ void Planner::UpdatePlan()
 	compareUtilityInfo = GetHealSelfUtility();
 
 	if(compareUtilityInfo.utility != 0.f)
-		SkewUtilityForBias(compareUtilityInfo, m_agent->m_healBias);
+		SkewUtilityForBias(compareUtilityInfo, personalityData.m_healBias);
 
 	if (m_currentPlan == HEAL_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
@@ -1020,7 +1023,7 @@ IntVector2 Planner::GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVec
 	IntVector2 closestCoordinate = coordinate;
 
 	//maxs of map (walkable is -2).  (assumed mins are 0,0)
-	IntVector2 maxTileCoordinates = IntVector2(m_map->m_dimensions.x - 2.f, m_map->m_dimensions.y - 2.f);
+	IntVector2 maxTileCoordinates = IntVector2(s_mapPlannerReference->m_dimensions.x - 2.f, s_mapPlannerReference->m_dimensions.y - 2.f);
 
 	/*ex:
 	the coordinate (3,6) on a map the size of (8,8) will return (3,7);
@@ -1121,7 +1124,7 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 		//we care about the distance to their current path
 	
 		Agent* mostResembledAgent = nullptr;
-		float minDistanceSquared = m_map->GetMapDistanceSquared();
+		float minDistanceSquared = s_mapPlannerReference->GetMapDistanceSquared();
 		uint8_t indexIntoMostResembledAgentsPath = UINT8_MAX;
 
 		compareDisc.center = goalPosition;
@@ -1212,37 +1215,36 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 }
 
 //  =========================================================================================
-void Planner::CopyPath(Agent* toAgent, Agent* fromAgent, uint8_t startingIndex)
+void Planner::CopyPath(PathData& toAgentPathData, PathData& fromAgentPathData, uint8_t startingIndex)
 {
-	toAgent->m_currentPath.clear();
-	toAgent->m_currentPathIndex = startingIndex;
-	toAgent->m_currentPath.resize(startingIndex + 1);
+	Agent::ClearPathData(toAgentPathData);
+	toAgentPathData.m_currentPathIndex = startingIndex;
 
 	for (int pathIndex = startingIndex; pathIndex >= 0; --pathIndex)
 	{
-		toAgent->m_currentPath[pathIndex] = fromAgent->m_currentPath[pathIndex];
+		toAgentPathData.m_currentPath[pathIndex] = fromAgentPathData.m_currentPath[pathIndex];
 	}
 }
 
 //  =========================================================================================
-Agent* Planner::GetAgentFromSortedList(uint16_t agentIndex, eAgentSortType sortType)
+uint16 Planner::GetAgentIndexFromSortedList(uint16_t agentIndex, eAgentSortType sortType)
 {
 	switch (sortType)
 	{
 	case X_AGENT_SORT_TYPE:
-		if (agentIndex < 0 || agentIndex >= (uint16_t)m_map->m_agentsOrderedByXPosition.size())
+		if (agentIndex < 0 || agentIndex >= (uint16_t)s_mapPlannerReference->m_agentIndexesOrderedByXPosition.size())
 		{
-			return nullptr;
+			return UINT16_MAX;
 		}
-		return m_map->m_agentsOrderedByXPosition[agentIndex];
+		return s_mapPlannerReference->m_agentIndexesOrderedByXPosition[agentIndex];
 		break;
 
 	case Y_AGENT_SORT_TYPE:
-		if (agentIndex < 0 || agentIndex >= (uint16_t)m_map->m_agentsOrderedByYPosition.size())
+		if (agentIndex < 0 || agentIndex >= (uint16_t)s_mapPlannerReference->m_agentIndexesOrderedByYPosition.size())
 		{
-			return nullptr;
+			return UINT16_MAX;
 		}
-		return m_map->m_agentsOrderedByYPosition[agentIndex];
+		return s_mapPlannerReference->m_agentIndexesOrderedByYPosition[agentIndex];
 		break;
 	}
 }

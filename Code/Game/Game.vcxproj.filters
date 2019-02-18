@@ -157,5 +157,6 @@
     <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Entities\Bombardment.hpp" />
     <ClInclude Include="Entities\PointOfInterest.hpp" />
+    <ClInclude Include="Pathing\ThesisAStar.hpp" />
   </ItemGroup>
 </Project>

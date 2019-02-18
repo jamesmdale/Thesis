@@ -4,6 +4,7 @@
 #include "Game\Map\Map.hpp"
 #include "Game\Agents\Planner.hpp";
 #include "Game\GameCommon.hpp"
+#include "Game\Pathing\ThesisAStar.hpp"
 #include "Game\Entities\PointOfInterest.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Engine\Core\Transform2D.hpp"
@@ -14,56 +15,110 @@
 #include "Engine\Profiler\Profiler.hpp"
 #include "Engine\File\CSVWriter.hpp"
 
-//  =========================================================================================
-Agent::Agent()
-{
-}
+Map* m_agentMapReference = nullptr;
+uint16 m_numAgents = 0;
 
 //  =========================================================================================
-Agent::Agent(Vector2 startingPosition, IsoSpriteAnimSet* animationSet, Map* mapReference)
+Agent::Agent(Map* mapReference, uint16 numAgents)
 {
-	//set id according to how many we've made
-	m_id = mapReference->m_agentsOrderedByXPosition.size();
+	s_mapAgentReference = mapReference;
+	s_numAgents = numAgents;
 
-	//setup position and planner
-	m_position = startingPosition;
-	m_planner = new Planner(mapReference, this);
-	m_intermediateGoalPosition = m_position;
-	m_actionTimer = new Stopwatch(GetGameClock());
+	m_agentInfo = new AgentInfo[numAgents];
+	m_positionData = new PositionData[numAgents];
+	m_pathData = new PathData[numAgents];
+	m_personality = new Personality[numAgents];
 
-	//generate personality
-	GenerateRandomStats();
-	
-	//setup physics
-	m_physicsDisc.radius = 0.25f;
-	m_physicsDisc.center = m_position;
+	m_planner = new Planner[numAgents];
 
-	m_pathDisc.radius = 0.30f;
-	m_pathDisc.center = m_position;
-
-	//precompute sprite data
-	m_animationSet = animationSet;
-	m_animationSet->SetCurrentAnim("idle");
-	Sprite sprite = *m_animationSet->GetCurrentSprite(m_spriteDirection);
-	Vector2 spritePivot = sprite.m_definition->m_pivot;
-	IntVector2 spriteDimensions = sprite.GetDimensions();
-
-	//m_spriteRenderBounds.mins.x = 0.f - (spritePivot.x) * 1.f;
-	//m_spriteRenderBounds.maxs.x = m_spriteRenderBounds.mins.x + 1.f * 1.f;
-	//m_spriteRenderBounds.mins.y = 0.f - (spritePivot.y) * 1.f;
-	//m_spriteRenderBounds.maxs.y = m_spriteRenderBounds.mins.y + 1.f * 1.f;
+	m_actionData = new ActionData[numAgents];
+	m_indexInSortedXList = new uint16[numAgents];
+	m_indexInSortedYList = new uint16[numAgents];
+	m_indexInPriorityList = new uint16[numAgents];		
 }
 
 //  =========================================================================================
 Agent::~Agent()
 {
-	delete(m_planner);
+	s_mapAgentReference = nullptr;
+	
+	delete[] m_agentInfo;
+	m_agentInfo = nullptr;
+
+	delete[] m_positionData;
+	m_positionData = nullptr;
+
+	delete[] m_pathData;
+	m_pathData = nullptr;
+
+	delete[] m_personality;
+	m_personality = nullptr;
+
+	delete[] m_planner;
 	m_planner = nullptr;
 
-	delete(m_actionTimer);
-	m_actionTimer = nullptr;
+	delete[] m_actionData;
+	m_actionData = nullptr;
 
-	m_animationSet = nullptr;
+	delete[] m_indexInSortedXList;
+	m_indexInSortedXList = nullptr;
+
+	delete[] m_indexInSortedYList;
+	m_indexInSortedYList = nullptr;
+
+	delete[] m_indexInPriorityList;
+	m_indexInPriorityList = nullptr;
+}
+
+//  =========================================================================================
+void Agent::AddAgentData(const uint16 id, const Vector2& startingPosition, IsoSpriteAnimSet* animationSet)
+{
+
+}
+
+//  =========================================================================================
+void Agent::Initialize()
+{
+	InitializeAgentInfos();
+	InitializePathData();
+	InitializePersonalities();
+	InitializeActionData();
+	InitialisePlannerData();
+}
+
+//  =========================================================================================
+void Agent::InitializeAgentInfos()
+{
+}
+
+//  =========================================================================================
+void Agent::InitializePathData()
+{
+}
+
+//  =========================================================================================
+void Agent::InitializePersonalities()
+{
+}
+
+//  =========================================================================================
+void Agent::InitializeActionData()
+{
+}
+
+//  =========================================================================================
+void Agent::InitialisePlannerData()
+{
+	m_planner[0].s_agentsPlannerReference = this;
+}
+
+//  =========================================================================================
+void Agent::ClearPathData(PathData& pathData)
+{
+	for (int pathIndex = 0; pathIndex < pathData.m_pathCount; ++pathIndex)
+	{
+		pathData.m_currentPath[pathData.m_pathCount] = Vector2::ZERO;
+	}
 }
 
 //  =========================================================================================
@@ -77,9 +132,9 @@ void Agent::GenerateRandomStats(Personality& personality)
 	personality.m_repairEfficiency = GetRandomFloatInRange(0.25f, 0.9f);
 	personality.m_healEfficiency = GetRandomFloatInRange(0.25f, 0.9f);
 
-	UpdateCombatPerformanceTime();
-	UpdateRepairPerformanceTime();
-	UpdateHealPerformanceTime();
+	UpdateCombatPerformanceTime(personality);
+	UpdateRepairPerformanceTime(personality);
+	UpdateHealPerformanceTime(personality);
 }	
 
 //  =========================================================================================
@@ -165,7 +220,7 @@ void Agent::Render()
 }
 
 //  =========================================================================================
-bool Agent::GetPathToDestination(PathData& pathData, const Vector2& goalDestination)
+bool Agent::GetPathToDestination(PositionData& positionData, PathData& pathData, const Vector2& goalDestination)
 {
 	++g_numGetPathCalls;
 
@@ -181,22 +236,24 @@ bool Agent::GetPathToDestination(PathData& pathData, const Vector2& goalDestinat
 #endif
 
 	PROFILER_PUSH();
-	pathData.m_currentPath = std::vector<Vector2>(); //clear vector
+	ClearPathData(pathData); //clear current path
 
-	IntVector2 startCoord = pathData.m_map->GetTileCoordinateOfPosition(pathData.m_position);
-	IntVector2 endCoord = pathData.m_map->GetTileCoordinateOfPosition(goalDestination);
+	IntVector2 startCoord = s_mapAgentReference->GetTileCoordinateOfPosition(positionData.m_position);
+	IntVector2 endCoord = s_mapAgentReference->GetTileCoordinateOfPosition(goalDestination);
 	bool isDestinationFound = false;
 
-	pathData.m_currentPath.push_back(goalDestination);
+	//add final position to current path list
+	pathData.m_currentPath[pathData.m_pathCount] = goalDestination;
+	++pathData.m_pathCount;
 
 	//add the location
 	if (GetIsOptimized())
 	{
-		isDestinationFound = AStarSearchOnGrid(pathData.m_currentPath, startCoord, endCoord, pathData.m_map->m_mapAsGrid, pathData.m_map);
+		isDestinationFound = ThesisAStarSearchOnGrid(pathData, startCoord, endCoord, s_mapAgentReference->m_mapAsGrid);
 	}		
 	else
 	{
-		isDestinationFound = AStarSearchOnGrid(pathData.m_currentPath, startCoord, endCoord, pathData.m_map->GetAsGrid(), pathData.m_map);
+		isDestinationFound = ThesisAStarSearchOnGrid(pathData, startCoord, endCoord, s_mapAgentReference->GetAsGrid());
 	}
 
 #ifdef PathingDataAnalysis
@@ -240,16 +297,15 @@ bool Agent::GetPathToDestination(PathData& pathData, const Vector2& goalDestinat
 //}
 
 //  =========================================================================================
-bool Agent::GetIsAtPosition(PathData& pathData, const Vector2& position)
+bool Agent::GetIsAtPosition(PositionData& positionData, const Vector2& position)
 {
-	return pathData.m_pathDisc.IsPointInside(position);
+	return positionData.m_physicsDisc.IsPointInside(position);
 }
 
 //  =========================================================================================
-void Agent::UpdatePhysicsData(PathData& pathData)
+void Agent::UpdatePhysicsData(PositionData& positionData)
 {
-	pathData.m_physicsDisc.center = pathData.m_position;
-	pathData.m_pathDisc.center = pathData.m_position;
+	positionData.m_physicsDisc.center = positionData.m_position;
 }
 
 //  =============================================================================
@@ -274,50 +330,50 @@ void Agent::UpdateHealPerformanceTime(Personality& personality)
 void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 {
 	//id
-	outStrings.push_back(Stringf("ID: %i", m_id));
-	outStrings.push_back(Stringf("Health: %i", m_health));
+	//outStrings.push_back(Stringf("ID: %i", m_id));
+	//outStrings.push_back(Stringf("Health: %i", m_health));
 
-	//biases
-	outStrings.push_back(Stringf("Biases"));
-	outStrings.push_back(Stringf("CB: %f", m_combatBias));
-	outStrings.push_back(Stringf("RB: %f", m_repairBias));
-	outStrings.push_back(Stringf("HB: %f", m_healBias));
+	////biases
+	//outStrings.push_back(Stringf("Biases"));
+	//outStrings.push_back(Stringf("CB: %f", m_combatBias));
+	//outStrings.push_back(Stringf("RB: %f", m_repairBias));
+	//outStrings.push_back(Stringf("HB: %f", m_healBias));
 
-	//efficiencies
-	outStrings.push_back(Stringf("Efficiencies"));
-	outStrings.push_back(Stringf("CE: %f", m_combatEfficiency));
-	outStrings.push_back(Stringf("RE: %f", m_repairEfficiency));
-	outStrings.push_back(Stringf("HE: %f", m_healEfficiency));
+	////efficiencies
+	//outStrings.push_back(Stringf("Efficiencies"));
+	//outStrings.push_back(Stringf("CE: %f", m_combatEfficiency));
+	//outStrings.push_back(Stringf("RE: %f", m_repairEfficiency));
+	//outStrings.push_back(Stringf("HE: %f", m_healEfficiency));
 
-	//inventory
-	outStrings.push_back(Stringf("Inventory"));
-	outStrings.push_back(Stringf("Arrows: %i", m_arrowCount));
-	outStrings.push_back(Stringf("Bandages: %i", m_bandageCount));
-	outStrings.push_back(Stringf("Lumber: %i", m_lumberCount));
+	////inventory
+	//outStrings.push_back(Stringf("Inventory"));
+	//outStrings.push_back(Stringf("Arrows: %i", m_arrowCount));
+	//outStrings.push_back(Stringf("Bandages: %i", m_bandageCount));
+	//outStrings.push_back(Stringf("Lumber: %i", m_lumberCount));
 
-	//planner
-	outStrings.push_back(Stringf("Planner"));
-	outStrings.push_back(Stringf("Plan: %s", m_planner->GetPlanTypeAsText().c_str()));
-	outStrings.push_back(Stringf("Path Steps: %i", m_currentPath.size()));
-	outStrings.push_back(Stringf("Update Pr.: %i", m_updatePriority));
-	outStrings.push_back(Stringf("Gather Arr. Util.: %f", m_planner->m_utilityHistory.m_lastGatherArrows));
-	outStrings.push_back(Stringf("Gather Lum. Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
-	outStrings.push_back(Stringf("Shoot. Util.: %f", m_planner->m_utilityHistory.m_lastShoot));
-	outStrings.push_back(Stringf("Repair Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
-	outStrings.push_back(Stringf("Chosen Outcome.: %i", (int)m_planner->m_utilityHistory.m_chosenOutcome));
+	////planner
+	//outStrings.push_back(Stringf("Planner"));
+	//outStrings.push_back(Stringf("Plan: %s", m_planner->GetPlanTypeAsText().c_str()));
+	//outStrings.push_back(Stringf("Path Steps: %i", m_currentPath.size()));
+	//outStrings.push_back(Stringf("Update Pr.: %i", m_updatePriority));
+	//outStrings.push_back(Stringf("Gather Arr. Util.: %f", m_planner->m_utilityHistory.m_lastGatherArrows));
+	//outStrings.push_back(Stringf("Gather Lum. Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
+	//outStrings.push_back(Stringf("Shoot. Util.: %f", m_planner->m_utilityHistory.m_lastShoot));
+	//outStrings.push_back(Stringf("Repair Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
+	//outStrings.push_back(Stringf("Chosen Outcome.: %i", (int)m_planner->m_utilityHistory.m_chosenOutcome));
 }
 
 //  =========================================================================================
-void Agent::UpdateSpriteRenderDirection(PathData& pathData)
+void Agent::UpdateSpriteRenderDirection(PositionData& positionData)
 {
 	PROFILER_PUSH();
 
 	//calculate the largest dot between facing or turned away
 	float dotValue = 0;
-	float northDot = DotProduct(Vector2(MAP_NORTH), Vector2(pathData.m_forward));
-	float southDot = DotProduct(Vector2(MAP_SOUTH), Vector2(pathData.m_forward));
-	float eastDot = DotProduct(Vector2(MAP_EAST), Vector2(pathData.m_forward));
-	float westDot = DotProduct(Vector2(MAP_WEST), Vector2(pathData.m_forward));
+	float northDot = DotProduct(Vector2(MAP_NORTH), Vector2(positionData.m_forward));
+	float southDot = DotProduct(Vector2(MAP_SOUTH), Vector2(positionData.m_forward));
+	float eastDot = DotProduct(Vector2(MAP_EAST), Vector2(positionData.m_forward));
+	float westDot = DotProduct(Vector2(MAP_WEST), Vector2(positionData.m_forward));
 
 	IntVector2 direction;
 
@@ -354,7 +410,7 @@ void Agent::UpdateSpriteRenderDirection(PathData& pathData)
 		direction.y = 0;
 
 	//set the final direction.
-	pathData.m_spriteDirection = direction;
+	positionData.m_spriteDirection = direction;
 }
 //  =========================================================================================
 void Agent::TakeDamage(AgentInfo& agentInfo, int damageAmount)
@@ -393,6 +449,7 @@ bool MoveAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalD
 	PROFILER_PUSH();
 	
 	//get references to the necessary data
+	PositionData& positionData = agentsList->m_positionData[agentIndex];
 	PathData& pathData = agentsList->m_pathData[agentIndex];
 	ActionData& actionData = agentsList->m_actionData[agentIndex];
 
@@ -400,7 +457,7 @@ bool MoveAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalD
 	if (actionData.m_isFirstLoopThroughAction)
 	{
 		//do first pass logic
-		pathData.m_currentPath.clear();
+		Agent::ClearPathData(pathData);
 		pathData.m_currentPathIndex = UINT8_MAX;
 		actionData.m_isFirstLoopThroughAction = false;
 	}
@@ -411,31 +468,31 @@ bool MoveAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalD
 	actionData.m_animationSet->SetCurrentAnim("walk");
 
 	// early out
-	if (Agent::GetIsAtPosition(pathData, goalDestination))
+	if (Agent::GetIsAtPosition(positionData, goalDestination))
 	{
 		//reset first loop action
 		actionData.m_isFirstLoopThroughAction = true;
 		pathData.m_currentPathIndex = UINT8_MAX;
-		Agent::UpdatePhysicsData(pathData);
+		Agent::UpdatePhysicsData(positionData);
 		return true;
 	}		
 
 	//if we don't have a path to the destination or have completed our previous path, get a new path
-	if (pathData.m_currentPath.size() == 0 || pathData.m_currentPathIndex == UINT8_MAX)
+	if (pathData.m_pathCount == 0 || pathData.m_currentPathIndex == UINT8_MAX)
 	{
-		Agent::GetPathToDestination(pathData, goalDestination);
-		pathData.m_currentPathIndex = pathData.m_currentPath.size() - 1;
+		Agent::GetPathToDestination(positionData, pathData, goalDestination);
+		pathData.m_currentPathIndex = pathData.m_pathCount - 1;
 	}	
 
 	//We have a path, follow it.
-	if(!Agent::GetIsAtPosition(pathData, pathData.m_currentPath[pathData.m_currentPathIndex]))
+	if(!Agent::GetIsAtPosition(positionData, pathData.m_currentPath[pathData.m_currentPathIndex]))
 	{
 		pathData.m_intermediateGoalPosition = pathData.m_currentPath[pathData.m_currentPathIndex];
 
-		pathData.m_forward = pathData.m_intermediateGoalPosition - pathData.m_position;
-		pathData.m_forward.NormalizeAndGetLength();
+		positionData.m_forward = pathData.m_intermediateGoalPosition - positionData.m_position;
+		positionData.m_forward.NormalizeAndGetLength();
 
-		pathData.m_position += (pathData.m_forward * (pathData.m_movespeed * GetGameClock()->GetDeltaSeconds()));
+		positionData.m_position += (positionData.m_forward * (positionData.m_movespeed * GetGameClock()->GetDeltaSeconds()));
 		
 	}		
 	else
@@ -443,66 +500,68 @@ bool MoveAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalD
 		//if we are down to our final destination and we are in the same tile, just snap to the location in that tile
 		if (pathData.m_currentPathIndex == 0)
 		{
-			pathData.m_position = pathData.m_currentPath[pathData.m_currentPathIndex];
+			positionData.m_position = pathData.m_currentPath[pathData.m_currentPathIndex];
 			--pathData.m_currentPathIndex;
 
 			//reset first loop action
 			actionData.m_isFirstLoopThroughAction = true;
-			Agent::UpdatePhysicsData(pathData);
+			Agent::UpdatePhysicsData(positionData);
 			return true;
 		}
 		else
 		{
 			--pathData.m_currentPathIndex;
 
-			if (pathData.m_currentPath.size() != 0)
+			if (pathData.m_pathCount != 0)
 				pathData.m_intermediateGoalPosition = pathData.m_currentPath[pathData.m_currentPathIndex];
 
-			pathData.m_forward = pathData.m_intermediateGoalPosition - pathData.m_position;
-			pathData.m_forward.NormalizeAndGetLength();
+			positionData.m_forward = pathData.m_intermediateGoalPosition - positionData.m_position;
+			positionData.m_forward.NormalizeAndGetLength();
 
-			pathData.m_position += (pathData.m_forward * (pathData.m_movespeed * GetGameClock()->GetDeltaSeconds()));
-			Agent::UpdatePhysicsData(pathData);
+			positionData.m_position += (positionData.m_forward * (positionData.m_movespeed * GetGameClock()->GetDeltaSeconds()));
+			Agent::UpdatePhysicsData(positionData);
 		}
 	}
-
-	
 
 	//we aren't finish moving
 	return false;
 }
 
 //  =========================================================================================
-bool ShootAction(const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId)
+bool ShootAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId)
 {
 	PROFILER_PUSH();
 
+	PathData& pathData = agentsList->m_pathData[agentIndex];
+	Personality& personality = agentsList->m_personality[agentIndex];
+	ActionData& actionData = agentsList->m_actionData[agentIndex];
+
 	//used to handle any extra logic that must occur on first loop
-	if (agent->m_isFirstLoopThroughAction)
+	if (actionData.m_isFirstLoopThroughAction)
 	{
 		//do first pass logic
-		agent->m_isFirstLoopThroughAction = false;
-		agent->m_actionTimer->SetTimer(agent->m_calculatedCombatPerformancePerSecond);		
+		actionData.m_isFirstLoopThroughAction = false;
+		actionData.m_actionTimer->SetTimer(personality.m_calculatedCombatPerformancePerSecond);		
 	}
 
-	agent->m_animationSet->SetCurrentAnim("shoot");
+	actionData.m_animationSet->SetCurrentAnim("shoot");
 
 	//if we are at our destination, we are ready to shoot	
-	if (agent->m_actionTimer->DecrementAll() > 0)
+	if (actionData.m_actionTimer->DecrementAll() > 0)
 	{
 		//launch arrow in agent forward
-		agent->m_planner->m_map->m_threat = ClampInt(agent->m_planner->m_map->m_threat - g_baseShootDamageAmountPerPerformance, 0, g_maxThreat);
-		agent->m_arrowCount--;
+		m_agentMapReference->m_threat = ClampInt(m_agentMapReference->m_threat - g_baseShootDamageAmountPerPerformance, 0, g_maxThreat);
+		actionData.m_arrowCount--;
 
-		ASSERT_OR_DIE(agent->m_arrowCount >= 0, "AGENT ARROW COUNT NEGATIVE!!");
+		ASSERT_OR_DIE(actionData.m_arrowCount >= 0, "AGENT ARROW COUNT NEGATIVE!!");
 
-		agent->m_animationSet->GetCurrentAnim()->PlayFromStart();
+		actionData.m_animationSet->GetCurrentAnim()->PlayFromStart();
 	}	
 
-	if (agent->m_arrowCount == 0 || agent->m_planner->m_map->m_threat == 0)
+	if (actionData.m_arrowCount == 0 || m_agentMapReference->m_threat == 0)
 	{
 		//reset first loop action
-		agent->m_isFirstLoopThroughAction = true;
+		actionData.m_isFirstLoopThroughAction = true;
 		return true;
 	}
 		
@@ -514,36 +573,37 @@ bool RepairAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goa
 {
 	PROFILER_PUSH();
 
-	PathData& pathData = agentsList->m_pathData[agentIndex];
+	PositionData& positionData = agentsList->m_positionData[agentIndex];
+	Personality& personality = agentsList->m_personality[agentIndex];
 	ActionData& actionData = agentsList->m_actionData[agentIndex];
 
 	//used to handle any extra logic that must occur on first loop
 	if (actionData.m_isFirstLoopThroughAction)
 	{
-		PointOfInterest* targetPoi = pathData.m_map->GetPointOfInterestById(interactEntityId);
-		pathData.m_forward = targetPoi->GetWorldBounds().GetCenter() - pathData.m_position;
+		PointOfInterest* targetPoi = m_agentMapReference->GetPointOfInterestById(interactEntityId);
+		positionData.m_forward = targetPoi->GetWorldBounds().GetCenter() - positionData.m_position;
 		//do first pass logic
-		actionData.m_actionTimer->SetTimer(agent->m_calculatedRepairPerformancePerSecond);
+		actionData.m_actionTimer->SetTimer(personality.m_calculatedRepairPerformancePerSecond);
 		actionData.m_isFirstLoopThroughAction = false;
 	}
 
-	agent->m_animationSet->SetCurrentAnim("cast");
+	actionData.m_animationSet->SetCurrentAnim("cast");
 
 	//if we are at our destination, we are ready to repair
-	PointOfInterest* targetPoi = agent->m_planner->m_map->GetPointOfInterestById(interactEntityId);
+	PointOfInterest* targetPoi = m_agentMapReference->GetPointOfInterestById(interactEntityId);
 	
-	if (agent->m_actionTimer->DecrementAll() > 0)
+	if (actionData.m_actionTimer->DecrementAll() > 0)
 	{
 		targetPoi->m_health = ClampInt(targetPoi->m_health + g_baseRepairAmountPerPerformance, 0, 100);
-		agent->m_lumberCount--;
+		actionData.m_lumberCount--;
 
-		ASSERT_OR_DIE(agent->m_lumberCount >= 0, "AGENT LUMBER COUNT NEGATIVE!!");
+		ASSERT_OR_DIE(actionData.m_lumberCount >= 0, "AGENT LUMBER COUNT NEGATIVE!!");
 	}
 
-	if (agent->m_lumberCount == 0 || targetPoi->m_health == 100)
+	if (actionData.m_lumberCount == 0 || targetPoi->m_health == 100)
 	{
 		//reset first loop action
-		agent->m_isFirstLoopThroughAction = true;
+		actionData.m_isFirstLoopThroughAction = true;
 		return true;
 	}		
 
@@ -551,49 +611,59 @@ bool RepairAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goa
 }
 
 //  =========================================================================================
-bool HealAction(const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId)
+bool HealAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId)
 {
 	PROFILER_PUSH();
 
+	AgentInfo& agentInfo = agentsList->m_agentInfo[agentIndex];
+	PositionData& positionData = agentsList->m_positionData[agentIndex];
+	Personality& personality = agentsList->m_personality[agentIndex];
+	ActionData& actionData = agentsList->m_actionData[agentIndex];
+
 	//used to handle any extra logic that must occur on first loop
-	if (agent->m_isFirstLoopThroughAction)
+	if (actionData.m_isFirstLoopThroughAction)
 	{
 		//do first pass logic
-		agent->m_actionTimer->SetTimer(agent->m_calculatedHealPerformancePerSecond);
-		agent->m_isFirstLoopThroughAction = false;
+		actionData.m_actionTimer->SetTimer(personality.m_calculatedHealPerformancePerSecond);
+		actionData.m_isFirstLoopThroughAction = false;
 	}
 
-	agent->m_animationSet->SetCurrentAnim("heal");
+	actionData.m_animationSet->SetCurrentAnim("heal");
 
-	if (agent->m_actionTimer->DecrementAll() > 0)
+	if (actionData.m_actionTimer->DecrementAll() > 0)
 	{
-		agent->m_health = ClampInt(agent->m_health + g_baseHealAmountPerPerformance, 0, 100);
-		agent->m_bandageCount--;
+		agentInfo.m_health = ClampInt(agentInfo.m_health + g_baseHealAmountPerPerformance, 0, 100);
+		actionData.m_bandageCount--;
 
-		ASSERT_OR_DIE(agent->m_bandageCount >= 0, "AGENT BANDAGE COUNT NEGATIVE!!");
+		ASSERT_OR_DIE(actionData.m_bandageCount >= 0, "AGENT BANDAGE COUNT NEGATIVE!!");
 	}
 
-	if (agent->m_bandageCount == 0 || agent->m_health == 100)
+	if (actionData.m_bandageCount == 0 || agentInfo.m_health == 100)
 	{
 		//reset first loop action
-		agent->m_isFirstLoopThroughAction = true;
+		actionData.m_isFirstLoopThroughAction = true;
 		return true;
 	}		
 
 	//reset first loop action
-	agent->m_isFirstLoopThroughAction = true;
+	actionData.m_isFirstLoopThroughAction = true;
 	return true;	
 }
 
 //  =========================================================================================
-bool GatherAction(const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId)
+bool GatherAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId)
 {
 	PROFILER_PUSH();
 
-	agent->m_animationSet->SetCurrentAnim("cast");
+	AgentInfo& agentInfo = agentsList->m_agentInfo[agentIndex];
+	PositionData& positionData = agentsList->m_positionData[agentIndex];
+	Personality& personality = agentsList->m_personality[agentIndex];
+	ActionData& actionData = agentsList->m_actionData[agentIndex];
+
+	actionData.m_animationSet->SetCurrentAnim("cast");
 
 	//if we are at our destination, we are ready to gather
-	PointOfInterest* targetPoi = agent->m_planner->m_map->GetPointOfInterestById(interactEntityId);
+	PointOfInterest* targetPoi = m_agentMapReference->GetPointOfInterestById(interactEntityId);
 
 	//confirm agent is at targetPOI accessLocation
 	//if (agent->m_planner->m_map->GetTileCoordinateOfPosition(agent->m_position) != targetPoi->m_accessCoordinate)
@@ -609,16 +679,16 @@ bool GatherAction(const uint16 agentIndex, const Vector2& goalDestination, int i
 	//}
 
 	//if we are serving another agent or no one is assigned we either need to wait or set this agent to currently serving
-	if (targetPoi->m_agentCurrentlyServing != agent)
+	if (targetPoi->m_agentCurrentlyServingIndex != agentIndex)
 	{
-		agent->m_forward = targetPoi->GetWorldBounds().GetCenter() - agent->m_position;
+		positionData.m_forward = targetPoi->GetWorldBounds().GetCenter() - positionData.m_position;
 
 		//no one is being served, we can begin acquiring resources from the poi
-		if (targetPoi->m_agentCurrentlyServing == nullptr)
+		if (targetPoi->m_agentCurrentlyServingIndex == UINT16_MAX)
 		{
-			targetPoi->m_agentCurrentlyServing = agent;
+			targetPoi->m_agentCurrentlyServingIndex = agentIndex;
 			targetPoi->m_refillTimer->Reset();
-			agent->m_animationSet->SetCurrentAnim("cast");
+			actionData.m_animationSet->SetCurrentAnim("cast");
 		}
 		//another agent is being served so we need to wait
 		else
@@ -635,12 +705,12 @@ bool GatherAction(const uint16 agentIndex, const Vector2& goalDestination, int i
 	case ARMORY_POI_TYPE:
 		if (targetPoi->m_refillTimer->ResetAndDecrementIfElapsed())
 		{
-			agent->m_arrowCount++;
+			actionData.m_arrowCount++;
 		}
-		if (agent->m_arrowCount == g_maxResourceCarryAmount)
+		if (actionData.m_arrowCount == g_maxResourceCarryAmount)
 		{
 			//agent is served and ready to move on
-			targetPoi->m_agentCurrentlyServing = nullptr;
+			targetPoi->m_agentCurrentlyServingIndex = UINT16_MAX;
 
 			//cleanup
 			targetPoi = nullptr;
@@ -650,12 +720,12 @@ bool GatherAction(const uint16 agentIndex, const Vector2& goalDestination, int i
 	case LUMBERYARD_POI_TYPE:
 		if (targetPoi->m_refillTimer->ResetAndDecrementIfElapsed())
 		{
-			agent->m_lumberCount++;
+			actionData.m_lumberCount++;
 		}
-		if (agent->m_lumberCount == g_maxResourceCarryAmount)
+		if (actionData.m_lumberCount == g_maxResourceCarryAmount)
 		{
 			//agent is served and ready to move on
-			targetPoi->m_agentCurrentlyServing = nullptr;
+			targetPoi->m_agentCurrentlyServingIndex = UINT16_MAX;
 
 			//cleanup
 			targetPoi = nullptr;
@@ -665,12 +735,12 @@ bool GatherAction(const uint16 agentIndex, const Vector2& goalDestination, int i
 	case MED_STATION_POI_TYPE:
 		if (targetPoi->m_refillTimer->ResetAndDecrementIfElapsed())
 		{
-			agent->m_bandageCount++;
+			actionData.m_bandageCount++;
 		}
-		if (agent->m_bandageCount == g_maxResourceCarryAmount)
+		if (actionData.m_bandageCount == g_maxResourceCarryAmount)
 		{
 			//agent is served and ready to move on
-			targetPoi->m_agentCurrentlyServing = nullptr;
+			targetPoi->m_agentCurrentlyServingIndex = UINT16_MAX;
 
 			//cleanup
 			targetPoi = nullptr;

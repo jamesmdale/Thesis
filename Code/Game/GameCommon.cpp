@@ -3,7 +3,6 @@
 #include "Game\Definitions\SimulationDefinition.hpp"
 #include "Engine\Window\Window.hpp"
 
-
 SimulationDefinition* g_currentSimulationDefinition = nullptr;
 
 SimulationData* g_generalSimulationData = nullptr;
@@ -43,34 +42,6 @@ uint64_t g_previousFrameRenderTime = 0.0;
 uint64_t g_previousFrameNonAgentUpdateTime = 0.0;
 uint64_t g_agentUpdateBudgetThisFrame = 0.0;
 int g_agentsUpdatedThisFrame = 0;
-
-//general globals
-int g_maxHealth = 100;
-float g_skewForCurrentPlan = 0.05f;
-
-//poi globals
-float g_baseResourceRefillTimePerSecond = 0.5f;
-int g_maxResourceCarryAmount = 1;
-
-//action performance globals
-float g_baseRepairAmountPerPerformance = 5.f;
-float g_baseShootDamageAmountPerPerformance = 5.f;
-float g_baseHealAmountPerPerformance = 5.f;
-float g_minActionPerformanceRatePerSecond = 0.25f;
-
-float g_minSkillEfficiency = 0.1f;
-
-//bombardment globals
-float g_bombardmentExplosionTime = 1.f;
-float g_bombardmentExplosionSize = 1.f;
-int g_bombardmentDamage = 10.f;
-
-//optimization globals
-float g_sortTimerInSeconds = 0.5f;
-float g_agentCopyDestinationPositionRadius = 0.5f;
-
-//threat globals
-float g_maxThreat = 500.f;
 
 //XY
 IntVector2 MAP_NORTH = IntVector2(0, 1);
