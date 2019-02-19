@@ -73,6 +73,22 @@ Agent::~Agent()
 //  =========================================================================================
 void Agent::AddAgentData(const uint16 id, const Vector2& startingPosition, IsoSpriteAnimSet* animationSet)
 {
+	AgentInfo& agentInfo = m_agentInfo[id];
+	PositionData& positionData = m_positionData[id];
+	Personality& personalityData = m_personality[id];
+	ActionData& actionData = m_actionData[id];
+
+	//agent info setup
+	agentInfo.m_id = id;
+
+	//position setup
+	positionData.m_position = startingPosition;
+
+	//personality setup
+	GenerateRandomStats(personalityData);
+
+	//action data setup
+	actionData.m_animationSet = animationSet;
 
 }
 
@@ -104,6 +120,10 @@ void Agent::InitializePersonalities()
 //  =========================================================================================
 void Agent::InitializeActionData()
 {
+	for (int agentIndex = 0; agentIndex < s_numAgents; ++agentIndex)
+	{
+		m_actionData[agentIndex].m_actionTimer = new Stopwatch(Game::GetInstance()->m_gameClock);
+	}
 }
 
 //  =========================================================================================
@@ -115,9 +135,9 @@ void Agent::InitialisePlannerData()
 //  =========================================================================================
 void Agent::ClearPathData(PathData& pathData)
 {
-	for (int pathIndex = 0; pathIndex < pathData.m_pathCount; ++pathIndex)
+	for (int pathIndex = 0; pathIndex < pathData.m_pathSize; ++pathIndex)
 	{
-		pathData.m_currentPath[pathData.m_pathCount] = Vector2::ZERO;
+		pathData.m_currentPath[pathData.m_pathSize] = Vector2::ZERO;
 	}
 }
 
@@ -138,7 +158,7 @@ void Agent::GenerateRandomStats(Personality& personality)
 }	
 
 //  =========================================================================================
-void Agent::Update(float deltaSeconds)
+void Agent::Update(uint16 agentIndex, float deltaSeconds)
 {
 	PROFILER_PUSH();
 
@@ -149,10 +169,14 @@ void Agent::Update(float deltaSeconds)
 	//  ----------------------------------------------
 #endif
 
-	m_planner->ProcessActionStack(deltaSeconds);	
+	PositionData& positionData = m_positionData[agentIndex];
+	Planner& agentPlanner = m_planner[agentIndex];
+	ActionData& actionData = m_actionData[agentIndex];
 
-	UpdateSpriteRenderDirection();
-	m_animationSet->Update(deltaSeconds);
+	agentPlanner.ProcessActionStack(agentIndex, deltaSeconds);	
+
+	UpdateSpriteRenderDirection(positionData);
+	actionData.m_animationSet->Update(deltaSeconds);
 
 
 #ifdef AgentUpdateAnalysis
@@ -164,29 +188,35 @@ void Agent::Update(float deltaSeconds)
 }
 
 //  =============================================================================
-void Agent::QuickUpdate(float deltaSeconds)
+void Agent::QuickUpdate(uint16 agentIndex, float deltaSeconds)
 {
 	PROFILER_PUSH();
 
+	AgentInfo& agentInfo = m_agentInfo[agentIndex];
+	PositionData& positionData = m_positionData[agentIndex];
+	PathData& pathData = m_pathData[agentIndex];
+	Planner& agentPlanner = m_planner[agentIndex];
+	ActionData& actionData = m_actionData[agentIndex];
+
 	int priorityIncreaseAmount = 1;
 
-	m_animationSet->Update(deltaSeconds);
+	actionData.m_animationSet->Update(deltaSeconds);
 
 	//if we are walking at the moment, keep walking in the same direction (physics will handle the rest)
-	if (m_currentPath.size() > 0)
+	if (pathData.m_pathSize > 0)
 	{
-		m_forward = m_intermediateGoalPosition - m_position;
-		m_forward.NormalizeAndGetLength();
+		positionData.m_forward = pathData.m_intermediateGoalPosition - positionData.m_position;
+		positionData.m_forward.NormalizeAndGetLength();
 
 		//move even slower if we can't get here
-		m_position += (m_forward * (m_movespeed * GetGameClock()->GetDeltaSeconds() * 0.1f));
+		positionData.m_position += (positionData.m_forward * (positionData.m_movespeed * GetGameClock()->GetDeltaSeconds() * 0.1f));
 	}
 
 	TODO("Later add more criteria to better define this data");
-	if(m_planner->GetActionStackSize() == 0)
+	if(agentPlanner.GetActionStackSize() == 0)
 		priorityIncreaseAmount = 10; //increase a significant amount
 
-	IncreaseUpdatePriority(priorityIncreaseAmount);
+	IncreaseUpdatePriority(agentInfo, priorityIncreaseAmount);
 }
 
 //  =========================================================================================
@@ -243,8 +273,8 @@ bool Agent::GetPathToDestination(PositionData& positionData, PathData& pathData,
 	bool isDestinationFound = false;
 
 	//add final position to current path list
-	pathData.m_currentPath[pathData.m_pathCount] = goalDestination;
-	++pathData.m_pathCount;
+	pathData.m_currentPath[pathData.m_pathSize] = goalDestination;
+	++pathData.m_pathSize;
 
 	//add the location
 	if (GetIsOptimized())
@@ -327,7 +357,7 @@ void Agent::UpdateHealPerformanceTime(Personality& personality)
 }
 
 //  =========================================================================================
-void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
+void Agent::ConstructInformationAsText(const uint16 agentIndex, std::vector<std::string>& outStrings)
 {
 	//id
 	//outStrings.push_back(Stringf("ID: %i", m_id));
@@ -478,10 +508,10 @@ bool MoveAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalD
 	}		
 
 	//if we don't have a path to the destination or have completed our previous path, get a new path
-	if (pathData.m_pathCount == 0 || pathData.m_currentPathIndex == UINT8_MAX)
+	if (pathData.m_pathSize == 0 || pathData.m_currentPathIndex == UINT8_MAX)
 	{
 		Agent::GetPathToDestination(positionData, pathData, goalDestination);
-		pathData.m_currentPathIndex = pathData.m_pathCount - 1;
+		pathData.m_currentPathIndex = pathData.m_pathSize - 1;
 	}	
 
 	//We have a path, follow it.
@@ -512,7 +542,7 @@ bool MoveAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalD
 		{
 			--pathData.m_currentPathIndex;
 
-			if (pathData.m_pathCount != 0)
+			if (pathData.m_pathSize != 0)
 				pathData.m_intermediateGoalPosition = pathData.m_currentPath[pathData.m_currentPathIndex];
 
 			positionData.m_forward = pathData.m_intermediateGoalPosition - positionData.m_position;

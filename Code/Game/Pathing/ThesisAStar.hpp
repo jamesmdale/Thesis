@@ -58,8 +58,8 @@ static void ThesisGetPath(PathData& pathData, Grid<ThesisSearchCell>& cellList, 
 		IntVector2 coordinate = IntVector2((float)currentRow, (float)currentColumn);
 
 		//add position to path
-		pathData.m_currentPath[pathData.m_pathCount] = Vector2(0.5f, 0.5f) + Vector2(coordinate);
-		++pathData.m_pathCount;
+		pathData.m_currentPath[pathData.m_pathSize] = Vector2(0.5f, 0.5f) + Vector2(coordinate);
+		++pathData.m_pathSize;
 
 		int tempRow = cellList.GetValueAtCoordinate(currentRow, currentColumn).parentCoordinateX;
 		int tempColumn = cellList.GetValueAtCoordinate(currentRow, currentColumn).parentCoordinateY;

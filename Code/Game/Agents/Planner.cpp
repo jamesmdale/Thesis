@@ -1118,7 +1118,7 @@ bool Planner::FindAgentAndCopyPath(PositionData& positionData, PathData& pathDat
 				continue;
 			}				
 		
-			if (s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_pathCount > 0)
+			if (s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_pathSize > 0)
 			{	
 				Vector2 matchingAgentFinalDestinationPosition = Vector2::ZERO;
 				if (!s_agentsPlannerReference->m_planner[matchingAgents[agentIndex]].GetDoesHaveTopActionGoalPosition(matchingAgentFinalDestinationPosition))
@@ -1129,7 +1129,7 @@ bool Planner::FindAgentAndCopyPath(PositionData& positionData, PathData& pathDat
 				if (compareDisc.IsPointInside(matchingAgentFinalDestinationPosition))
 				{
 					//this agent matches our current goal location
-					for (int agentPathIndex = 0; agentPathIndex < s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_pathCount; ++agentPathIndex)
+					for (int agentPathIndex = 0; agentPathIndex < s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_pathSize; ++agentPathIndex)
 					{
 						float distanceSquared = GetDistanceSquared(s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_currentPath[agentPathIndex], positionData.m_position);
 						if (distanceSquared < minDistanceSquared)

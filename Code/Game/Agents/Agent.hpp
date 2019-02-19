@@ -22,13 +22,13 @@ struct ActionCallbackData
 {
 	ActionCallback m_action = nullptr;
 	Vector2 m_finalGoalPosition;
-	uint16 m_interactEntityId = -1;
+	uint16 m_interactEntityId = UINT16_MAX;
 };
 
 //  ----------------------------------------------
 struct AgentInfo
 {
-	uint16 m_id = -1;
+	uint16 m_id = UINT16_MAX;
 	uint8 m_updatePriority = 1;	
 	uint8 m_health = 100;	
 };
@@ -55,7 +55,7 @@ struct PathData
 		delete[] m_currentPath;
 	}
 
-	uint8 m_pathCount = 0;	
+	uint8 m_pathSize = 0;	
 	uint8_t m_currentPathIndex = UINT8_MAX;
 	Vector2 m_intermediateGoalPosition;	//used for temp locations while pathing	
 
@@ -87,8 +87,10 @@ struct ActionData
 	~ActionData()
 	{
 		m_animationSet = nullptr;
+		
+		delete(m_actionTimer);
+		m_actionTimer = nullptr;
 	}
-
 
 	bool m_isFirstLoopThroughAction = true;
 	Stopwatch* m_actionTimer = nullptr;
@@ -117,8 +119,8 @@ public:
 	void InitialisePlannerData();
 
 	//overriden classes
-	void Update(int agentIndex, float deltaSeconds);
-	void QuickUpdate(int agentIndex, float deltaSeconds);
+	void Update(uint16 agentIndex, float deltaSeconds);
+	void QuickUpdate(uint16 agentIndex, float deltaSeconds);
 	void Render();
 
 	static void ClearPathData(PathData& pathData);
@@ -140,7 +142,7 @@ public:
 	static void UpdateRepairPerformanceTime(Personality& personality);
 	static void UpdateHealPerformanceTime(Personality& personality);
 
-	void ConstructInformationAsText(std::vector<std::string>& outStrings);
+	static void ConstructInformationAsText(const uint16 agentIndex, std::vector<std::string>& outStrings);
 
 public:
 	//structs organized by access ----------------------------------------------

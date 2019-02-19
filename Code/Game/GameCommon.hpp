@@ -63,7 +63,7 @@ constexpr float g_minSkillEfficiency = 0.1f;
 
  //bombardment globals
 constexpr float g_bombardmentExplosionTime = 1.f;
-constexpr float g_bombardmentExplosionSize = 1.f;
+float g_bombardmentExplosionSize = 1.f;
 constexpr int g_bombardmentDamage = 10.f;
  
  //optimization globals

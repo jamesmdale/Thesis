@@ -180,22 +180,26 @@ void Map::Initialize()
 	//create agents
 	m_agents = new Agent(this, m_activeSimulationDefinition->m_numAgents);
 
+	m_agents->Initialize();
+
 	IsoSpriteAnimSet* animSet = nullptr;
 	std::map<std::string, IsoSpriteAnimSetDefinition*>::iterator spriteDefIterator = IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.find("agent");
 	ASSERT_OR_DIE(spriteDefIterator != IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.end(), "ANIMATION SET NOT FOUND WHEN CREATING AGENTS");
 
 	//create all the agents
-	for (int agentIndex = 0; agentIndex < m_activeSimulationDefinition->m_numAgents; ++agentIndex)
+	for (uint16 agentIndex = 0; agentIndex < m_activeSimulationDefinition->m_numAgents; ++agentIndex)
 	{
 		animSet = new IsoSpriteAnimSet(spriteDefIterator->second);
 		Vector2 randomStartingLocation = GetRandomNonBlockedPositionInMapBounds();
 		m_agents->AddAgentData(agentIndex, randomStartingLocation, animSet);
+
 		m_agentIndexesOrderedByXPosition.push_back(agentIndex);
 		m_agentIndexesOrderedByYPosition.push_back(agentIndex);
 		m_agentIndexesOrderedByPriority.push_back(agentIndex);
 
-		m_agents[agentIndex].m_indexInSortedXList[agentIndex] = (uint16)agentIndex;
-		m_agents[agentIndex].m_indexInSortedYList[agentIndex] = (uint16)agentIndex;
+		m_agents[agentIndex].m_indexInSortedXList[agentIndex] = agentIndex;
+		m_agents[agentIndex].m_indexInSortedYList[agentIndex] = agentIndex;
+		m_agents[agentIndex].m_indexInPriorityList[agentIndex] = agentIndex;
 	}
 
 	//init other starting values

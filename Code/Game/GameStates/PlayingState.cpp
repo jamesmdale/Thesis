@@ -31,8 +31,6 @@ bool isResetingSimulation = false;
 //  =============================================================================
 PlayingState::~PlayingState()
 {
-	m_disectedAgent = nullptr;
-
 	delete(m_simulationTimer);
 	m_simulationTimer = nullptr;
 
@@ -110,8 +108,10 @@ void PlayingState::PreRender()
 {
 	if (m_isCameraLockedToAgent)
 	{
+		PositionData& positionData = m_map->m_agents->m_positionData[m_disectedAgentIndex];
+
 		//have the camera follow the agent
-		m_camera->SetPosition(Vector3(m_disectedAgent->m_position) * 0.5f);
+		m_camera->SetPosition(Vector3(positionData.m_position) * 0.5f);
 	}
 }
 
@@ -151,7 +151,7 @@ void PlayingState::PostRender()
 
 		g_currentSimDefinitionIndex++;
 		isResetingSimulation = false;
-		m_disectedAgent = nullptr;
+		m_disectedAgentIndex = UINT16_MAX;
 
 		if (g_currentSimDefinitionIndex < SimulationDefinition::s_simulationDefinitions.size())
 		{
@@ -212,33 +212,33 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	// cycle through agents ----------------------------------------------
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
-		if (m_disectedAgent == nullptr)
+		if (m_disectedAgentIndex == UINT16_MAX)
 		{
-			m_disectedAgent = m_map->GetAgentById(0);
+			m_disectedAgentIndex = m_map->GetAgentPriorityIndexById(0);
 		}
 		else
 		{
-			int currentAgentId = m_disectedAgent->m_id;
-			m_disectedAgent = m_map->GetAgentById(currentAgentId + 1);
-			if (m_disectedAgent == nullptr)
+			int currentAgentId = m_map->m_agents->m_agentInfo[m_disectedAgentIndex].m_id;
+			m_disectedAgentIndex =  m_map->GetAgentPriorityIndexById(currentAgentId + 1);
+			if (m_disectedAgentIndex == UINT16_MAX)
 			{
-				m_map->GetAgentById(0);
+				m_disectedAgentIndex = m_map->GetAgentPriorityIndexById(0);
 			}
 		}
 	}
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
-		if (m_disectedAgent == nullptr)
+		if (m_disectedAgentIndex == UINT16_MAX)
 		{
-			m_disectedAgent = m_map->GetAgentById(0);
+			m_disectedAgentIndex = m_map->GetAgentPriorityIndexById(0);
 		}
 		else
 		{
-			int currentAgentId = m_disectedAgent->m_id;
-			m_disectedAgent = m_map->GetAgentById(currentAgentId - 1);
-			if (m_disectedAgent == nullptr)
+			int currentAgentId = m_map->m_agents->m_agentInfo[m_disectedAgentIndex].m_id;
+			m_disectedAgentIndex =  m_map->GetAgentPriorityIndexById(currentAgentId - 1);
+			if (m_disectedAgentIndex == UINT16_MAX)
 			{
-				m_map->GetAgentById(0);
+				m_disectedAgentIndex = m_map->GetAgentPriorityIndexById(0);
 			}
 		}
 	}
@@ -275,7 +275,7 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 		else
 		{
 			DebugInputBox::GetInstance()->Close();
-			m_disectedAgent = nullptr;
+			m_disectedAgentIndex = UINT16_MAX;
 			m_isCameraLockedToAgent = false;
 		}		
 	}
@@ -333,9 +333,12 @@ void PlayingState::RenderDebugUI()
 
 	//handle path
 	Mesh* pathMesh = nullptr;
-	if (m_disectedAgent != nullptr)
+	if (m_disectedAgentIndex != UINT16_MAX)
 	{
-		if (m_disectedAgent->m_currentPath.size() > 0)
+		PositionData& positionData = m_map->m_agents->m_positionData[m_disectedAgentIndex];
+		PathData& pathData = m_map->m_agents->m_pathData[m_disectedAgentIndex];
+
+		if (pathData.m_pathSize > 0)
 		{
 			Mesh* pathMesh = CreateDisectedAgentPathMesh();
 
@@ -349,8 +352,7 @@ void PlayingState::RenderDebugUI()
 		}	
 
 		theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("default"));
-		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_physicsDisc, Rgba::ORANGE, 10);
-		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_pathDisc, Rgba::PINK, 10);
+		theRenderer->DrawDottedDisc2WithColor(positionData.m_physicsDisc, Rgba::PINK, 10);
 	}
 }
 
@@ -651,10 +653,10 @@ Mesh* PlayingState::CreateUIDebugTextMesh()
 	builder.CreateText2DFromPoint( Vector2(10.f , 0.0f), theWindow->GetClientHeight() * 0.015, 1.f, inputText.c_str(), Rgba::WHITE );
 
 	//disected agent ----------------------------------------------
-	if (m_disectedAgent != nullptr)
+	if (m_disectedAgentIndex != UINT16_MAX)
 	{
 		std::vector<std::string> agentInfo;
-		m_disectedAgent->ConstructInformationAsText(agentInfo);
+		Agent::ConstructInformationAsText(m_disectedAgentIndex, agentInfo);
 
 		float printHeight = 0.5f;
 
@@ -705,27 +707,30 @@ Mesh* PlayingState::CreateWorldDebugTextMesh()
 //  =========================================================================================
 Mesh* PlayingState::CreateDisectedAgentPathMesh()
 {
+	PositionData& positionData = m_map->m_agents->m_positionData[m_disectedAgentIndex];
+	PathData& pathData = m_map->m_agents->m_pathData[m_disectedAgentIndex];
+
 	MeshBuilder builder = MeshBuilder();
 	Mesh* pathMesh = nullptr;
 
 	//get player to first position
-	Vector2 agentPosition = m_disectedAgent->m_position;
+	Vector2 agentPosition = positionData.m_position;
 
 	//get current index
-	uint8_t pathIndex = m_disectedAgent->m_currentPathIndex;
+	uint8_t pathIndex = pathData.m_currentPathIndex;
 	if(pathIndex == UINT8_MAX)
-		pathIndex = m_disectedAgent->m_currentPath.size() -1 ;
+		pathIndex = pathData.m_pathSize - 1;
 
 	//build player to next position in path index
-	Vector2 nextTileCenter = m_disectedAgent->m_currentPath[pathIndex];
+	Vector2 nextTileCenter = pathData.m_currentPath[pathIndex];
 	builder.CreateLine2D(agentPosition, nextTileCenter, Rgba::PINK);
 
-	if (m_disectedAgent->m_currentPath.size() != 1)
+	if (pathData.m_pathSize != 1)
 	{
 		//we know the agent is set so we don't have to check for nullptr case
-		for (int pathIndex = 1; pathIndex < m_disectedAgent->m_currentPath.size() - 1; ++pathIndex)
+		for (int pathIndex = 1; pathIndex < pathData.m_pathSize - 1; ++pathIndex)
 		{
-			builder.CreateLine2D(m_disectedAgent->m_currentPath[pathIndex], m_disectedAgent->m_currentPath[pathIndex + 1], Rgba::PINK);
+			builder.CreateLine2D(pathData.m_currentPath[pathIndex], pathData.m_currentPath[pathIndex + 1], Rgba::PINK);
 		}
 	}	
 
@@ -737,9 +742,9 @@ Mesh* PlayingState::CreateDisectedAgentPathMesh()
 //  =========================================================================================
 void PlayingState::ClearDisectedAgent()
 {
-	if (m_disectedAgent != nullptr)
+	if (m_disectedAgentIndex != UINT16_MAX)
 	{
-		m_disectedAgent = nullptr;
+		m_disectedAgentIndex = UINT16_MAX;
 	}
 
 	m_isCameraLockedToAgent = false;
@@ -796,9 +801,9 @@ void DisectAgent(Command& cmd)
 		return;
 	}
 
-	playingState->m_disectedAgent = playingState->m_map->GetAgentById(agentId);
+	playingState->m_disectedAgentIndex = playingState->m_map->GetAgentPriorityIndexById(agentId);
 
-	if (playingState->m_disectedAgent == nullptr)
+	if (playingState->m_disectedAgentIndex == UINT16_MAX)
 	{
 		DevConsolePrintf(Rgba::RED, "INVALID AGENT INDEX!");
 		playingState->ClearDisectedAgent();
