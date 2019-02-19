@@ -122,23 +122,6 @@ Map::~Map()
 		m_pointsOfInterest[poiIndex] = nullptr;
 	}
 
-	//cleanup agents
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
-	{
-		m_agentsOrderedByXPosition[agentIndex] = nullptr;
-	}
-
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
-	{
-		m_agentsOrderedByYPosition[agentIndex] = nullptr;
-	}
-
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
-	{
-		delete(m_agentsOrderedByPriority[agentIndex]);
-		m_agentsOrderedByPriority[agentIndex] = nullptr;
-	}
-
 	//tiles
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); ++tileIndex)
 	{
@@ -195,26 +178,24 @@ void Map::Initialize()
 	AABB2 mapBounds = AABB2(Vector2::ZERO, Vector2(dimensions));
 
 	//create agents
+	m_agents = new Agent(this, m_activeSimulationDefinition->m_numAgents);
+
+	IsoSpriteAnimSet* animSet = nullptr;
+	std::map<std::string, IsoSpriteAnimSetDefinition*>::iterator spriteDefIterator = IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.find("agent");
+	ASSERT_OR_DIE(spriteDefIterator != IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.end(), "ANIMATION SET NOT FOUND WHEN CREATING AGENTS");
+
+	//create all the agents
 	for (int agentIndex = 0; agentIndex < m_activeSimulationDefinition->m_numAgents; ++agentIndex)
 	{
-		IsoSpriteAnimSet* animSet = nullptr;
-		std::map<std::string, IsoSpriteAnimSetDefinition*>::iterator spriteDefIterator = IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.find("agent");
-		if (spriteDefIterator != IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.end())
-		{
-			animSet = new IsoSpriteAnimSet(spriteDefIterator->second);
-		}
-
+		animSet = new IsoSpriteAnimSet(spriteDefIterator->second);
 		Vector2 randomStartingLocation = GetRandomNonBlockedPositionInMapBounds();
-		Agent* agent = new Agent(randomStartingLocation, animSet, this);
-		m_agentsOrderedByXPosition.push_back(agent);
-		m_agentsOrderedByYPosition.push_back(agent);
-		m_agentsOrderedByPriority.push_back(agent);
+		m_agents->AddAgentData(agentIndex, randomStartingLocation, animSet);
+		m_agentIndexesOrderedByXPosition.push_back(agentIndex);
+		m_agentIndexesOrderedByYPosition.push_back(agentIndex);
+		m_agentIndexesOrderedByPriority.push_back(agentIndex);
 
-		agent->m_indexInSortedXList = agentIndex;
-		agent->m_indexInSortedYList = agentIndex;
-
-		animSet = nullptr;
-		agent = nullptr;
+		m_agents[agentIndex].m_indexInSortedXList[agentIndex] = (uint16)agentIndex;
+		m_agents[agentIndex].m_indexInSortedYList[agentIndex] = (uint16)agentIndex;
 	}
 
 	//init other starting values
@@ -280,15 +261,24 @@ void Map::UpdateAgents(float deltaSeconds)
 
 	if (!GetIsAgentUpdateBudgeted())
 	{
-		for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
+		for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByXPosition.size(); ++agentIndex)
 		{
-			m_agentsOrderedByXPosition[agentIndex]->Update(deltaSeconds);
-			DetectAgentToTileCollision(m_agentsOrderedByXPosition[agentIndex]);
+			m_agents->Update(m_agentIndexesOrderedByXPosition[agentIndex], deltaSeconds);		
+		}
+
+		for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByXPosition.size(); ++agentIndex)
+		{
+			DetectAgentToTileCollision(m_agentIndexesOrderedByXPosition[agentIndex]);
 		}
 	}
 	else
 	{
 		UpdateAgentsBudgeted(deltaSeconds);
+
+		for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByXPosition.size(); ++agentIndex)
+		{
+			DetectAgentToTileCollision(m_agentIndexesOrderedByPriority[agentIndex]);
+		}
 	}
 
 	//check optimization flags
@@ -313,12 +303,12 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 	//if this is the first frame, there is no point in sorting because we have no criteria to decide on
 	if (g_previousFrameNonAgentUpdateTime != 0 && g_previousFrameRenderTime != 0)
 	{
-		QuickSortAgentByPriority(m_agentsOrderedByPriority, 0, (int)m_agentsOrderedByPriority.size() - 1);
+		QuickSortAgentByPriority(m_agentIndexesOrderedByPriority, 0, (int)m_agentIndexesOrderedByPriority.size() - 1);
 	}	
 
 	SimpleTimer agentUpdateTimer;
 	bool canUpdate = true;
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
+	for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByPriority.size(); ++agentIndex)
 	{
 		//if there is still budget left for update
 		if (canUpdate)
@@ -326,7 +316,7 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 			agentUpdateTimer.Start();
 
 			//do udpate work
-			m_agentsOrderedByPriority[agentIndex]->Update(deltaSeconds);
+			m_agents->Update(m_agentIndexesOrderedByPriority[agentIndex], deltaSeconds);
 			//DetectAgentToTileCollision(m_agentsOrderedByPriority[agentIndex]);
 
 			agentUpdateTimer.Stop();
@@ -334,7 +324,7 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 			agentUpdateTimer.Reset();
 
 			remainingAgentUpdateBudget -= totalUpdateTime;
-			m_agentsOrderedByPriority[agentIndex]->ResetPriority();
+			Agent::ResetPriority(m_agents->m_agentInfo[m_agentIndexesOrderedByPriority[agentIndex]]);
 
 			if (remainingAgentUpdateBudget <= 0)
 			{
@@ -346,10 +336,14 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 		else
 		{
 			//update by one
-			m_agentsOrderedByPriority[agentIndex]->QuickUpdate(deltaSeconds);
+			m_agents->QuickUpdate(m_agentIndexesOrderedByPriority[agentIndex], deltaSeconds);
 		}		
+	}
 
-		DetectAgentToTileCollision(m_agentsOrderedByPriority[agentIndex]);
+	//do tile collision
+	for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByPriority.size(); ++agentIndex)
+	{
+		DetectAgentToTileCollision(m_agentIndexesOrderedByPriority[agentIndex]);
 	}
 
 	//sort if we are optimized
@@ -387,7 +381,7 @@ void Map::Render()
 
 	//create and render agent mesh
 	Mesh* agentMesh = CreateDynamicAgentMesh();
-	theRenderer->SetTexture(*theRenderer->CreateOrGetTexture(m_agentsOrderedByXPosition[0]->m_animationSet->GetCurrentSprite(m_agentsOrderedByXPosition[0]->m_spriteDirection)->m_definition->m_diffuseSource));
+	theRenderer->SetTexture(*theRenderer->CreateOrGetTexture("Data/Images/Agents/Male_1.png"));
 	theRenderer->SetShader(theRenderer->CreateOrGetShader("agents"));
 	theRenderer->DrawMesh(agentMesh);
 
@@ -442,43 +436,30 @@ void Map::Reload(SimulationDefinition* definition)
 	}
 	m_activeBombardments.clear();
 
-	//cleanup agents
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
-	{
-		m_agentsOrderedByXPosition[agentIndex] = nullptr;		
-	}
-	m_agentsOrderedByXPosition.clear();
-
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
-	{
-		delete(m_agentsOrderedByYPosition[agentIndex]);
-		m_agentsOrderedByYPosition[agentIndex] = nullptr;
-	}
-	m_agentsOrderedByYPosition.clear();
+	m_agentIndexesOrderedByXPosition.clear();
+	m_agentIndexesOrderedByYPosition.clear();
+	m_agentIndexesOrderedByPriority.clear();
 
 	// Reload step ----------------------------------------------
 
-	//create agents
+	IsoSpriteAnimSet* animSet = nullptr;
+	std::map<std::string, IsoSpriteAnimSetDefinition*>::iterator spriteDefIterator = IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.find("agent");
+	ASSERT_OR_DIE(spriteDefIterator != IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.end(), "ANIMATION SET NOT FOUND WHEN CREATING AGENTS");
+
+	//create all the agents
 	for (int agentIndex = 0; agentIndex < m_activeSimulationDefinition->m_numAgents; ++agentIndex)
 	{
-		IsoSpriteAnimSet* animSet = nullptr;
-		std::map<std::string, IsoSpriteAnimSetDefinition*>::iterator spriteDefIterator = IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.find("agent");
-		if (spriteDefIterator != IsoSpriteAnimSetDefinition::s_isoSpriteAnimSetDefinitions.end())
-		{
-			animSet = new IsoSpriteAnimSet(spriteDefIterator->second);
-		}
-
+		animSet = new IsoSpriteAnimSet(spriteDefIterator->second);
 		Vector2 randomStartingLocation = GetRandomNonBlockedPositionInMapBounds();
-		Agent* agent = new Agent(randomStartingLocation, animSet, this);
-		m_agentsOrderedByXPosition.push_back(agent);
-		m_agentsOrderedByYPosition.push_back(agent);
+		m_agents->AddAgentData(agentIndex, randomStartingLocation, animSet);
+		m_agentIndexesOrderedByXPosition.push_back(agentIndex);
+		m_agentIndexesOrderedByYPosition.push_back(agentIndex);
+		m_agentIndexesOrderedByPriority.push_back(agentIndex);
 
-		agent->m_indexInSortedXList = agentIndex;
-		agent->m_indexInSortedYList = agentIndex;
-
-		animSet = nullptr;
-		agent = nullptr;
+		m_agents[agentIndex].m_indexInSortedXList[agentIndex] = (uint16)agentIndex;
+		m_agents[agentIndex].m_indexInSortedYList[agentIndex] = (uint16)agentIndex;
 	}
+
 
 	//init other starting values
 	m_threat = m_activeSimulationDefinition->m_startingThreat;
@@ -533,12 +514,16 @@ Mesh* Map::CreateDynamicAgentMesh()
 	MeshBuilder builder = MeshBuilder();
 
 	//create mesh for static tiles and buildings
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
+	for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByYPosition.size(); ++agentIndex)
 	{
-		Sprite sprite = *m_agentsOrderedByXPosition[agentIndex]->m_animationSet->GetCurrentSprite(m_agentsOrderedByXPosition[agentIndex]->m_spriteDirection);
+		PositionData& positionData = m_agents->m_positionData[m_agentIndexesOrderedByYPosition[agentIndex]];
+		Planner& plannerData = m_agents->m_planner[m_agentIndexesOrderedByYPosition[agentIndex]];
+		ActionData& actionData = m_agents->m_actionData[m_agentIndexesOrderedByYPosition[agentIndex]];
+
+		Sprite sprite = *actionData.m_animationSet->GetCurrentSprite(positionData.m_spriteDirection);
 
 		Rgba agentColor = Rgba::WHITE;
-		switch (m_agentsOrderedByXPosition[agentIndex]->m_planner->m_currentPlan)
+		switch (plannerData.m_currentPlan)
 		{
 		case GATHER_ARROWS_PLAN_TYPE:
 			agentColor = GATHER_ARROWS_TINT;
@@ -565,11 +550,11 @@ Mesh* Map::CreateDynamicAgentMesh()
 
 		if (g_isDebugDataShown)
 		{
-			if(m_agentsOrderedByXPosition[agentIndex] == m_playingState->m_disectedAgent)
+			if(m_agentIndexesOrderedByXPosition[agentIndex] == m_playingState->m_disectedAgentIndex)
 				agentSize = Vector2(1.75f, 1.75f);
 		}	
 
-		builder.CreateTexturedQuad2D(m_agentsOrderedByXPosition[agentIndex]->m_position,
+		builder.CreateTexturedQuad2D(positionData.m_position,
 			agentSize, 
 			Vector2(sprite.GetNormalizedUV().mins.x, sprite.GetNormalizedUV().maxs.y), 
 			Vector2(sprite.GetNormalizedUV().maxs.x, sprite.GetNormalizedUV().mins.y), 
@@ -590,9 +575,12 @@ Mesh* Map::CreateTextMesh()
 	//agent ids
 	if (g_isIdShown)
 	{
-		for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
+		for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByYPosition.size(); ++agentIndex)
 		{
-			builder.CreateText2DInAABB2(Vector2(m_agentsOrderedByXPosition[agentIndex]->m_position.x, m_agentsOrderedByXPosition[agentIndex]->m_position.y + 0.7), Vector2(0.25f, 0.25f), 1.f, Stringf("%i", m_agentsOrderedByXPosition[agentIndex]->m_id), Rgba::WHITE);
+			uint16 agentId = m_agents->m_agentInfo[m_agentIndexesOrderedByXPosition[agentIndex]].m_id;
+			Vector2 agentPosition = m_agents->m_positionData[m_agentIndexesOrderedByXPosition[agentIndex]].m_position;
+
+			builder.CreateText2DInAABB2(Vector2(agentPosition.x, agentPosition.y + 0.7), Vector2(0.25f, 0.25f), 1.f, Stringf("%i", (int)agentId), Rgba::WHITE);
 		}
 	}
 
@@ -654,14 +642,14 @@ void Map::SortAgentsByX()
 	int j = 0;
 	bool swapped = false;
 
-	for (int i = 0; i < (int)m_agentsOrderedByXPosition.size() - 1; ++i)
+	for (int i = 0; i < (int)m_agentIndexesOrderedByXPosition.size() - 1; ++i)
 	{
 		swapped = false;
-		for (int j = 0; j < (int)m_agentsOrderedByXPosition.size() - i - 1; ++j)
+		for (int j = 0; j < (int)m_agentIndexesOrderedByXPosition.size() - i - 1; ++j)
 		{
-			if(m_agentsOrderedByXPosition[j]->m_position.x > m_agentsOrderedByXPosition[j+1]->m_position.x)
+			if (m_agents->m_positionData[m_agentIndexesOrderedByXPosition[j]].m_position.y > m_agents->m_positionData[m_agentIndexesOrderedByXPosition[j + 1]].m_position.y)
 			{
-				SwapAgents(j, j+1, X_AGENT_SORT_TYPE);
+				SwapAgents(j, j + 1, X_AGENT_SORT_TYPE);
 				swapped = true;
 			}
 		}
@@ -681,12 +669,12 @@ void Map::SortAgentsByY()
 	int j = 0;
 	bool swapped = false;
 
-	for (int i = 0; i < (int)m_agentsOrderedByYPosition.size(); ++i)
+	for (int i = 0; i < (int)m_agentIndexesOrderedByYPosition.size(); ++i)
 	{
 		swapped = false;
-		for (int j = 0; j < (int)m_agentsOrderedByYPosition.size() - i - 1; ++j)
+		for (int j = 0; j < (int)m_agentIndexesOrderedByYPosition.size() - i - 1; ++j)
 		{
-			if (m_agentsOrderedByYPosition[j]->m_position.y > m_agentsOrderedByYPosition[j + 1]->m_position.y)
+			if (m_agents->m_positionData[m_agentIndexesOrderedByYPosition[j]].m_position.y > m_agents->m_positionData[m_agentIndexesOrderedByYPosition[j + 1]].m_position.y)
 			{
 				SwapAgents(j, j + 1, Y_AGENT_SORT_TYPE);
 				swapped = true;
@@ -700,28 +688,31 @@ void Map::SortAgentsByY()
 }
 
 //  =============================================================================
-void Map::QuickSortAgentByPriority(std::vector<Agent*>& agents, int startIndex, int endIndex)
+void Map::QuickSortAgentByPriority(std::vector<uint16>& agentIndexes, int startIndex, int endIndex)
 {
 	if (startIndex < endIndex)
 	{
-		int divisorIndex = QuickSortPivot(agents, startIndex, endIndex);
+		int divisorIndex = QuickSortPivot(agentIndexes, startIndex, endIndex);
 
-		QuickSortAgentByPriority(agents, startIndex, divisorIndex - 1);  //sort everything BEFORE the split
-		QuickSortAgentByPriority(agents, divisorIndex + 1, endIndex);	   //sort everything AFTER the split
+		QuickSortAgentByPriority(agentIndexes, startIndex, divisorIndex - 1);  //sort everything BEFORE the split
+		QuickSortAgentByPriority(agentIndexes, divisorIndex + 1, endIndex);	   //sort everything AFTER the split
 	}
 }
 
 //  =============================================================================
-int Map::QuickSortPivot(std::vector<Agent*>& agents, int startIndex, int endIndex)
+int Map::QuickSortPivot(std::vector<uint16>& agentIndexes, int startIndex, int endIndex)
 {
-	int pivotValue = agents[endIndex]->m_updatePriority;
+	AgentInfo& agentAtEndIndexInfo = m_agents->m_agentInfo[agentIndexes[endIndex]];
+	int pivotValue = agentAtEndIndexInfo.m_updatePriority;
 
 	int lessIndex = (startIndex - 1);
 
 	for (int agentIndex = startIndex; agentIndex <= endIndex - 1; ++agentIndex)
 	{
+		AgentInfo& swapAgentInfo = m_agents->m_agentInfo[agentIndexes[agentIndex]];
+
 		//only swap if agent priority is higher than pivot
-		if (agents[agentIndex]->m_updatePriority > pivotValue)
+		if (swapAgentInfo.m_updatePriority > pivotValue)
 		{
 			++lessIndex;
 
@@ -735,49 +726,47 @@ int Map::QuickSortPivot(std::vector<Agent*>& agents, int startIndex, int endInde
 }
 
 //  =========================================================================================
-void Map::SwapAgents(int indexI, int indexJ, eAgentSortType type)
+void Map::SwapAgents(uint16 indexI, uint16 indexJ, eAgentSortType type)
 {
-	Agent* tempAgent = nullptr;
+	uint16 tempAgentIndex = UINT16_MAX;
 
 	//swap stored indices
 	switch (type)
 	{
 	case X_AGENT_SORT_TYPE:
-		tempAgent = m_agentsOrderedByXPosition[indexI];
+		tempAgentIndex = m_agentIndexesOrderedByXPosition[indexI];
 
 		//swap first
-		m_agentsOrderedByXPosition[indexI] = m_agentsOrderedByXPosition[indexJ];
-		m_agentsOrderedByXPosition[indexJ] = tempAgent;
+		m_agentIndexesOrderedByXPosition[indexI] = m_agentIndexesOrderedByXPosition[indexJ];
+		m_agentIndexesOrderedByXPosition[indexJ] = tempAgentIndex;
 
-		//set new indexes
-		m_agentsOrderedByXPosition[indexI]->m_indexInSortedXList = indexI;
-		m_agentsOrderedByXPosition[indexJ]->m_indexInSortedXList = indexJ;
+		//set new indexes in agent info
+		m_agents->m_indexInSortedXList[indexI] = indexI;
+		m_agents->m_indexInSortedXList[indexJ] = indexJ;
 		break;
 	case Y_AGENT_SORT_TYPE:
-		tempAgent = m_agentsOrderedByYPosition[indexI];
+		tempAgentIndex = m_agentIndexesOrderedByYPosition[indexI];
 
 		//swap first
-		m_agentsOrderedByYPosition[indexI] = m_agentsOrderedByYPosition[indexJ];
-		m_agentsOrderedByYPosition[indexJ] = tempAgent;
+		m_agentIndexesOrderedByYPosition[indexI] = m_agentIndexesOrderedByYPosition[indexJ];
+		m_agentIndexesOrderedByYPosition[indexJ] = tempAgentIndex;
 
-		//set new indexes
-		m_agentsOrderedByYPosition[indexI]->m_indexInSortedYList = indexI;
-		m_agentsOrderedByYPosition[indexJ]->m_indexInSortedYList = indexJ;
+		//set new indexes in agent info
+		m_agents->m_indexInSortedYList[indexI] = indexI;
+		m_agents->m_indexInSortedYList[indexJ] = indexJ;
 		break;
 	case PRIORITY_AGENT_SORT_TYPE:
-		tempAgent = m_agentsOrderedByPriority[indexI];
+		tempAgentIndex = m_agentIndexesOrderedByPriority[indexI];
 
 		//swap first
-		m_agentsOrderedByPriority[indexI] = m_agentsOrderedByPriority[indexJ];
-		m_agentsOrderedByPriority[indexJ] = tempAgent;
+		m_agentIndexesOrderedByPriority[indexI] = m_agentIndexesOrderedByPriority[indexJ];
+		m_agentIndexesOrderedByPriority[indexJ] = tempAgentIndex;
 
-		//set new indexes
-		m_agentsOrderedByPriority[indexI]->m_indexInPriorityList = indexI;
-		m_agentsOrderedByPriority[indexJ]->m_indexInPriorityList = indexJ;
+		//set new indexes in agent info
+		m_agents->m_indexInPriorityList[indexI] = indexI;
+		m_agents->m_indexInPriorityList[indexJ] = indexJ;
 		break;
 	}
-
-	tempAgent = nullptr;
 }
 
 //  =========================================================================================
@@ -816,20 +805,20 @@ Tile* Map::GetTileAtCoordinate(const IntVector2& coordinate)
 }
 
 //  =========================================================================================
-Agent* Map::GetAgentById(int agentId)
+uint16 Map::GetAgentPriorityIndexById(int agentId)
 {
 	//invalid input
-	if (agentId > m_agentsOrderedByPriority.size() - 1 || agentId < 0)
+	if (agentId > m_agentIndexesOrderedByPriority.size() - 1 || agentId < 0)
 	{
-		return nullptr;
+		return UINT_MAX;
 	}
 
 	//we know the agent exists. Search for them
-	for(int agentIndex = 0; agentIndex < m_agentsOrderedByPriority.size(); ++agentIndex)
+	for(int agentIndex = 0; agentIndex < m_agentIndexesOrderedByPriority.size(); ++agentIndex)
 	{
-		if (m_agentsOrderedByPriority[agentIndex]->m_id == agentId)
+		if (m_agents->m_agentInfo[m_agentIndexesOrderedByPriority[agentIndex]].m_id == agentId)
 		{
-			return m_agentsOrderedByPriority[agentIndex];
+			return m_agentIndexesOrderedByPriority[agentIndex];
 		}
 	}
 }
@@ -850,11 +839,17 @@ PointOfInterest* Map::GetPointOfInterestById(int poiId)
 //  =========================================================================================
 void Map::DetectBombardmentToAgentCollision(Bombardment* bombardment)
 {
-	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
+	for (int agentIndex = 0; agentIndex < (int)m_agentIndexesOrderedByXPosition.size(); ++agentIndex)
 	{
-		if (bombardment->m_disc.IsPointInside(m_agentsOrderedByXPosition[agentIndex]->m_position))
+		//get the position data we need
+		PositionData& positionData = m_agents->m_positionData[agentIndex];
+
+		if (bombardment->m_disc.IsPointInside(positionData.m_position))
 		{
-			m_agentsOrderedByXPosition[agentIndex]->TakeDamage(g_bombardmentDamage);
+			//we must get the agent's health out of the info
+			AgentInfo& agentInfo = m_agents->m_agentInfo[agentIndex];
+
+			Agent::TakeDamage(agentInfo, g_bombardmentDamage);
 		}
 	}
 }
@@ -873,24 +868,26 @@ void Map::DetectBombardmentToPOICollision(Bombardment* bombardment)
 }
 
 //  =========================================================================================
-void Map::DetectAgentToTileCollision(Agent* agent)
+void Map::DetectAgentToTileCollision(const uint16 agentIndex)
 {
-	IntVector2 agentTileCoord = GetTileCoordinateOfPosition(agent->m_position);
-	Vector2 agentPosition = agent->m_position;
+	PositionData& positionData = m_agents->m_positionData[agentIndex];
+
+	IntVector2 agentTileCoord = GetTileCoordinateOfPosition(positionData.m_position);
+	Vector2 agentPosition = positionData.m_position;
 	bool didPushOutCorner = false;
 	bool didPushOutAxis = false;
 
 	//handle northeast
 	IntVector2 tileDirection = IntVector2(1,1);
 	IntVector2 tileCoord = agentTileCoord + tileDirection;
-	didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHEAST_TILE_DIRECTION);
+	didPushOutCorner = PushAgentOutOfTile(positionData, tileCoord, NORTHEAST_TILE_DIRECTION);
 
 	if (!didPushOutCorner)
 	{
 		//handle southeast
 		tileDirection = IntVector2(1,-1);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHEAST_TILE_DIRECTION);
+		didPushOutCorner = PushAgentOutOfTile(positionData, tileCoord, SOUTHEAST_TILE_DIRECTION);
 	}
 
 	if (!didPushOutCorner)
@@ -898,7 +895,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle northwest
 		tileDirection = IntVector2(-1,1);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHWEST_TILE_DIRECTION);
+		didPushOutCorner = PushAgentOutOfTile(positionData, tileCoord, NORTHWEST_TILE_DIRECTION);
 	}
 
 	if (!didPushOutCorner)
@@ -906,14 +903,14 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle southwest
 		tileDirection = IntVector2(-1,-1);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHWEST_TILE_DIRECTION);
+		didPushOutCorner = PushAgentOutOfTile(positionData, tileCoord, SOUTHWEST_TILE_DIRECTION);
 	}
  
 	// handle up,down,left,right push out (because we've done corners, we can skip scenarios where we have both) ----------------------------------------------
 	//handle north
 	tileDirection = IntVector2(0,1);
 	tileCoord = agentTileCoord + tileDirection;
-	didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, NORTH_TILE_DIRECTION);
+	didPushOutAxis = PushAgentOutOfTile(positionData, tileCoord, NORTH_TILE_DIRECTION);
 
 	//handle south
 	if (!didPushOutAxis)
@@ -921,7 +918,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle southeast
 		tileDirection = IntVector2(0,-1);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, SOUTH_TILE_DIRECTION);
+		didPushOutAxis = PushAgentOutOfTile(positionData, tileCoord, SOUTH_TILE_DIRECTION);
 	}
 
 	//handle east
@@ -930,7 +927,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle southeast
 		tileDirection = IntVector2(1,0);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, EAST_TILE_DIRECTION);
+		didPushOutAxis = PushAgentOutOfTile(positionData, tileCoord, EAST_TILE_DIRECTION);
 	}
 
 	//handle west
@@ -939,7 +936,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle southeast
 		tileDirection = IntVector2(-1,0);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, WEST_TILE_DIRECTION);
+		didPushOutAxis = PushAgentOutOfTile(positionData, tileCoord, WEST_TILE_DIRECTION);
 	}
 
 	if (didPushOutAxis || didPushOutCorner)
@@ -949,7 +946,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 }
 
 //  =========================================================================================
-bool Map::PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection)
+bool Map::PushAgentOutOfTile(PositionData& positionData, const IntVector2& tileCoordinate, int tileDirection)
 {
 	//early outs
 	Tile* tile = GetTileAtCoordinate(tileCoordinate);
@@ -959,7 +956,7 @@ bool Map::PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int
 	if(tile->m_tileDefinition->m_allowsWalking)
 		return false;
 
-	Vector2 agentCenter = agent->m_position;
+	Vector2 agentCenter = positionData.m_position;
 
 		Vector2 collisionPoint;
 		switch(tileDirection)
@@ -990,16 +987,16 @@ bool Map::PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int
 			break;
 		}
 
-		bool isColliding =  agent->m_physicsDisc.IsPointInside(collisionPoint);
+		bool isColliding =  positionData.m_physicsDisc.IsPointInside(collisionPoint);
 		if(isColliding)
 		{
 			float displacement = GetDistance(agentCenter, collisionPoint);
 
-			float amountToPush = agent->m_physicsDisc.radius - displacement;
+			float amountToPush = positionData.m_physicsDisc.radius - displacement;
 			Vector2 pushOutDirection = (agentCenter - collisionPoint).GetNormalized();
 
-			agent->m_position += pushOutDirection * (amountToPush);
-			agent->UpdatePhysicsData();
+			positionData.m_position += pushOutDirection * (amountToPush);
+			Agent::UpdatePhysicsData(positionData);
 		}	
 
 		return isColliding;

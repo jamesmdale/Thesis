@@ -161,9 +161,15 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	PROFILER_PUSH();
 	ClearStack();
 
+	//load all relevant agent 
+	AgentInfo& agentInfo = s_agentsPlannerReference->m_agentInfo[agentIndex];
 	PositionData& positionData = s_agentsPlannerReference->m_positionData[agentIndex];
+	PathData& pathData = s_agentsPlannerReference->m_pathData[agentIndex];
 	Personality& personalityData = s_agentsPlannerReference->m_personality[agentIndex];
 	ActionData& actionData = s_agentsPlannerReference->m_actionData[agentIndex];	
+	uint16& indexInSortedXList = s_agentsPlannerReference->m_indexInSortedXList[agentIndex];
+	uint16& indexInSortedYList = s_agentsPlannerReference->m_indexInSortedYList[agentIndex];
+
 
 	//set preset to 
 	ePlanTypes chosenOutcome = NONE_PLAN_TYPE;
@@ -171,7 +177,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	UtilityInfo compareUtilityInfo;
 
 	//utility for gathering arrows ----------------------------------------------
-	compareUtilityInfo = GetHighestGatherArrowsUtility();
+	compareUtilityInfo = GetHighestGatherArrowsUtility(positionData, actionData);
 	if (m_currentPlan == GATHER_ARROWS_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -185,7 +191,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	m_utilityHistory.m_lastGatherArrows = compareUtilityInfo.utility;
 		
 	//utility for gathering lumber ----------------------------------------------
-	compareUtilityInfo = GetHighestGatherLumberUtility();
+	compareUtilityInfo = GetHighestGatherLumberUtility(positionData, actionData);
 	if (m_currentPlan == GATHER_LUMBER_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -199,7 +205,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	m_utilityHistory.m_lastGatherLumber = compareUtilityInfo.utility;
 
 	// utility for gathering bandages ----------------------------------------------
-	compareUtilityInfo = GetHighestGatherBandagesUtility();
+	compareUtilityInfo = GetHighestGatherBandagesUtility(positionData, actionData);
 	if (m_currentPlan == GATHER_BANDAGES_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -211,7 +217,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	}
 
 	//utility for shooting	 ----------------------------------------------
-	compareUtilityInfo = GetHighestShootUtility();
+	compareUtilityInfo = GetHighestShootUtility(positionData, actionData);
 
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, personalityData.m_combatBias);
@@ -230,7 +236,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	
 
 	//utility for repairing buildings ----------------------------------------------
-	compareUtilityInfo = GetHighestRepairUtility();
+	compareUtilityInfo = GetHighestRepairUtility(positionData, actionData);
 
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, personalityData.m_repairBias);
@@ -248,7 +254,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	m_utilityHistory.m_lastRepair = compareUtilityInfo.utility;
 
 	//utility for healing agents  ----------------------------------------------
-	compareUtilityInfo = GetHealSelfUtility();
+	compareUtilityInfo = GetHealSelfUtility(agentInfo, positionData, actionData);
 
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, personalityData.m_healBias);
@@ -271,7 +277,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 	//debug
 	m_utilityHistory.m_chosenOutcome = chosenOutcome;
 
-	QueueActionsFromCurrentPlan(m_currentPlan, highestUtilityInfo);
+	QueueActionsFromCurrentPlan(positionData, pathData, indexInSortedXList, indexInSortedYList, m_currentPlan, highestUtilityInfo);
 
 #ifdef UpdatePlanAnalysis
 	// profiling ----------------------------------------------
@@ -302,7 +308,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 }
 
 //  =========================================================================================
-void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo& info)
+void Planner::QueueActionsFromCurrentPlan(PositionData& positionData, PathData& pathData, uint16& indexInSortedXList, uint16& indexInSortedYList, ePlanTypes planType, const UtilityInfo& info)
 {
 	++g_numCopyPathCalls;
 
@@ -342,25 +348,25 @@ void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo
 	}
 
 	//decide if we have to queue a MoveAction
-	if (!m_agent->GetIsAtPosition(info.endPosition))
+	if (!Agent::GetIsAtPosition(positionData, info.endPosition))
 	{
 		ActionCallbackData* data = new ActionCallbackData();
 		data->m_action = MoveAction;
 		data->m_finalGoalPosition = info.endPosition;
 
-		m_agent->m_planner->AddActionToStack(data);
+		AddActionToStack(data);
 
 
 		//figure out if we can skip doing an A* by borrowing someone else's path
 		if (GetIsOptimized())
 		{
 			PROFILER_PUSH();
-			bool success = FindAgentAndCopyPath(info.endPosition);
+			bool success = FindAgentAndCopyPath(positionData, pathData, indexInSortedXList, indexInSortedYList, info.endPosition);
 		}
 		else
 		{
 			PROFILER_PUSH();
-			m_agent->GetPathToDestination(info.endPosition);
+			Agent::GetPathToDestination(positionData, pathData, info.endPosition);
 		}		
 
 #ifdef QueueActionPathingDataAnalysis
@@ -496,23 +502,23 @@ std::string Planner::GetPlanTypeAsText()
 //  =========================================================================================
 // Get utilities
 //  =========================================================================================
-UtilityInfo Planner::GetHighestGatherArrowsUtility()
+UtilityInfo Planner::GetHighestGatherArrowsUtility(PositionData& positionData, ActionData& actionData)
 {
 	UtilityInfo highestGatherArrowsUtility;
 
 	/*if (GetIsOptimized())
 	{*/
-		if (m_agent->m_arrowCount == g_maxResourceCarryAmount)
+		if (actionData.m_arrowCount == g_maxResourceCarryAmount)
 		{
 			return highestGatherArrowsUtility;
 		}
 	//}
 
-	if (m_map->m_armories.size() > 0)
+	if (s_mapPlannerReference->m_armories.size() > 0)
 	{
-		for (int armoryIndex = 0; armoryIndex < (int)m_map->m_armories.size(); ++armoryIndex)
+		for (int armoryIndex = 0; armoryIndex < (int)s_mapPlannerReference->m_armories.size(); ++armoryIndex)
 		{
-			UtilityInfo infoForBuilding = GetGatherUitlityPerBuilding(m_map->m_armories[armoryIndex]);
+			UtilityInfo infoForBuilding = GetGatherUitlityPerBuilding(positionData, actionData, s_mapPlannerReference->m_armories[armoryIndex]);
 			if (infoForBuilding.utility > highestGatherArrowsUtility.utility)
 			{
 				highestGatherArrowsUtility = infoForBuilding;
@@ -524,23 +530,23 @@ UtilityInfo Planner::GetHighestGatherArrowsUtility()
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetHighestGatherLumberUtility()
+UtilityInfo Planner::GetHighestGatherLumberUtility(PositionData& positionData, ActionData& actionData)
 {
 	UtilityInfo highestGatherLumberUtility;
 
 	/*if (GetIsOptimized())
 	{*/
-		if (m_agent->m_lumberCount == g_maxResourceCarryAmount)
+		if (actionData.m_lumberCount == g_maxResourceCarryAmount)
 		{
 			return highestGatherLumberUtility;
 		}
 	//}
 
-	if (m_map->m_lumberyards.size() > 0)
+	if (s_mapPlannerReference->m_lumberyards.size() > 0)
 	{
-		for (int lumberyardIndex = 0; lumberyardIndex < (int)m_map->m_lumberyards.size(); ++lumberyardIndex)
+		for (int lumberyardIndex = 0; lumberyardIndex < (int)s_mapPlannerReference->m_lumberyards.size(); ++lumberyardIndex)
 		{
-			UtilityInfo infoForBuilding = GetGatherUitlityPerBuilding(m_map->m_lumberyards[lumberyardIndex]);
+			UtilityInfo infoForBuilding = GetGatherUitlityPerBuilding(positionData, actionData, s_mapPlannerReference->m_lumberyards[lumberyardIndex]);
 			if (infoForBuilding.utility > highestGatherLumberUtility.utility)
 			{
 				highestGatherLumberUtility = infoForBuilding;
@@ -552,23 +558,23 @@ UtilityInfo Planner::GetHighestGatherLumberUtility()
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetHighestGatherBandagesUtility()
+UtilityInfo Planner::GetHighestGatherBandagesUtility(PositionData& positionData, ActionData& actionData)
 {
 	UtilityInfo highestGatherBandagesUtility;
 
 	/*if (GetIsOptimized())
 	{*/
-		if (m_agent->m_bandageCount == g_maxResourceCarryAmount)
+		if (actionData.m_bandageCount == g_maxResourceCarryAmount)
 		{
 			return highestGatherBandagesUtility;
 		}
 	//}
 
-	if (m_map->m_medStations.size() > 0)
+	if (s_mapPlannerReference->m_medStations.size() > 0)
 	{
-		for (int medStationIndex = 0; medStationIndex < (int)m_map->m_medStations.size(); ++medStationIndex)
+		for (int medStationIndex = 0; medStationIndex < (int)s_mapPlannerReference->m_medStations.size(); ++medStationIndex)
 		{
-			UtilityInfo infoForBuilding = GetGatherUitlityPerBuilding(m_map->m_medStations[medStationIndex]);
+			UtilityInfo infoForBuilding = GetGatherUitlityPerBuilding(positionData, actionData, s_mapPlannerReference->m_medStations[medStationIndex]);
 			if (infoForBuilding.utility > highestGatherBandagesUtility.utility)
 			{
 				highestGatherBandagesUtility = infoForBuilding;
@@ -580,25 +586,25 @@ UtilityInfo Planner::GetHighestGatherBandagesUtility()
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetHighestShootUtility()
+UtilityInfo Planner::GetHighestShootUtility(PositionData& positionData, ActionData& actionData)
 {
 	UtilityInfo info;
 
 	/*if (GetIsOptimized())
 	{*/
-		if (m_map->m_threat == 0 || m_agent->m_arrowCount == 0)
+		if (s_mapPlannerReference->m_threat == 0 || actionData.m_arrowCount == 0)
 		{
 			return info;
 		}
 	//}
 
-	Vector2 nearestWallPosition = Vector2(0.5f, 0.5f) + (Vector2)GetNearestTileCoordinateOfMapEdgeFromCoordinate((IntVector2)m_agent->m_position);
+	Vector2 nearestWallPosition = Vector2(0.5f, 0.5f) + (Vector2)GetNearestTileCoordinateOfMapEdgeFromCoordinate((IntVector2)positionData.m_position);
 
 	// distance to nearest wall squared ----------------------------------------------
-	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, nearestWallPosition);
+	float distanceToBuildingSquared = GetDistanceSquared(positionData.m_position, nearestWallPosition);
 
 	//get max distance
-	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(m_map->GetDimensions()));
+	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(s_mapPlannerReference->GetDimensions()));
 
 	//normalize distance
 	float normalizedDistance = distanceToBuildingSquared/maxDistanceSquared;
@@ -608,7 +614,7 @@ UtilityInfo Planner::GetHighestShootUtility()
 
 
 	//normalized threat ----------------------------------------------
-	float normalizedThreat = m_map->m_threat/g_maxThreat;
+	float normalizedThreat = s_mapPlannerReference->m_threat/g_maxThreat;
 
 	//apply shoot utility formula for utility value
 	float threatUtility = CalculateShootUtility(normalizedThreat);
@@ -623,21 +629,21 @@ UtilityInfo Planner::GetHighestShootUtility()
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetHighestRepairUtility()
+UtilityInfo Planner::GetHighestRepairUtility(PositionData& positionData, ActionData& actionData)
 {
 	UtilityInfo highestRepairUtility;
 
 	//if (GetIsOptimized())
 	//{
-		if (m_agent->m_lumberCount == 0)
+		if (actionData.m_lumberCount == 0)
 		{
 			return highestRepairUtility;
 		}
 	//}
 
-	for (int buildingIndex = 0; buildingIndex < (int)m_map->m_pointsOfInterest.size(); ++buildingIndex)
+	for (int buildingIndex = 0; buildingIndex < (int)s_mapPlannerReference->m_pointsOfInterest.size(); ++buildingIndex)
 	{
-		UtilityInfo utilityInfoForBuilding = GetRepairUtilityPerBuilding(m_map->m_pointsOfInterest[buildingIndex]);
+		UtilityInfo utilityInfoForBuilding = GetRepairUtilityPerBuilding(positionData, actionData, s_mapPlannerReference->m_pointsOfInterest[buildingIndex]);
 		if (utilityInfoForBuilding.utility > highestRepairUtility.utility)
 		{
 			highestRepairUtility = utilityInfoForBuilding;
@@ -648,31 +654,31 @@ UtilityInfo Planner::GetHighestRepairUtility()
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetHealSelfUtility()
+UtilityInfo Planner::GetHealSelfUtility(AgentInfo& agentInfo, PositionData& positionData, ActionData& actionData)
 {
 	UtilityInfo healUtilityInfo;
 
 	//if (GetIsOptimized())
 	//{
-	if (m_agent->m_bandageCount == 0)
+	if (actionData.m_bandageCount == 0)
 	{
 		return healUtilityInfo;
 	}
 	//}
 
 	//building health ----------------------------------------------
-	float normalizedHealth = m_agent->m_health/g_maxHealth;
+	float normalizedHealth = agentInfo.m_health/g_maxHealth;
 
 	float agentUtility = CalculateAgentHealthUtility(normalizedHealth);
 	healUtilityInfo.utility = agentUtility;
-	healUtilityInfo.targetEntityId = m_agent->m_id;
-	healUtilityInfo.endPosition = m_agent->m_position;
+	healUtilityInfo.targetEntityId = agentInfo.m_id;
+	healUtilityInfo.endPosition = positionData.m_position;
 
 	return healUtilityInfo;
 }
 
 //  =============================================================================
-UtilityInfo Planner::GetRepairUtilityPerBuilding(PointOfInterest* poi)
+UtilityInfo Planner::GetRepairUtilityPerBuilding(PositionData& positionData, ActionData& actionData, PointOfInterest* poi)
 {
 	UtilityInfo info;
 	info.utility = 0.f;
@@ -680,16 +686,16 @@ UtilityInfo Planner::GetRepairUtilityPerBuilding(PointOfInterest* poi)
 	info.targetEntityId = poi->m_id;
 
 	//easy out if building is at full health
-	if (poi->m_health == g_maxHealth || m_agent->m_lumberCount == 0)
+	if (poi->m_health == g_maxHealth || actionData.m_lumberCount == 0)
 	{
 		return info;
 	}
 
 	// distance to building squared ----------------------------------------------
-	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, poi->m_accessPosition);
+	float distanceToBuildingSquared = GetDistanceSquared(positionData.m_position, poi->m_accessPosition);
 	
 	//get max distance
-	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(m_map->GetDimensions()));
+	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(s_mapPlannerReference->GetDimensions()));
 
 	//normalize distance
 	float normalizedDistance = distanceToBuildingSquared/maxDistanceSquared;
@@ -713,7 +719,7 @@ UtilityInfo Planner::GetRepairUtilityPerBuilding(PointOfInterest* poi)
 }
 
 //  =============================================================================
-UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
+UtilityInfo Planner::GetGatherUitlityPerBuilding(PositionData& positionData, ActionData& actionData, PointOfInterest* poi)
 {
 	UtilityInfo info;
 	info.utility = 0.f;
@@ -724,13 +730,13 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 	switch (poi->m_type)
 	{
 	case ARMORY_POI_TYPE:
-		inventoryCountPerType = m_agent->m_arrowCount;
+		inventoryCountPerType = actionData.m_arrowCount;
 		break;
 	case LUMBERYARD_POI_TYPE:
-		inventoryCountPerType = m_agent->m_lumberCount;
+		inventoryCountPerType = actionData.m_lumberCount;
 		break;
 	case MED_STATION_POI_TYPE:
-		inventoryCountPerType = m_agent->m_bandageCount;
+		inventoryCountPerType = actionData.m_bandageCount;
 		break;
 	}
 
@@ -741,10 +747,10 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 	}
 
 	// distance to building squared ----------------------------------------------
-	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, poi->m_accessPosition);
+	float distanceToBuildingSquared = GetDistanceSquared(positionData.m_position, poi->m_accessPosition);
 
 	//get max distance
-	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(m_map->GetDimensions()));
+	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(s_mapPlannerReference->GetDimensions()));
 
 	//normalize distance
 	float normalizedDistance = distanceToBuildingSquared/maxDistanceSquared;
@@ -763,31 +769,6 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 	// combine distance and health utilities for final utility ----------------------------------------------
 	float adjustedUtility = distanceUtility * gatherUtility;
 	info.utility = adjustedUtility;
-
-	return info;
-}
-
-//  =========================================================================================
-UtilityInfo Planner::GetHealUtilityPerAgent(Agent* agent)
-{
-	UtilityInfo info;
-	info.utility = 0.f;
-	info.endPosition = agent->m_position;
-	info.targetEntityId = agent->m_id;
-
-	//easy out if agent is at full health or if we don't have bandages
-	if (agent->m_health == g_maxHealth || m_agent->m_bandageCount == 0)
-	{
-		return info;
-	}
-
-	//building health ----------------------------------------------
-	float normalizedHealth = agent->m_health/g_maxHealth;
-
-	//apply health utility formula for utility value
-	float healthUtility = CalculateAgentHealthUtility(normalizedHealth);
-
-	info.utility = healthUtility;
 
 	return info;
 }
@@ -1075,7 +1056,7 @@ IntVector2 Planner::GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVec
 //  =========================================================================================
 // Optimizations
 //  =========================================================================================
-bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
+bool Planner::FindAgentAndCopyPath(PositionData& positionData, PathData& pathData, uint16& indexInSortedXList, uint16& indexInSortedYList, const Vector2& endPosition)
 {
 	++g_numCopyPathCalls;
 
@@ -1097,25 +1078,25 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 	if (GetDoesHaveTopActionGoalPosition(goalPosition))
 	{
 		//search surrounding agents for similarities (most likely to be similar)
-		Agent* matchingAgents[12]; //get 3 on each side from each list
+		uint16 matchingAgents[12]; //get 3 on each side from each list
 
 		//get the 6 closest on the X plane
-		matchingAgents[0] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 1, X_AGENT_SORT_TYPE);
-		matchingAgents[1] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 2, X_AGENT_SORT_TYPE);
-		matchingAgents[2] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 3, X_AGENT_SORT_TYPE);
+		matchingAgents[0] = GetAgentIndexFromSortedList(indexInSortedXList - 1, X_AGENT_SORT_TYPE);
+		matchingAgents[1] = GetAgentIndexFromSortedList(indexInSortedXList - 2, X_AGENT_SORT_TYPE);
+		matchingAgents[2] = GetAgentIndexFromSortedList(indexInSortedXList - 3, X_AGENT_SORT_TYPE);
 
-		matchingAgents[3] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 1, X_AGENT_SORT_TYPE);
-		matchingAgents[4] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 2, X_AGENT_SORT_TYPE);
-		matchingAgents[5] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 3, X_AGENT_SORT_TYPE);
+		matchingAgents[3] = GetAgentIndexFromSortedList(indexInSortedXList + 1, X_AGENT_SORT_TYPE);
+		matchingAgents[4] = GetAgentIndexFromSortedList(indexInSortedXList + 2, X_AGENT_SORT_TYPE);
+		matchingAgents[5] = GetAgentIndexFromSortedList(indexInSortedXList + 3, X_AGENT_SORT_TYPE);
 
 		//get 6 closest on the Y Plane
-		matchingAgents[6] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 1, Y_AGENT_SORT_TYPE);
-		matchingAgents[7] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 2, Y_AGENT_SORT_TYPE);
-		matchingAgents[8] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 3, Y_AGENT_SORT_TYPE);
+		matchingAgents[6] = GetAgentIndexFromSortedList(indexInSortedYList - 1, Y_AGENT_SORT_TYPE);
+		matchingAgents[7] = GetAgentIndexFromSortedList(indexInSortedYList - 2, Y_AGENT_SORT_TYPE);
+		matchingAgents[8] = GetAgentIndexFromSortedList(indexInSortedYList - 3, Y_AGENT_SORT_TYPE);
 
-		matchingAgents[9] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 1, Y_AGENT_SORT_TYPE);
-		matchingAgents[10] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 2, Y_AGENT_SORT_TYPE);
-		matchingAgents[11] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 3, Y_AGENT_SORT_TYPE);
+		matchingAgents[9] = GetAgentIndexFromSortedList(indexInSortedYList + 1, Y_AGENT_SORT_TYPE);
+		matchingAgents[10] = GetAgentIndexFromSortedList(indexInSortedYList + 2, Y_AGENT_SORT_TYPE);
+		matchingAgents[11] = GetAgentIndexFromSortedList(indexInSortedYList + 3, Y_AGENT_SORT_TYPE);
 
 
 		//--------IN ORDER OF PRIORITY-----------
@@ -1123,7 +1104,7 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 		//we care about their current task
 		//we care about the distance to their current path
 	
-		Agent* mostResembledAgent = nullptr;
+		uint16 mostResembledAgent = UINT16_MAX;
 		float minDistanceSquared = s_mapPlannerReference->GetMapDistanceSquared();
 		uint8_t indexIntoMostResembledAgentsPath = UINT8_MAX;
 
@@ -1132,15 +1113,15 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 		for (int agentIndex = 0; agentIndex < 12; ++agentIndex)
 		{
 			//early out if agent index is out of range OR if we've already looked over this agent
-			if (matchingAgents[agentIndex] == nullptr || mostResembledAgent == matchingAgents[agentIndex])
+			if (matchingAgents[agentIndex] == UINT16_MAX || mostResembledAgent == matchingAgents[agentIndex])
 			{
 				continue;
 			}				
 		
-			if (matchingAgents[agentIndex]->m_currentPath.size() > 0)
+			if (s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_pathCount > 0)
 			{	
 				Vector2 matchingAgentFinalDestinationPosition = Vector2::ZERO;
-				if (!matchingAgents[agentIndex]->m_planner->GetDoesHaveTopActionGoalPosition(matchingAgentFinalDestinationPosition))
+				if (!s_agentsPlannerReference->m_planner[matchingAgents[agentIndex]].GetDoesHaveTopActionGoalPosition(matchingAgentFinalDestinationPosition))
 				{
 					continue;
 				}
@@ -1148,9 +1129,9 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 				if (compareDisc.IsPointInside(matchingAgentFinalDestinationPosition))
 				{
 					//this agent matches our current goal location
-					for (int agentPathIndex = 0; agentPathIndex < (int)matchingAgents[agentIndex]->m_currentPath.size(); ++agentPathIndex)
+					for (int agentPathIndex = 0; agentPathIndex < s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_pathCount; ++agentPathIndex)
 					{
-						float distanceSquared = GetDistanceSquared(matchingAgents[agentIndex]->m_currentPath[agentPathIndex], m_agent->m_position);
+						float distanceSquared = GetDistanceSquared(s_agentsPlannerReference->m_pathData[matchingAgents[agentIndex]].m_currentPath[agentPathIndex], positionData.m_position);
 						if (distanceSquared < minDistanceSquared)
 						{
 							mostResembledAgent = matchingAgents[agentIndex];
@@ -1162,26 +1143,26 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 			}
 
 			//cleanup this agent so we can simply call delete at the end
-			matchingAgents[agentIndex] = nullptr;
+			matchingAgents[agentIndex] = UINT16_MAX;
 		}
 
 		//we didn't find someone else's path to borrow
-		if (mostResembledAgent != nullptr)
+		if (mostResembledAgent != UINT16_MAX)
 		{
 			//copy path into this agent's path
-			CopyPath(m_agent, mostResembledAgent, indexIntoMostResembledAgentsPath);
+			CopyPath(pathData, s_agentsPlannerReference->m_pathData[mostResembledAgent], indexIntoMostResembledAgentsPath);
 			didSuccessfullyCopyMatchingAgent = true;		
 		}
 
 		// cleanup ----------------------------------------------
 		//should all be marked as nullptr by the end
-		mostResembledAgent = nullptr;
+		mostResembledAgent = UINT16_MAX;
 	}
 
 	//Generate our own path and queue move action
 	if (!didSuccessfullyCopyMatchingAgent)
 	{
-		m_agent->GetPathToDestination(endPosition);
+		Agent::GetPathToDestination(positionData, pathData, endPosition);
 	}
 
 #ifdef CopyPathAnalysis

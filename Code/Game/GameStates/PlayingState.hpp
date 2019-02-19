@@ -56,7 +56,7 @@ public:
 	Stopwatch* m_simulationTimer = nullptr;
 
 	bool m_isCameraLockedToAgent = false;
-	Agent* m_disectedAgent = nullptr;
+	int m_disectedAgentIndex = UINT16_MAX;
 };
 
 void TogglePaused(Command& cmd);

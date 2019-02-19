@@ -60,7 +60,7 @@ public:
 
 	//planning
 	void UpdatePlan(uint16 agentIndex);	
-	void QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo& info);
+	void QueueActionsFromCurrentPlan(PositionData& positionData, PathData& pathData, uint16& indexInSortedXList, uint16& indexInSortedYList, ePlanTypes planType, const UtilityInfo& info);
 
 	void QueueGatherArrowsAction(const UtilityInfo& info);
 	void QueueGatherLumberAction(const UtilityInfo& info);
@@ -72,17 +72,16 @@ public:
 	std::string GetPlanTypeAsText();
 
 	//utility cost calculations
-	UtilityInfo GetHighestGatherArrowsUtility();
-	UtilityInfo GetHighestGatherLumberUtility();
-	UtilityInfo GetHighestGatherBandagesUtility();
+	UtilityInfo GetHighestGatherArrowsUtility(PositionData& positionData, ActionData& actionData);
+	UtilityInfo GetHighestGatherLumberUtility(PositionData& positionData, ActionData& actionData);
+	UtilityInfo GetHighestGatherBandagesUtility(PositionData& positionData, ActionData& actionData);
 
-	UtilityInfo GetHighestShootUtility();
-	UtilityInfo GetHighestRepairUtility();
-	UtilityInfo GetHealSelfUtility();
+	UtilityInfo GetHighestShootUtility(PositionData& positionData, ActionData& actionData);
+	UtilityInfo GetHighestRepairUtility(PositionData& positionData, ActionData& actionData);
+	UtilityInfo GetHealSelfUtility(AgentInfo& agentInfo, PositionData& positionData, ActionData& actionData);
 
-	UtilityInfo GetRepairUtilityPerBuilding(PointOfInterest* poi);
-	UtilityInfo GetGatherUitlityPerBuilding(PointOfInterest* poi);
-	UtilityInfo GetHealUtilityPerAgent(Agent* agent);
+	UtilityInfo GetRepairUtilityPerBuilding(PositionData& positionData, ActionData& actionData, PointOfInterest* poi);
+	UtilityInfo GetGatherUitlityPerBuilding(PositionData& positionData, ActionData& actionData, PointOfInterest* poi);
 
 	UtilityInfo GetIdleUtilityInfo();
 
@@ -101,7 +100,7 @@ public:
 	IntVector2 GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVector2& coordinate);					//O(1)
 
 	//optimizations
-	bool FindAgentAndCopyPath(const Vector2& endPostion);
+	bool FindAgentAndCopyPath(PositionData& positionData, PathData& pathData, uint16& indexInSortedXList, uint16& indexInSortedYList, const Vector2& endPostion);
 	void CopyPath(PathData& toAgentPathData, PathData& fromAgentPathData, uint8_t startingIndex);
 	uint16 GetAgentIndexFromSortedList(uint16_t agentIndex, eAgentSortType sortType);
 

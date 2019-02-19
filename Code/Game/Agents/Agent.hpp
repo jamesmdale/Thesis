@@ -14,7 +14,7 @@ class PlayingState;
 class Stopwatch;
 
 //typedefs
-typedef bool (*ActionCallback)(Agent* agents, const uint16 agentIndex, const Vector2& goalDestination, uint16 interactEntityId);
+typedef bool (*ActionCallback)(Agent* agents, const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId);
 
 
 //container for data needed to be stored in queue  ----------------------------------------------
@@ -134,7 +134,6 @@ public:
 	static bool GetIsAtPosition(PositionData& positionData, const Vector2& goalDestination);
 	static void UpdatePhysicsData(PositionData& positionData);
 	static void UpdateSpriteRenderDirection(PositionData& positionData);
-	static void HandleTileToAgentPhysics();
 
 	//stats
 	static void UpdateCombatPerformanceTime(Personality& personality);

@@ -159,6 +159,8 @@ void Game::InitializeMapDefinitions()
 void Game::InitializeAgentDefinitions()
 {
 	//unused atm 11/13/2018
+
+	Renderer::GetInstance()->CreateOrGetTexture("Data/Images/Agents/Male_1.png");
 }
 
 //  =============================================================================

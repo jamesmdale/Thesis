@@ -10,6 +10,8 @@
 
 //forward declarations
 enum ePointOfInterestType;
+struct AgentInfo;
+struct PositionData;
 class Agent;
 class PointOfInterest;
 class Bombardment;
@@ -72,10 +74,10 @@ public:
 	//agent sorting  ----------------------------------------------
 	void SortAgentsByX();
 	void SortAgentsByY();
-	void QuickSortAgentByPriority(std::vector<Agent*>& agents, int startIndex, int endIndex);
-	int QuickSortPivot(std::vector<Agent*>& agents, int startIndex, int endIndex);
-	void SwapAgents(int indexI, int indexJ, eAgentSortType type);
-	Agent* GetAgentById(int agentId);
+	void QuickSortAgentByPriority(std::vector<uint16>& agentIndexes, int startIndex, int endIndex);
+	int QuickSortPivot(std::vector<uint16>& agentIndexes, int startIndex, int endIndex);
+	void SwapAgents(uint16 indexI, uint16 indexJ, eAgentSortType type);
+	uint16 GetAgentPriorityIndexById(int agentId);
 
 	//Conversion functions for Tile Coordinates to World Coordinates  ----------------------------------------------
 	IntVector2 GetTileCoordinateOfPosition(const Vector2& position);
@@ -100,8 +102,8 @@ public:
 	void DetectBombardmentToPOICollision(Bombardment* bombardment);
 
 	//agent to tile collision  ----------------------------------------------
-	void DetectAgentToTileCollision(Agent* agent);
-	bool PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection);
+	void DetectAgentToTileCollision(const uint16 agentIndex);
+	bool PushAgentOutOfTile(PositionData& positionData, const IntVector2& tileCoordinate, int tileDirection);
 	
 public:
 	std::string m_name;
@@ -113,6 +115,7 @@ public:
 	AABB2 m_mapWorldBounds;
 
 	//lists
+	Agent* m_agents = nullptr;
 	std::vector<uint16> m_agentIndexesOrderedByPriority;
 	std::vector<uint16> m_agentIndexesOrderedByXPosition;
 	std::vector<uint16> m_agentIndexesOrderedByYPosition;
