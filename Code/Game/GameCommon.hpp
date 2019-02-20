@@ -61,17 +61,17 @@ constexpr float g_minActionPerformanceRatePerSecond = 0.25f;
 
 constexpr float g_minSkillEfficiency = 0.1f;
 
- //bombardment globals
-constexpr float g_bombardmentExplosionTime = 1.f;
-float g_bombardmentExplosionSize = 1.f;
-constexpr int g_bombardmentDamage = 10.f;
- 
  //optimization globals
 constexpr float g_sortTimerInSeconds = 0.5f;
 constexpr float g_agentCopyDestinationPositionRadius = 0.5f;
 
  //threat globals
 constexpr float g_maxThreat = 500.f;
+
+//bombardment globals
+extern float g_bombardmentExplosionTime;
+extern int g_bombardmentDamage;
+extern float g_bombardmentExplosionSize;
 
 extern SimulationDefinition* g_currentSimulationDefinition;
 

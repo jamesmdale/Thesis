@@ -110,11 +110,11 @@ private:
 	std::stack<ActionCallbackData*> m_actionStack;
 
 public:
-	static Agent* s_agentsPlannerReference;
-	static Map* s_mapPlannerReference;
-
 	ePlanTypes m_currentPlan;
 	UtilityHistory m_utilityHistory;
+
+	static Agent* s_agentsPlannerReference;
+	static Map* s_mapPlannerReference;
 
 	//utility data
 	static UtilityStorage* m_distanceUtilityStorage;

@@ -12,9 +12,10 @@ class Planner;
 class Map;
 class PlayingState;
 class Stopwatch;
+class Agent;
 
 //typedefs
-typedef bool (*ActionCallback)(Agent* agents, const uint16 agentIndex, const Vector2& goalDestination, int interactEntityId);
+typedef bool (*ActionCallback)(Agent* agents, uint16 agentIndex, const Vector2& goalDestination, int interactEntityId);
 
 
 //container for data needed to be stored in queue  ----------------------------------------------
@@ -159,6 +160,7 @@ public:
 	static uint16 s_numAgents;
 	static Map* s_mapAgentReference;
 };
+
 
 
 // actions ----------------------------------------------

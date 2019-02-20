@@ -197,9 +197,9 @@ void Map::Initialize()
 		m_agentIndexesOrderedByYPosition.push_back(agentIndex);
 		m_agentIndexesOrderedByPriority.push_back(agentIndex);
 
-		m_agents[agentIndex].m_indexInSortedXList[agentIndex] = agentIndex;
-		m_agents[agentIndex].m_indexInSortedYList[agentIndex] = agentIndex;
-		m_agents[agentIndex].m_indexInPriorityList[agentIndex] = agentIndex;
+		m_agents->m_indexInSortedXList[agentIndex] = agentIndex;
+		m_agents->m_indexInSortedYList[agentIndex] = agentIndex;
+		m_agents->m_indexInPriorityList[agentIndex] = agentIndex;
 	}
 
 	//init other starting values
@@ -460,8 +460,8 @@ void Map::Reload(SimulationDefinition* definition)
 		m_agentIndexesOrderedByYPosition.push_back(agentIndex);
 		m_agentIndexesOrderedByPriority.push_back(agentIndex);
 
-		m_agents[agentIndex].m_indexInSortedXList[agentIndex] = (uint16)agentIndex;
-		m_agents[agentIndex].m_indexInSortedYList[agentIndex] = (uint16)agentIndex;
+		m_agents->m_indexInSortedXList[agentIndex] = (uint16)agentIndex;
+		m_agents->m_indexInSortedYList[agentIndex] = (uint16)agentIndex;
 	}
 
 

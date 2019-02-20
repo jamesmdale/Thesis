@@ -15,8 +15,8 @@
 #include "Engine\Profiler\Profiler.hpp"
 #include "Engine\File\CSVWriter.hpp"
 
-Map* m_agentMapReference = nullptr;
-uint16 m_numAgents = 0;
+uint16 Agent::s_numAgents = 0;
+Map* Agent::s_mapAgentReference = nullptr;
 
 //  =========================================================================================
 Agent::Agent(Map* mapReference, uint16 numAgents)
@@ -83,6 +83,8 @@ void Agent::AddAgentData(const uint16 id, const Vector2& startingPosition, IsoSp
 
 	//position setup
 	positionData.m_position = startingPosition;
+	positionData.m_physicsDisc.radius = PHYSICS_DISC_RADIUS;
+	UpdatePhysicsData(positionData);
 
 	//personality setup
 	GenerateRandomStats(personalityData);
@@ -129,6 +131,7 @@ void Agent::InitializeActionData()
 //  =========================================================================================
 void Agent::InitialisePlannerData()
 {
+	m_planner[0].s_mapPlannerReference = s_mapAgentReference;
 	m_planner[0].s_agentsPlannerReference = this;
 }
 
@@ -580,7 +583,7 @@ bool ShootAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goal
 	if (actionData.m_actionTimer->DecrementAll() > 0)
 	{
 		//launch arrow in agent forward
-		m_agentMapReference->m_threat = ClampInt(m_agentMapReference->m_threat - g_baseShootDamageAmountPerPerformance, 0, g_maxThreat);
+		Agent::s_mapAgentReference->m_threat = ClampInt(Agent::s_mapAgentReference->m_threat - g_baseShootDamageAmountPerPerformance, 0, g_maxThreat);
 		actionData.m_arrowCount--;
 
 		ASSERT_OR_DIE(actionData.m_arrowCount >= 0, "AGENT ARROW COUNT NEGATIVE!!");
@@ -588,7 +591,7 @@ bool ShootAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goal
 		actionData.m_animationSet->GetCurrentAnim()->PlayFromStart();
 	}	
 
-	if (actionData.m_arrowCount == 0 || m_agentMapReference->m_threat == 0)
+	if (actionData.m_arrowCount == 0 || Agent::s_mapAgentReference->m_threat == 0)
 	{
 		//reset first loop action
 		actionData.m_isFirstLoopThroughAction = true;
@@ -610,7 +613,7 @@ bool RepairAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goa
 	//used to handle any extra logic that must occur on first loop
 	if (actionData.m_isFirstLoopThroughAction)
 	{
-		PointOfInterest* targetPoi = m_agentMapReference->GetPointOfInterestById(interactEntityId);
+		PointOfInterest* targetPoi = Agent::s_mapAgentReference->GetPointOfInterestById(interactEntityId);
 		positionData.m_forward = targetPoi->GetWorldBounds().GetCenter() - positionData.m_position;
 		//do first pass logic
 		actionData.m_actionTimer->SetTimer(personality.m_calculatedRepairPerformancePerSecond);
@@ -620,7 +623,7 @@ bool RepairAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goa
 	actionData.m_animationSet->SetCurrentAnim("cast");
 
 	//if we are at our destination, we are ready to repair
-	PointOfInterest* targetPoi = m_agentMapReference->GetPointOfInterestById(interactEntityId);
+	PointOfInterest* targetPoi = Agent::s_mapAgentReference->GetPointOfInterestById(interactEntityId);
 	
 	if (actionData.m_actionTimer->DecrementAll() > 0)
 	{
@@ -693,7 +696,7 @@ bool GatherAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goa
 	actionData.m_animationSet->SetCurrentAnim("cast");
 
 	//if we are at our destination, we are ready to gather
-	PointOfInterest* targetPoi = m_agentMapReference->GetPointOfInterestById(interactEntityId);
+	PointOfInterest* targetPoi = Agent::s_mapAgentReference->GetPointOfInterestById(interactEntityId);
 
 	//confirm agent is at targetPOI accessLocation
 	//if (agent->m_planner->m_map->GetTileCoordinateOfPosition(agent->m_position) != targetPoi->m_accessCoordinate)

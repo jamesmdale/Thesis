@@ -1,4 +1,3 @@
-#include "Engine\Profiler\Profiler.hpp"
 #include "Game\Agents\Planner.hpp"
 #include "Game\Map\Map.hpp"
 #include "Game\Agents\Agent.hpp"
@@ -6,9 +5,10 @@
 #include "Game\Agents\Agent.hpp"
 #include "Game\GameCommon.hpp"
 #include "Game\GameStates\PlayingState.hpp"
+#include "Engine\Profiler\Profiler.hpp"
 
-Agent* m_plannerAgentsReference = nullptr;
-Map* s_mapPlannerReference = nullptr;
+Agent* Planner::s_agentsPlannerReference = nullptr;
+Map* Planner::s_mapPlannerReference = nullptr;
 
 //declarations for utility storage members
 UtilityStorage* Planner::m_distanceUtilityStorage = nullptr;
@@ -59,6 +59,7 @@ Planner::~Planner()
 		m_shootUtilityStorageUtility = nullptr;
 	}
 
+	s_mapPlannerReference = nullptr;
 	s_agentsPlannerReference = nullptr;
 }
 

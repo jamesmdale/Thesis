@@ -43,6 +43,11 @@ uint64_t g_previousFrameNonAgentUpdateTime = 0.0;
 uint64_t g_agentUpdateBudgetThisFrame = 0.0;
 int g_agentsUpdatedThisFrame = 0;
 
+//bombardment
+float g_bombardmentExplosionTime = 1.f;
+int g_bombardmentDamage = 10.f;
+float g_bombardmentExplosionSize = 1.f;
+
 //XY
 IntVector2 MAP_NORTH = IntVector2(0, 1);
 IntVector2 MAP_SOUTH = IntVector2(0, -1);
