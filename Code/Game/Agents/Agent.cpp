@@ -526,7 +526,7 @@ bool MoveAction(Agent* agentsList, const uint16 agentIndex, const Vector2& goalD
 		positionData.m_forward.NormalizeAndGetLength();
 
 		positionData.m_position += (positionData.m_forward * (positionData.m_movespeed * GetGameClock()->GetDeltaSeconds()));
-		
+		Agent::UpdatePhysicsData(positionData);
 	}		
 	else
 	{
