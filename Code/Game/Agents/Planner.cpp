@@ -1106,13 +1106,13 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 		matchingAgents[5] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 3, X_AGENT_SORT_TYPE);
 
 		//get 6 closest on the Y Plane
-		matchingAgents[6] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 1, Y_AGENT_SORT_TYPE);
-		matchingAgents[7] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 2, Y_AGENT_SORT_TYPE);
-		matchingAgents[8] = GetAgentFromSortedList(m_agent->m_indexInSortedXList - 3, Y_AGENT_SORT_TYPE);
+		matchingAgents[6] = GetAgentFromSortedList(m_agent->m_indexInSortedYList - 1, Y_AGENT_SORT_TYPE);
+		matchingAgents[7] = GetAgentFromSortedList(m_agent->m_indexInSortedYList - 2, Y_AGENT_SORT_TYPE);
+		matchingAgents[8] = GetAgentFromSortedList(m_agent->m_indexInSortedYList - 3, Y_AGENT_SORT_TYPE);
 
-		matchingAgents[9] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 1, Y_AGENT_SORT_TYPE);
-		matchingAgents[10] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 2, Y_AGENT_SORT_TYPE);
-		matchingAgents[11] = GetAgentFromSortedList(m_agent->m_indexInSortedXList + 3, Y_AGENT_SORT_TYPE);
+		matchingAgents[9] = GetAgentFromSortedList(m_agent->m_indexInSortedYList + 1, Y_AGENT_SORT_TYPE);
+		matchingAgents[10] = GetAgentFromSortedList(m_agent->m_indexInSortedYList + 2, Y_AGENT_SORT_TYPE);
+		matchingAgents[11] = GetAgentFromSortedList(m_agent->m_indexInSortedYList + 3, Y_AGENT_SORT_TYPE);
 
 
 		//--------IN ORDER OF PRIORITY-----------
