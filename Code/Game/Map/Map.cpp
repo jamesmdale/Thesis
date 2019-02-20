@@ -874,6 +874,20 @@ void Map::DetectBombardmentToPOICollision(Bombardment* bombardment)
 //  =========================================================================================
 void Map::DetectAgentToTileCollision(const uint16 agentIndex)
 {
+
+#ifdef CollisionDataAnalysis
+	// profiling ----------------------------------------------
+	++g_numCollisionCalls;
+
+	static int iterations = 0;
+	static uint64_t timeAverage = 0.f;
+	static uint64_t iterationStartHPC = GetPerformanceCounter();
+	uint64_t startHPC = GetPerformanceCounter();
+
+	++iterations;
+	//  ----------------------------------------------
+#endif
+
 	PositionData& positionData = m_agents->m_positionData[agentIndex];
 
 	IntVector2 agentTileCoord = GetTileCoordinateOfPosition(positionData.m_position);
@@ -947,6 +961,34 @@ void Map::DetectAgentToTileCollision(const uint16 agentIndex)
 	{
 		int i = 0;
 	}
+
+#ifdef CollisionDataAnalysis
+	// profiling ----------------------------------------------
+	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
+
+	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
+	if (iterations == 1)
+	{
+		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
+		float iterationsPerSecond = totalSeconds/100.f;
+
+
+		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
+		//DevConsolePrintf(Rgba::LIGHT_BLUE, "Average Time After 100 iterations (Pathing) %f", secondsAverage);
+		//DevConsolePrintf(Rgba::LIGHT_BLUE, "Iterations per second %f (Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds);
+
+		g_collisionData->AddCell(Stringf("%f", secondsAverage), true);
+
+		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds));
+
+
+		//reset data
+		iterationStartHPC = GetPerformanceCounter();
+		iterations = 0;
+		timeAverage = 0.0;
+	}
+	//  ----------------------------------------------
+#endif
 }
 
 //  =========================================================================================

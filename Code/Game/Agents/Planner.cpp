@@ -311,7 +311,7 @@ void Planner::UpdatePlan(uint16 agentIndex)
 //  =========================================================================================
 void Planner::QueueActionsFromCurrentPlan(PositionData& positionData, PathData& pathData, uint16& indexInSortedXList, uint16& indexInSortedYList, ePlanTypes planType, const UtilityInfo& info)
 {
-	++g_numCopyPathCalls;
+	g_numQueueActionPathCalls++;
 
 #ifdef QueueActionPathingDataAnalysis
 	// profiling ----------------------------------------------

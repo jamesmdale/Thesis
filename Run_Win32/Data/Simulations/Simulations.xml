@@ -2,49 +2,34 @@
 
     <SimulationDefinition
   name="default_optimized"
-  mapName="30x30"
-  numAgents="20"
-  numArmories="3"
-  numLumberyards="3"
-  numMedStations="3"
-  bombardmentRatePerSecond="3.0"
-  threatRatePerSecond = "1.0"
+  mapName="50x50"
+  numAgents="500"
+  numArmories="6"
+  numLumberyards="6"
+  numMedStations="6"
+  bombardmentRatePerSecond="8.0"
+  threatRatePerSecond = "10.0"
   startingThreat="400"
-  processTimerInSeconds="180"
-  isOptimized="false" 
-  isBudgeted="false"
+  processTimerInSeconds="60"
+  isOptimized="true" 
+  isBudgeted="true"
   />
 
       <SimulationDefinition
-  name="default_optimized"
-  mapName="20x20"
-  numAgents="1"
-  numArmories="1"
-  numLumberyards="1"
-  numMedStations="1"
-  bombardmentRatePerSecond="5.0"
+  name="default"
+  mapName="50x50"
+  numAgents="500"
+  numArmories="6"
+  numLumberyards="6"
+  numMedStations="6"
+  bombardmentRatePerSecond="8.0"
   threatRatePerSecond = "10.0"
-  startingThreat="100"
-  processTimerInSeconds="180"
-  isOptimized="true" 
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
   isBudgeted="false"
   />
 
-
-   <SimulationDefinition
-  name="default"
-  mapName="30x30"
-  numAgents="50"
-  numArmories="3"
-  numLumberyards="3"
-  numMedStations="0"
-  bombardmentRatePerSecond="5.0"
-  threatRatePerSecond = "10.0"
-  startingThreat="100"
-  processTimerInSeconds="30"
-  isOptimized="false" 
-  isBudgeted="false"
-  />  
 </SimulationDefinitions>
 
  <!-->

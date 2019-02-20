@@ -39,12 +39,12 @@ struct PositionData
 	// position logic ----------------------------------------------
 	Vector2 m_position;
 	float m_movespeed = 1.f;
-	Vector2 m_forward;
+	Vector2 m_forward = Vector2::UP;
 
 	Disc2 m_physicsDisc;
 
 	// sprite data ----------------------------------------------
-	IntVector2 m_spriteDirection; // = IntVector2::UP;	
+	IntVector2 m_spriteDirection = IntVector2::UP;	
 };
 
 // pathing logic  ----------------------------------------------

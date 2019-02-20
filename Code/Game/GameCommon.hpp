@@ -12,6 +12,7 @@
 #define CopyPathAnalysis
 #define QueueActionPathingDataAnalysis
 #define DistanceMemoizationDataAnalysis
+#define CollisionDataAnalysis
 
 //data organization switches
 #define ArrayOfStructs
@@ -83,6 +84,7 @@ extern SimulationData* g_pathingData;
 extern SimulationData* g_copyPathData;
 extern SimulationData* g_queueActionPathingData;
 extern SimulationData* g_distanceMemoizationData;
+extern SimulationData* g_collisionData;
 
 extern uint g_numUpdatePlanCalls;
 extern uint g_numActionStackProcessCalls;
@@ -90,6 +92,7 @@ extern uint g_numAgentUpdateCalls;
 extern uint g_numGetPathCalls;
 extern uint g_numCopyPathCalls;
 extern uint g_numQueueActionPathCalls;
+extern uint g_numCollisionCalls;
 
 extern int g_currentSimDefinitionIndex;
 
