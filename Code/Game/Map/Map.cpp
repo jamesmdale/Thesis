@@ -875,6 +875,18 @@ void Map::DetectBombardmentToPOICollision(Bombardment* bombardment)
 //  =========================================================================================
 void Map::DetectAgentToTileCollision(Agent* agent)
 {
+	++g_numCollisionCalls;
+
+#ifdef CollisionDataAnalysis
+	// profiling ----------------------------------------------
+	static int iterations = 0;
+	static uint64_t timeAverage = 0.f;
+	static uint64_t iterationStartHPC = GetPerformanceCounter();
+	uint64_t startHPC = GetPerformanceCounter();
+	++iterations;
+	//  ----------------------------------------------
+#endif
+
 	IntVector2 agentTileCoord = GetTileCoordinateOfPosition(agent->m_position);
 	Vector2 agentPosition = agent->m_position;
 	bool didPushOutCorner = false;
@@ -946,6 +958,28 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 	{
 		int i = 0;
 	}
+
+#ifdef CollisionDataAnalysis
+	// profiling ----------------------------------------------
+	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
+
+	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
+	if (iterations == 1)
+	{
+		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
+		float iterationsPerSecond = totalSeconds/100.f;
+
+		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
+
+		g_collisionData->AddCell(Stringf("%f", secondsAverage), true);
+
+		//reset data
+		iterationStartHPC = GetPerformanceCounter();
+		iterations = 0;
+		timeAverage = 0.0;
+	}
+	//  ----------------------------------------------
+#endif
 }
 
 //  =========================================================================================

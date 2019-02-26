@@ -301,7 +301,7 @@ void Planner::UpdatePlan()
 //  =========================================================================================
 void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo& info)
 {
-	++g_numCopyPathCalls;
+	++g_numQueueActionPathCalls;
 
 #ifdef QueueActionPathingDataAnalysis
 	// profiling ----------------------------------------------

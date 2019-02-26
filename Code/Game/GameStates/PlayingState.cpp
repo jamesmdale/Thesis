@@ -432,6 +432,12 @@ void PlayingState::InitializeSimulationData()
 	g_distanceMemoizationData = new SimulationData();
 	g_distanceMemoizationData->Initialize(g_currentSimulationDefinition);
 #endif // DistanceMemoizationDataAnalysis
+
+#ifdef CollisionDataAnalysis
+	//queue path data
+	g_collisionData = new SimulationData();
+	g_collisionData->Initialize(g_currentSimulationDefinition);
+#endif // CollisionDataAnalysis
 }
 
 //  =============================================================================
@@ -475,12 +481,18 @@ void PlayingState::ResetCurrentSimulationData()
 	g_distanceMemoizationData = nullptr;
 #endif
 
+#ifdef CollisionDataAnalysis
+	delete(g_collisionData);
+	g_collisionData = nullptr;
+#endif
+
 	g_numUpdatePlanCalls = 0;
 	g_numActionStackProcessCalls = 0;
 	g_numAgentUpdateCalls = 0;
 	g_numGetPathCalls = 0;
 	g_numCopyPathCalls = 0;
 	g_numQueueActionPathCalls = 0;
+	g_numCollisionCalls = 0;
 }
 
 //  =============================================================================
@@ -547,13 +559,19 @@ void PlayingState::ExportSimulationData()
 #ifdef QueueActionPathingDataAnalysis
 	fileName = Stringf("QueueActionPathingTimes_%s.csv", g_currentSimulationDefinition->m_name.c_str());
 	success = g_queueActionPathingData ->ExportCSV(finalFilePath, fileName.c_str());
-	ASSERT_OR_DIE(success, "Copy path data broken");
+	ASSERT_OR_DIE(success, "Que action pathing broken");
 #endif
 
 #ifdef DistanceMemoizationDataAnalysis
 	fileName = Stringf("DistanceMemoizationUtilityTimes_%s.csv", g_currentSimulationDefinition->m_name.c_str());
 	success = g_distanceMemoizationData ->ExportCSV(finalFilePath, fileName.c_str());
-	ASSERT_OR_DIE(success, "Copy path data broken");
+	ASSERT_OR_DIE(success, "Distance memoization broken");
+#endif
+
+#ifdef CollisionDataAnalysis
+	fileName = Stringf("CollisionCalculationTimes_%s.csv", g_currentSimulationDefinition->m_name.c_str());
+	success = g_collisionData ->ExportCSV(finalFilePath, fileName.c_str());
+	ASSERT_OR_DIE(success, "Collision data broken");
 #endif
 }
 
