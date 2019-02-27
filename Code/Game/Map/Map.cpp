@@ -21,6 +21,8 @@
 #include "Engine\Renderer\Mesh.hpp"
 #include "Engine\Time\SimpleTimer.hpp"
 
+int g_fireIdMarker = 0;
+
 //  =========================================================================================
 Map::Map(SimulationDefinition* simulationDefinition, const std::string & mapName, RenderScene2D* renderScene)
 {
@@ -175,9 +177,9 @@ void Map::Initialize()
 	{
 		//add random point of interest
 		PointOfInterest* poiLocation = GeneratePointOfInterest(LUMBERYARD_POI_TYPE);
-		m_lumberyards.push_back(poiLocation);
 		poiLocation->m_map = this;
 
+		m_lumberyards.push_back(poiLocation);
 		m_pointsOfInterest.push_back(poiLocation);
 	}
 
@@ -186,9 +188,9 @@ void Map::Initialize()
 	{
 		//add random point of interest
 		PointOfInterest* poiLocation = GeneratePointOfInterest(MED_STATION_POI_TYPE);
-		m_medStations.push_back(poiLocation);
 		poiLocation->m_map = this;
 
+		m_medStations.push_back(poiLocation);
 		m_pointsOfInterest.push_back(poiLocation);
 	}
 
@@ -197,9 +199,9 @@ void Map::Initialize()
 	{
 		//add random point of interest
 		PointOfInterest* poiLocation = GeneratePointOfInterest(WELL_POI_TYPE);
-		m_medStations.push_back(poiLocation);
 		poiLocation->m_map = this;
 
+		m_wells.push_back(poiLocation);
 		m_pointsOfInterest.push_back(poiLocation);
 	}
 
@@ -592,7 +594,7 @@ Mesh* Map::CreateDynamicAgentMesh()
 		case HEAL_PLAN_TYPE:
 			agentColor = HEAL_TINT;
 			break;
-		case PUT_OUT_FIRE_PLAN_TYPE:
+		case FIGHT_FIRE_PLAN_TYPE:
 			agentColor = PUT_OUT_FIRE_TINT;
 			break;
 		}
@@ -985,6 +987,20 @@ bool Map::DoesBombardmentStartFire()
 {
 	//Game::GetGlobalRNG()->GetRandomZeroToOne()
 	return GetRandomFloatInRange(0.f, 1.f) >= RANDOM_FIRE_THRESHOLD ? true : false;
+}
+
+
+//  =========================================================================================
+Fire* Map::GetFireById(int entityId)
+{
+	for (int fireIndex = 0; fireIndex < (int)m_pointsOfInterest.size(); ++fireIndex)
+	{
+		if(entityId == m_fires[fireIndex]->m_id)
+			return m_fires[fireIndex];
+	}
+
+	//if we never found the fire, return nullptr;
+	return nullptr;
 }
 
 //  =========================================================================================

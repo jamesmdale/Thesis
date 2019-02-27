@@ -705,16 +705,6 @@ Mesh* PlayingState::CreateWorldDebugTextMesh()
 		AABB2 poiBounds = m_map->m_pointsOfInterest[poiIndex]->GetWorldBounds();
 		builder.CreateText2DInAABB2( poiBounds.GetCenter(), poiBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_pointsOfInterest[poiIndex]->m_health), Rgba::WHITE);
 	}
-	//for (int lumberyardIndex = 0; lumberyardIndex < m_map->m_lumberyards.size(); ++lumberyardIndex)
-	//{
-	//	AABB2 lumberyardBounds = m_map->m_lumberyards[lumberyardIndex]->GetWorldBounds();
-	//	builder.CreateText2DInAABB2( lumberyardBounds.GetCenter(), lumberyardBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_lumberyards[lumberyardIndex]->m_health), Rgba::WHITE);
-	//}
-	//for (int lumberyardIndex = 0; lumberyardIndex < m_map->m_lumberyards.size(); ++lumberyardIndex)
-	//{
-	//	AABB2 lumberyardBounds = m_map->m_lumberyards[lumberyardIndex]->GetWorldBounds();
-	//	builder.CreateText2DInAABB2( lumberyardBounds.GetCenter(), lumberyardBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_lumberyards[lumberyardIndex]->m_health), Rgba::WHITE);
-	//}
 
 	// create mesh ----------------------------------------------
 	if (builder.m_vertices.size() > 0)

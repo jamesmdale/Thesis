@@ -6,6 +6,7 @@
 #include "Game\GameCommon.hpp"
 #include "Game\Entities\PointOfInterest.hpp"
 #include "Game\GameStates\PlayingState.hpp"
+#include "Game\Entities\Fire.hpp"
 #include "Engine\Core\Transform2D.hpp"
 #include "Engine\Math\MathUtils.hpp"
 #include "Engine\Window\Window.hpp"
@@ -72,14 +73,17 @@ void Agent::GenerateRandomStats()
 	m_combatBias = GetRandomFloatInRange(0.1f, 0.9f);
 	m_repairBias = GetRandomFloatInRange(0.1f, 0.9f);
 	m_healBias = GetRandomFloatInRange(0.1f, 0.9f);
+	m_fireFightingBias = GetRandomFloatInRange(0.1f, 0.9f);
 
 	m_combatEfficiency = GetRandomFloatInRange(0.25f, 0.9f);
 	m_repairEfficiency = GetRandomFloatInRange(0.25f, 0.9f);
 	m_healEfficiency = GetRandomFloatInRange(0.25f, 0.9f);
+	m_fireFightingEfficiency = GetRandomFloatInRange(0.25f, 0.9f);
 
 	UpdateCombatPerformanceTime();
 	UpdateRepairPerformanceTime();
 	UpdateHealPerformanceTime();
+	UpdateFireFightingPerformanceTime();
 }	
 
 //  =========================================================================================
@@ -271,6 +275,12 @@ void Agent::UpdateRepairPerformanceTime()
 void Agent::UpdateHealPerformanceTime()
 {
 	m_calculatedHealPerformancePerSecond = g_minActionPerformanceRatePerSecond / (1.f - m_healEfficiency);
+}
+
+//  =========================================================================================
+void Agent::UpdateFireFightingPerformanceTime()
+{
+	m_calculatedFireFightingPerformancePerSecond = g_minActionPerformanceRatePerSecond / (1.f - m_fireFightingEfficiency);
 }
 
 //  =========================================================================================
@@ -588,6 +598,44 @@ bool HealAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 }
 
 //  =========================================================================================
+bool FightFireAction(Agent* agent, const Vector2& goalDestination, int interactEntityId)
+{
+	PROFILER_PUSH();
+
+	//used to handle any extra logic that must occur on first loop
+	if (agent->m_isFirstLoopThroughAction)
+	{
+		Fire* targetFire = agent->m_planner->m_map->GetFireById(interactEntityId);
+		agent->m_forward = targetFire->m_worldPosition - agent->m_position;
+		//do first pass logic
+		agent->m_actionTimer->SetTimer(agent->m_calculatedRepairPerformancePerSecond);
+		agent->m_isFirstLoopThroughAction = false;
+	}
+
+	agent->m_animationSet->SetCurrentAnim("heal");
+
+	//if we are at our destination, we are ready to repair
+	Fire* targetFire = agent->m_planner->m_map->GetFireById(interactEntityId);
+
+	if (agent->m_actionTimer->DecrementAll() > 0)
+	{
+		targetFire->m_health = ClampInt(targetFire->m_health - g_baseFireFightingAmountPerPerformance, 0, 100);
+		agent->m_waterCount--;
+
+		ASSERT_OR_DIE(agent->m_waterCount >= 0, "AGENT WATER COUNT NEGATIVE!!");
+	}
+
+	if (agent->m_waterCount == 0 || targetFire->m_health == 0)
+	{
+		//reset first loop action
+		agent->m_isFirstLoopThroughAction = true;
+		return true;
+	}		
+
+	return false;
+}
+
+//  =========================================================================================
 bool GatherAction(Agent* agent, const Vector2& goalDestination, int interactEntityId)
 {
 	PROFILER_PUSH();
@@ -678,8 +726,24 @@ bool GatherAction(Agent* agent, const Vector2& goalDestination, int interactEnti
 			targetPoi = nullptr;
 			return true;
 		}
-		break;
-	}		
+		break;	
+
+		case WELL_POI_TYPE:
+			if (targetPoi->m_refillTimer->ResetAndDecrementIfElapsed())
+			{
+				agent->m_waterCount++;
+			}
+			if (agent->m_waterCount == g_maxResourceCarryAmount)
+			{
+				//agent is served and ready to move on
+				targetPoi->m_agentCurrentlyServing = nullptr;
+
+				//cleanup
+				targetPoi = nullptr;
+				return true;
+			}
+			break;
+		}	
 	
 	targetPoi = nullptr;
 	return false;

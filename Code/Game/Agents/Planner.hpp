@@ -20,7 +20,7 @@ enum ePlanTypes
 	SHOOT_PLAN_TYPE,
 	REPAIR_PLAN_TYPE,
 	HEAL_PLAN_TYPE,
-	PUT_OUT_FIRE_PLAN_TYPE,
+	FIGHT_FIRE_PLAN_TYPE,
 	NUM_PLAN_TYPE
 };
 
@@ -68,6 +68,7 @@ public:
 	void QueueShootActions(const UtilityInfo& info);
 	void QueueRepairActions(const UtilityInfo& info);
 	void QueueHealActions(const UtilityInfo& info);
+	void QueueFireFightingActions(const UtilityInfo& info);
 
 	std::string GetPlanTypeAsText();
 
@@ -83,6 +84,7 @@ public:
 	UtilityInfo GetPutOutFireUtility();
 
 	UtilityInfo GetRepairUtilityPerBuilding(PointOfInterest* poi);
+	UtilityInfo GetFightFireUtilityPerFire(Fire* fire);
 	UtilityInfo GetGatherUitlityPerBuilding(PointOfInterest* poi);
 	UtilityInfo GetHealUtilityPerAgent(Agent* agent);
 	UtilityInfo GetPutOutFireUtility(Fire* fire);

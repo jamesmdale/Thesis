@@ -179,8 +179,7 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = GATHER_ARROWS_PLAN_TYPE;
 	}
-	//debug info
-	m_utilityHistory.m_lastGatherArrows = compareUtilityInfo.utility;
+	m_utilityHistory.m_lastGatherArrows = compareUtilityInfo.utility; //debug info
 		
 	//utility for gathering lumber ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherLumberUtility();
@@ -193,8 +192,7 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = GATHER_LUMBER_PLAN_TYPE;
 	}
-	//debug info
-	m_utilityHistory.m_lastGatherLumber = compareUtilityInfo.utility;
+	m_utilityHistory.m_lastGatherLumber = compareUtilityInfo.utility; 	//debug info
 
 	// utility for gathering bandages ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherBandagesUtility();
@@ -207,6 +205,20 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = GATHER_BANDAGES_PLAN_TYPE;
 	}
+	m_utilityHistory.m_lastGatherBandages = compareUtilityInfo.utility;
+
+	//utility for gathering water ----------------------------------------------
+	compareUtilityInfo = GetHighestGatherWaterUtility();
+	if (m_currentPlan == GATHER_WATER_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
+	{
+		SkewCurrentPlanUtilityValue(compareUtilityInfo);
+	}
+	if (compareUtilityInfo.utility > highestUtilityInfo.utility)
+	{
+		highestUtilityInfo = compareUtilityInfo;
+		chosenOutcome = GATHER_WATER_PLAN_TYPE;
+	}
+	m_utilityHistory.m_lastGatherWater = compareUtilityInfo.utility; //debug info
 
 	//utility for shooting	 ----------------------------------------------
 	compareUtilityInfo = GetHighestShootUtility();
@@ -223,8 +235,7 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = SHOOT_PLAN_TYPE;
 	}
-	//debug info
-	m_utilityHistory.m_lastShoot = compareUtilityInfo.utility;
+	m_utilityHistory.m_lastShoot = compareUtilityInfo.utility; 	//debug info
 	
 
 	//utility for repairing buildings ----------------------------------------------
@@ -242,8 +253,7 @@ void Planner::UpdatePlan()
 		highestUtilityInfo = compareUtilityInfo;
 		chosenOutcome = REPAIR_PLAN_TYPE;
 	}
-	//debug info
-	m_utilityHistory.m_lastRepair = compareUtilityInfo.utility;
+	m_utilityHistory.m_lastRepair = compareUtilityInfo.utility; 	//debug info
 
 	//utility for healing agents  ----------------------------------------------
 	compareUtilityInfo = GetHealSelfUtility();
@@ -262,6 +272,23 @@ void Planner::UpdatePlan()
 	}
 	//debug info
 	m_utilityHistory.m_lastHeal = compareUtilityInfo.utility;
+
+	//utility for fighting fires  ----------------------------------------------
+	compareUtilityInfo = GetPutOutFireUtility();
+
+	if(compareUtilityInfo.utility != 0.f)
+		SkewUtilityForBias(compareUtilityInfo, m_agent->m_fireFightingBias);
+
+	if (m_currentPlan ==  FIGHT_FIRE_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
+	{
+		SkewCurrentPlanUtilityValue(compareUtilityInfo);
+	}
+	if(compareUtilityInfo.utility > highestUtilityInfo.utility)
+	{
+		highestUtilityInfo = compareUtilityInfo;
+		chosenOutcome = FIGHT_FIRE_PLAN_TYPE;
+	}
+	m_utilityHistory.m_lastFightFire = compareUtilityInfo.utility; 	//debug info
 
 	// set final plan ----------------------------------------------
 	m_currentPlan = chosenOutcome;
@@ -325,6 +352,9 @@ void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo
 	case GATHER_BANDAGES_PLAN_TYPE:
 		QueueGatherBandagesAction(info);
 		break;
+	case GATHER_WATER_PLAN_TYPE:
+		QueueGatherWaterAction(info);
+		break;
 	case SHOOT_PLAN_TYPE:
 		QueueShootActions(info);
 		break;
@@ -333,6 +363,9 @@ void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo
 		break;
 	case HEAL_PLAN_TYPE:
 		QueueHealActions(info);
+		break;
+	case FIGHT_FIRE_PLAN_TYPE:
+		QueueFireFightingActions(info);
 		break;
 	default:
 		//idle QueueIdleAction(info);
@@ -426,6 +459,17 @@ void Planner::QueueGatherBandagesAction(const UtilityInfo& info)
 }
 
 //  =========================================================================================
+void Planner::QueueGatherWaterAction(const UtilityInfo & info)
+{
+	ActionData* gatherActionData = new ActionData();
+	gatherActionData->m_action = GatherAction;
+	gatherActionData->m_finalGoalPosition = info.endPosition;
+	gatherActionData->m_interactEntityId = info.targetEntityId;
+
+	m_actionStack.push(gatherActionData);
+}
+
+//  =========================================================================================
 void Planner::QueueShootActions(const UtilityInfo& info)
 {
 	ActionData* shootActionData = new ActionData();
@@ -459,6 +503,17 @@ void Planner::QueueHealActions(const UtilityInfo& info)
 }
 
 //  =========================================================================================
+void Planner::QueueFireFightingActions(const UtilityInfo& info)
+{
+	ActionData* fireFightingActionData = new ActionData();
+	fireFightingActionData->m_action = FightFireAction;
+	fireFightingActionData->m_finalGoalPosition = info.endPosition;
+	fireFightingActionData->m_interactEntityId = info.targetEntityId;
+
+	m_actionStack.push(fireFightingActionData);
+}
+
+//  =========================================================================================
 std::string Planner::GetPlanTypeAsText()
 {
 	std::string planAsText = "";
@@ -476,6 +531,9 @@ std::string Planner::GetPlanTypeAsText()
 	case GATHER_BANDAGES_PLAN_TYPE:
 		planAsText = "GATHER BANDAGES";
 		break;
+	case GATHER_WATER_PLAN_TYPE:
+		planAsText = "GATHER WATER";
+		break;
 	case SHOOT_PLAN_TYPE:
 		planAsText = "SHOOT";
 		break;
@@ -484,6 +542,9 @@ std::string Planner::GetPlanTypeAsText()
 		break;
 	case HEAL_PLAN_TYPE:
 		planAsText = "HEAL";
+		break;
+	case FIGHT_FIRE_PLAN_TYPE:
+		planAsText = "FIGHT FIRE";
 		break;
 	}
 
@@ -578,6 +639,34 @@ UtilityInfo Planner::GetHighestGatherBandagesUtility()
 }
 
 //  =========================================================================================
+UtilityInfo Planner::GetHighestGatherWaterUtility()
+{
+	UtilityInfo highestGatherWaterUtility;
+
+	/*if (GetIsOptimized())
+	{*/
+	if (m_agent->m_waterCount == g_maxResourceCarryAmount)
+	{
+		return highestGatherWaterUtility;
+	}
+	//}
+
+	if (m_map->m_wells.size() > 0)
+	{
+		for (int wellIndex = 0; wellIndex < (int)m_map->m_medStations.size(); ++wellIndex)
+		{
+			UtilityInfo infoForBuilding = GetGatherUitlityPerBuilding(m_map->m_wells[wellIndex]);
+			if (infoForBuilding.utility > highestGatherWaterUtility.utility)
+			{
+				highestGatherWaterUtility = infoForBuilding;
+			}
+		}
+	}
+
+	return highestGatherWaterUtility;
+}
+
+//  =========================================================================================
 UtilityInfo Planner::GetHighestShootUtility()
 {
 	UtilityInfo info;
@@ -669,6 +758,31 @@ UtilityInfo Planner::GetHealSelfUtility()
 	return healUtilityInfo;
 }
 
+//  =========================================================================================
+UtilityInfo Planner::GetPutOutFireUtility()
+{
+	UtilityInfo highestFireUtility;
+
+	//if (GetIsOptimized())
+	//{
+	if (m_agent->m_waterCount == 0)
+	{
+		return highestFireUtility;
+	}
+	//}
+
+	for (int fireIndex = 0; fireIndex < (int)m_map->m_fires.size(); ++fireIndex)
+	{
+		UtilityInfo utilityInfoPerFire = GetFightFireUtilityPerFire(m_map->m_fires[fireIndex]);
+		if (utilityInfoPerFire.utility > highestFireUtility.utility)
+		{
+			highestFireUtility = utilityInfoPerFire;
+		}
+	}
+
+	return highestFireUtility;
+}
+
 //  =============================================================================
 UtilityInfo Planner::GetRepairUtilityPerBuilding(PointOfInterest* poi)
 {
@@ -705,6 +819,46 @@ UtilityInfo Planner::GetRepairUtilityPerBuilding(PointOfInterest* poi)
 
 	// combine distance and health utilities for final utility ----------------------------------------------
 	float adjustedUtility = distanceUtility * healthUtility;
+	info.utility = adjustedUtility;
+
+	return info;
+}
+
+//  =========================================================================================
+UtilityInfo Planner::GetFightFireUtilityPerFire(Fire* fire)
+{
+	UtilityInfo info;
+	info.utility = 0.f;
+	info.endPosition = fire->m_worldPosition;
+	info.targetEntityId = fire->m_id;
+
+	//easy out if building is at full health
+	if (fire->m_health == 0 || m_agent->m_waterCount == 0)
+	{
+		return info;
+	}
+
+	// distance to building squared ----------------------------------------------
+	float distanceToBuildingSquared = GetDistanceSquared(m_agent->m_position, fire->m_worldPosition);
+
+	//get max distance
+	float maxDistanceSquared = GetDistanceSquared(Vector2::ZERO, Vector2(m_map->GetDimensions()));
+
+	//normalize distance
+	float normalizedDistance = distanceToBuildingSquared/maxDistanceSquared;
+
+	//apply distance utility formula for utility value
+	float distanceUtility = CalculateDistanceUtility(normalizedDistance);
+
+
+	//building health ----------------------------------------------
+	float normalizedHealth = fire->m_health/g_maxHealth;
+
+	//apply health utility formula for utility value
+	//float healthUtility = CalculateBuildingHealthUtility(normalizedHealth);
+
+	// combine distance and health utilities for final utility ----------------------------------------------
+	float adjustedUtility = distanceUtility;
 	info.utility = adjustedUtility;
 
 	return info;
@@ -791,6 +945,12 @@ UtilityInfo Planner::GetHealUtilityPerAgent(Agent* agent)
 	info.utility = healthUtility;
 
 	return info;
+}
+
+//  =========================================================================================
+UtilityInfo Planner::GetPutOutFireUtility(Fire * fire)
+{
+	return UtilityInfo();
 }
 
 //  =============================================================================

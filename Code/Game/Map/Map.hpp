@@ -105,7 +105,9 @@ public:
 	void DetectBombardmentToAgentCollision(Bombardment* bombardment);
 	void DetectBombardmentToPOICollision(Bombardment* bombardment);
 
+	// fire ----------------------------------------------
 	bool DoesBombardmentStartFire();
+	Fire* GetFireById(int entityId);
 	void SpawnFire(Tile* spawnTile);
 
 	//agent to tile collision  ----------------------------------------------

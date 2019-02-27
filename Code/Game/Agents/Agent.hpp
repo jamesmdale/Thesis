@@ -56,6 +56,7 @@ public:
 	void UpdateCombatPerformanceTime();
 	void UpdateRepairPerformanceTime();
 	void UpdateHealPerformanceTime();
+	void UpdateFireFightingPerformanceTime();
 
 	void ConstructInformationAsText(std::vector<std::string>& outStrings);
 
@@ -120,8 +121,9 @@ public:
 // actions ----------------------------------------------
 bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);		//walk between locations	
 bool ShootAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);	    //combat
-bool RepairAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);									//repairs
-bool HealAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);										//heal
+bool RepairAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);		//repairs
+bool HealAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);		//heal
+bool FightFireAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);	//fight fire
 bool GatherAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);		//acquire resource at poiLocation	
 
 

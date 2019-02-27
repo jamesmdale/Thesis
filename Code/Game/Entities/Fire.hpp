@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine\Math\IntVector2.hpp"
+#include "Engine\Math\Vector2.hpp"
 
 class Fire
 {
@@ -13,5 +14,9 @@ public:
 	int m_id = -1;
 	int m_health = 100;
 	IntVector2 m_coordinate;
+	Vector2 m_worldPosition;
+
+private:
+	static int s_fireIdPosition;
 };
 
