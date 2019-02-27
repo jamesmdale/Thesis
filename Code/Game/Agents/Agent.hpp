@@ -71,16 +71,19 @@ public:
 	float m_combatBias = 0.5f;
 	float m_repairBias = 0.5f;
 	float m_healBias = 0.5f;
+	float m_fireFightingBias = 0.5f;
 
 	// skill ----------------------------------------------
 
 	float m_combatEfficiency = 1.f;
 	float m_repairEfficiency = 1.f;
 	float m_healEfficiency = 1.f;
+	float m_fireFightingEfficiency = 1.f;
 
 	float m_calculatedCombatPerformancePerSecond = 1.f;
 	float m_calculatedRepairPerformancePerSecond = 1.f;
 	float m_calculatedHealPerformancePerSecond = 1.f;
+	float m_calculatedFireFightingPerformancePerSecond = 1.f;
 
 	// inventory ----------------------------------------------
 	int m_arrowCount = 0;

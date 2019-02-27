@@ -285,18 +285,21 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 	outStrings.push_back(Stringf("CB: %f", m_combatBias));
 	outStrings.push_back(Stringf("RB: %f", m_repairBias));
 	outStrings.push_back(Stringf("HB: %f", m_healBias));
+	outStrings.push_back(Stringf("FB: %f", m_fireFightingBias));
 
 	//efficiencies
 	outStrings.push_back(Stringf("Efficiencies"));
 	outStrings.push_back(Stringf("CE: %f", m_combatEfficiency));
 	outStrings.push_back(Stringf("RE: %f", m_repairEfficiency));
 	outStrings.push_back(Stringf("HE: %f", m_healEfficiency));
+	outStrings.push_back(Stringf("FE: %f", m_fireFightingEfficiency));
 
 	//inventory
 	outStrings.push_back(Stringf("Inventory"));
 	outStrings.push_back(Stringf("Arrows: %i", m_arrowCount));
 	outStrings.push_back(Stringf("Bandages: %i", m_bandageCount));
 	outStrings.push_back(Stringf("Lumber: %i", m_lumberCount));
+	outStrings.push_back(Stringf("Water: %i", m_waterCount));
 
 	//planner
 	outStrings.push_back(Stringf("Planner"));
@@ -305,9 +308,14 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 	outStrings.push_back(Stringf("Update Pr.: %i", m_updatePriority));
 	outStrings.push_back(Stringf("Gather Arr. Util.: %f", m_planner->m_utilityHistory.m_lastGatherArrows));
 	outStrings.push_back(Stringf("Gather Lum. Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
+	outStrings.push_back(Stringf("Gather Ban. Util.: %f", m_planner->m_utilityHistory.m_lastGatherBandages));
+	outStrings.push_back(Stringf("Gather Wat. Util.: %f", m_planner->m_utilityHistory.m_lastGatherWater));
 	outStrings.push_back(Stringf("Shoot. Util.: %f", m_planner->m_utilityHistory.m_lastShoot));
-	outStrings.push_back(Stringf("Repair Util.: %f", m_planner->m_utilityHistory.m_lastGatherLumber));
+	outStrings.push_back(Stringf("Repair Util.: %f", m_planner->m_utilityHistory.m_lastRepair));
+	outStrings.push_back(Stringf("Heal Util.: %f", m_planner->m_utilityHistory.m_lastHeal));
+	outStrings.push_back(Stringf("Fire Util.: %f", m_planner->m_utilityHistory.m_lastFightFire));
 	outStrings.push_back(Stringf("Chosen Outcome.: %i", (int)m_planner->m_utilityHistory.m_chosenOutcome));
+
 }
 
 //  =========================================================================================

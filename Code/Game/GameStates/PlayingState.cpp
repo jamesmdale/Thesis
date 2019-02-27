@@ -674,11 +674,11 @@ Mesh* PlayingState::CreateUIDebugTextMesh()
 		std::vector<std::string> agentInfo;
 		m_disectedAgent->ConstructInformationAsText(agentInfo);
 
-		float printHeight = 0.5f;
+		float printHeight = 0.75f;
 
 		for (int agentInfoIndex = 0; agentInfoIndex < agentInfo.size(); ++agentInfoIndex)
 		{
-			builder.CreateText2DFromPoint( Vector2(theWindow->GetClientWidth() * 0.85f , theWindow->GetClientHeight() * printHeight), theWindow->GetClientHeight() * 0.010, 1.f, agentInfo[agentInfoIndex].c_str(), Rgba::WHITE );
+			builder.CreateText2DFromPoint( Vector2(theWindow->GetClientWidth() * 0.85f , theWindow->GetClientHeight() * printHeight), theWindow->GetClientHeight() * 0.01, 1.f, agentInfo[agentInfoIndex].c_str(), Rgba::WHITE );
 			printHeight -= 0.02;
 		}
 	}
@@ -700,16 +700,21 @@ Mesh* PlayingState::CreateWorldDebugTextMesh()
 	Window* theWindow = Window::GetInstance();
 
 	//building health ----------------------------------------------
-	for (int armoryIndex = 0; armoryIndex < m_map->m_armories.size(); ++armoryIndex)
+	for (int poiIndex = 0; poiIndex < m_map->m_pointsOfInterest.size(); ++poiIndex)
 	{
-		AABB2 armoryBounds = m_map->m_armories[armoryIndex]->GetWorldBounds();
-		builder.CreateText2DInAABB2( armoryBounds.GetCenter(), armoryBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_armories[armoryIndex]->m_health), Rgba::WHITE);
+		AABB2 poiBounds = m_map->m_pointsOfInterest[poiIndex]->GetWorldBounds();
+		builder.CreateText2DInAABB2( poiBounds.GetCenter(), poiBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_pointsOfInterest[poiIndex]->m_health), Rgba::WHITE);
 	}
-	for (int lumberyardIndex = 0; lumberyardIndex < m_map->m_lumberyards.size(); ++lumberyardIndex)
-	{
-		AABB2 lumberyardBounds = m_map->m_lumberyards[lumberyardIndex]->GetWorldBounds();
-		builder.CreateText2DInAABB2( lumberyardBounds.GetCenter(), lumberyardBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_lumberyards[lumberyardIndex]->m_health), Rgba::WHITE);
-	}
+	//for (int lumberyardIndex = 0; lumberyardIndex < m_map->m_lumberyards.size(); ++lumberyardIndex)
+	//{
+	//	AABB2 lumberyardBounds = m_map->m_lumberyards[lumberyardIndex]->GetWorldBounds();
+	//	builder.CreateText2DInAABB2( lumberyardBounds.GetCenter(), lumberyardBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_lumberyards[lumberyardIndex]->m_health), Rgba::WHITE);
+	//}
+	//for (int lumberyardIndex = 0; lumberyardIndex < m_map->m_lumberyards.size(); ++lumberyardIndex)
+	//{
+	//	AABB2 lumberyardBounds = m_map->m_lumberyards[lumberyardIndex]->GetWorldBounds();
+	//	builder.CreateText2DInAABB2( lumberyardBounds.GetCenter(), lumberyardBounds.GetDimensions(), 1.f, Stringf("%i", (int)m_map->m_lumberyards[lumberyardIndex]->m_health), Rgba::WHITE);
+	//}
 
 	// create mesh ----------------------------------------------
 	if (builder.m_vertices.size() > 0)
