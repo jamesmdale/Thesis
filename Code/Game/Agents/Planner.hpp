@@ -84,10 +84,9 @@ public:
 	UtilityInfo GetHighestFightFireUtility();
 
 	UtilityInfo GetRepairUtilityPerBuilding(PointOfInterest* poi);
-	UtilityInfo GetFightFireUtilityPerFire(Fire* fire);
 	UtilityInfo GetGatherUitlityPerBuilding(PointOfInterest* poi);
 	UtilityInfo GetHealUtilityPerAgent(Agent* agent);
-	UtilityInfo GetPutOutFireUtilityPerFire(Fire* fire);
+	UtilityInfo GetFightFireUtilityPerFire(Fire* fire);
 
 	UtilityInfo GetIdleUtilityInfo();
 

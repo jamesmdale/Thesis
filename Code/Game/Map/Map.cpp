@@ -697,6 +697,11 @@ void Map::DeleteDeadFires()
 	{
 		if (m_fires[fireIndex]->IsDead())
 		{
+			Tile* fireTile = GetTileAtWorldPosition(m_fires[fireIndex]->m_worldPosition);
+
+			ASSERT_OR_DIE(fireTile != nullptr, "FIRE TILE IS INVALID ON DELETION");
+
+			fireTile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("Ground")->second;
 			m_fires.erase(m_fires.begin() + fireIndex);
 			--fireIndex;
 		}			
@@ -924,6 +929,14 @@ Tile* Map::GetTileAtCoordinate(const IntVector2& coordinate)
 		return nullptr;
 
 	return m_tiles[coordinate.x + (coordinate.y * m_dimensions.x)];
+}
+
+//  =========================================================================================
+Tile* Map::GetTileAtWorldPosition(const Vector2& position)
+{
+	IntVector2 cooordinateOfPosition = GetTileCoordinateOfPosition(position);
+
+	return GetTileAtCoordinate(cooordinateOfPosition);
 }
 
 //  =========================================================================================

@@ -954,12 +954,6 @@ UtilityInfo Planner::GetHealUtilityPerAgent(Agent* agent)
 	return info;
 }
 
-//  =========================================================================================
-UtilityInfo Planner::GetPutOutFireUtilityPerFire(Fire * fire)
-{
-	return UtilityInfo();
-}
-
 //  =============================================================================
 UtilityInfo Planner::GetIdleUtilityInfo()
 {

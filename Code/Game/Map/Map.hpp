@@ -96,6 +96,7 @@ public:
 	bool IsTileBlockingAtCoordinate(const IntVector2& coordinate);
 	bool DoesTilePreventBuilding(const IntVector2& coordinate);
 	Tile* GetTileAtCoordinate(const IntVector2& coordinate);
+	Tile* GetTileAtWorldPosition(const Vector2& position);
 
 	//point of interest helpers  ----------------------------------------------
 	PointOfInterest* GeneratePointOfInterest(int poiType);
