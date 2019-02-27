@@ -602,24 +602,28 @@ bool FightFireAction(Agent* agent, const Vector2& goalDestination, int interactE
 {
 	PROFILER_PUSH();
 
+	Fire* targetFire = agent->m_planner->m_map->GetFireById(interactEntityId);
+	if (targetFire == nullptr)
+	{
+		agent->m_isFirstLoopThroughAction = true;
+		return true;
+	}
+
 	//used to handle any extra logic that must occur on first loop
 	if (agent->m_isFirstLoopThroughAction)
 	{
-		Fire* targetFire = agent->m_planner->m_map->GetFireById(interactEntityId);
-		agent->m_forward = targetFire->m_worldPosition - agent->m_position;
 		//do first pass logic
+		agent->m_forward = targetFire->m_worldPosition - agent->m_position;	
 		agent->m_actionTimer->SetTimer(agent->m_calculatedRepairPerformancePerSecond);
 		agent->m_isFirstLoopThroughAction = false;
 	}
 
 	agent->m_animationSet->SetCurrentAnim("heal");
 
-	//if we are at our destination, we are ready to repair
-	Fire* targetFire = agent->m_planner->m_map->GetFireById(interactEntityId);
-
+	//if we are at our destination, we are ready to fight the fire
 	if (agent->m_actionTimer->DecrementAll() > 0)
 	{
-		targetFire->m_health = ClampInt(targetFire->m_health - g_baseFireFightingAmountPerPerformance, 0, 100);
+		targetFire->m_health = ClampInt(targetFire->m_health - g_baseFireFightingAmountPerPerformance, 0, g_maxFireHealth);
 		agent->m_waterCount--;
 
 		ASSERT_OR_DIE(agent->m_waterCount >= 0, "AGENT WATER COUNT NEGATIVE!!");

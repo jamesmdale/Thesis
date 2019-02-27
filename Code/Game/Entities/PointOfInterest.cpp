@@ -93,7 +93,7 @@ IntVector2 PointOfInterest::GetCoordinateBoundsClosestToCoordinate(const IntVect
 	//check lower bottom wall
 	IntVector2 boundsCoordinate = IntVector2(m_startingCoordinate.x + 1, m_startingCoordinate.y - 1);
 	int boundsDistance = GetDistanceSquared(boundsCoordinate, coordinate);
-	if (GetDistanceSquared(boundsCoordinate, coordinate) < closestDistance && m_map->CheckIsCoordianteValid(boundsCoordinate))
+	if (GetDistanceSquared(boundsCoordinate, coordinate) < closestDistance && m_map->CheckIsCoordinateValid(boundsCoordinate))
 	{
 		closestCoordinate = boundsCoordinate;
 		closestDistance = boundsDistance;
@@ -102,7 +102,7 @@ IntVector2 PointOfInterest::GetCoordinateBoundsClosestToCoordinate(const IntVect
 	//check right wall
 	boundsCoordinate = IntVector2(m_startingCoordinate.x + 3, m_startingCoordinate.y + 1);
 	boundsDistance = GetDistanceSquared(boundsCoordinate, coordinate);
-	if (GetDistanceSquared(boundsCoordinate, coordinate) < closestDistance && m_map->CheckIsCoordianteValid(boundsCoordinate))
+	if (GetDistanceSquared(boundsCoordinate, coordinate) < closestDistance && m_map->CheckIsCoordinateValid(boundsCoordinate))
 	{
 		closestCoordinate = boundsCoordinate;
 		closestDistance = boundsDistance;
@@ -111,7 +111,7 @@ IntVector2 PointOfInterest::GetCoordinateBoundsClosestToCoordinate(const IntVect
 	//check upper wall
 	boundsCoordinate = IntVector2(m_startingCoordinate.x + 1, m_startingCoordinate.y + 3);
 	boundsDistance = GetDistanceSquared(boundsCoordinate, coordinate);
-	if (GetDistanceSquared(boundsCoordinate, coordinate) < closestDistance && m_map->CheckIsCoordianteValid(boundsCoordinate))
+	if (GetDistanceSquared(boundsCoordinate, coordinate) < closestDistance && m_map->CheckIsCoordinateValid(boundsCoordinate))
 	{
 		closestCoordinate = boundsCoordinate;
 		closestDistance = boundsDistance;

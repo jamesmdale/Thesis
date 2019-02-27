@@ -24,7 +24,7 @@ class SimulationDefinition;
 bool GetIsOptimized();
 bool GetIsAgentUpdateBudgeted();
 
-constexpr float RANDOM_FIRE_THRESHOLD = 0.95f;
+constexpr float RANDOM_FIRE_THRESHOLD = 0.99f;
 
 //following line will go here when any engine side globals are declared and need to be used
 //#include "Engine/Core/EngineCommon.hpp"
@@ -82,6 +82,7 @@ extern int g_agentsUpdatedThisFrame;
 
 //general globals
 extern int g_maxHealth;
+extern int g_maxFireHealth;
 extern float g_skewForCurrentPlan;
 
 //poi globals
@@ -114,6 +115,11 @@ extern IntVector2 MAP_NORTH;
 extern IntVector2 MAP_SOUTH;
 extern IntVector2 MAP_EAST;
 extern IntVector2 MAP_WEST;
+
+extern Vector2 NORTH_VEC2;
+extern Vector2 SOUTH_VEC2;
+extern Vector2 EAST_VEC2;
+extern Vector2 WEST_VEC2;
 
 extern IntVector2 UI_UP;
 extern IntVector2 UI_DOWN;

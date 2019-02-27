@@ -719,6 +719,7 @@ void Map::DeleteDeadBombardmentsAndRandomlyStartFire()
 			{
 				IntVector2 tileCoordinate = GetTileCoordinateOfPosition(m_activeBombardments[bombardmentIndex]->m_disc.center);
 				Tile* tile = GetTileAtCoordinate(tileCoordinate);
+				
 				if (tile->m_tileDefinition->m_allowsWalking && tile->m_tileDefinition->m_allowsBuilding)
 				{
 					SpawnFire(tile);
@@ -993,7 +994,7 @@ bool Map::DoesBombardmentStartFire()
 //  =========================================================================================
 Fire* Map::GetFireById(int entityId)
 {
-	for (int fireIndex = 0; fireIndex < (int)m_pointsOfInterest.size(); ++fireIndex)
+	for (int fireIndex = 0; fireIndex < (int)m_fires.size(); ++fireIndex)
 	{
 		if(entityId == m_fires[fireIndex]->m_id)
 			return m_fires[fireIndex];
@@ -1007,7 +1008,7 @@ Fire* Map::GetFireById(int entityId)
 void Map::SpawnFire(Tile* spawnTile)
 {
 	spawnTile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("Fire")->second;
-	Fire* fire = new Fire((int)m_fires.size(), spawnTile->m_tileCoords);
+	Fire* fire = new Fire(spawnTile->m_tileCoords, this);
 	m_fires.push_back(fire);
 
 	m_isMapGridDirty = true;
@@ -1197,9 +1198,9 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 		randomCoordinate = GetRandomNonBlockedCoordinateInMapBounds();
 		
 		//check tile to north, to the right, and to the northeast to see if they are even good
-		if(CheckIsCoordianteValid(IntVector2(randomCoordinate.x + 1, randomCoordinate.y)) 
-			&& CheckIsCoordianteValid(IntVector2(randomCoordinate.x, randomCoordinate.y + 1))
-			&& CheckIsCoordianteValid(IntVector2(randomCoordinate.x + 1, randomCoordinate.y + 1)))
+		if(CheckIsCoordinateValid(IntVector2(randomCoordinate.x + 1, randomCoordinate.y)) 
+			&& CheckIsCoordinateValid(IntVector2(randomCoordinate.x, randomCoordinate.y + 1))
+			&& CheckIsCoordinateValid(IntVector2(randomCoordinate.x + 1, randomCoordinate.y + 1)))
 		{
 			//check tile to north, to the right, and to the northeast to see if they are blocked
 			if (!IsTileBlockingAtCoordinate(IntVector2(randomCoordinate.x + 1, randomCoordinate.y))
@@ -1241,7 +1242,7 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 						break;
 					}
 
-					if (CheckIsCoordianteValid(accessCoordinate) && !IsTileBlockingAtCoordinate(accessCoordinate))
+					if (CheckIsCoordinateValid(accessCoordinate) && !IsTileBlockingAtCoordinate(accessCoordinate))
 					{
 						isAccessLocationValid = true;
 						isLocationValid = true;
@@ -1338,11 +1339,11 @@ Vector2 Map::GetWorldPositionOfMapCoordinate(const IntVector2& position)
 bool Map::CheckIsPositionValid(const Vector2& position)
 {
 	IntVector2 tileCoordinate = GetTileCoordinateOfPosition(position);
-	return CheckIsCoordianteValid(tileCoordinate);
+	return CheckIsCoordinateValid(tileCoordinate);
 }
 
 //  =========================================================================================
-bool Map::CheckIsCoordianteValid(const IntVector2 & coordinate)
+bool Map::CheckIsCoordinateValid(const IntVector2 & coordinate)
 {
 	bool isCoordinateValid = false;
 

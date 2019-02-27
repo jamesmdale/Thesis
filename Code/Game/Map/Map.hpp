@@ -86,7 +86,7 @@ public:
 
 	//helpers  ----------------------------------------------
 	bool CheckIsPositionValid(const Vector2& position);
-	bool CheckIsCoordianteValid(const IntVector2& coordinate);
+	bool CheckIsCoordinateValid(const IntVector2& coordinate);
 	Vector2 GetRandomNonBlockedPositionInMapBounds();
 	IntVector2 GetRandomNonBlockedCoordinateInMapBounds();
 	IntVector2 GetRandomCoordinateInMapBounds();

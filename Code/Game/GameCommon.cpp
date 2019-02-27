@@ -48,6 +48,7 @@ int g_agentsUpdatedThisFrame = 0;
 
 //general globals
 int g_maxHealth = 100;
+int g_maxFireHealth = 10;
 float g_skewForCurrentPlan = 0.05f;
 
 //poi globals
@@ -80,6 +81,11 @@ IntVector2 MAP_NORTH = IntVector2(0, 1);
 IntVector2 MAP_SOUTH = IntVector2(0, -1);
 IntVector2 MAP_EAST = IntVector2(1, 0);
 IntVector2 MAP_WEST = IntVector2(-1, 0);
+
+Vector2 NORTH_VEC2 = Vector2(0.f, 1.f);
+Vector2 SOUTH_VEC2 = Vector2(0.f, -1.f);;
+Vector2 EAST_VEC2 = Vector2(1.f, 0.f);;
+Vector2 WEST_VEC2 = Vector2(-1.f, 0.f);;
 
 IntVector2 UI_UP = IntVector2(0, 1);
 IntVector2 UI_DOWN = IntVector2(0, -1);

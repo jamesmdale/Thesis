@@ -81,13 +81,13 @@ public:
 	UtilityInfo GetHighestShootUtility();
 	UtilityInfo GetHighestRepairUtility();
 	UtilityInfo GetHealSelfUtility();
-	UtilityInfo GetPutOutFireUtility();
+	UtilityInfo GetHighestFightFireUtility();
 
 	UtilityInfo GetRepairUtilityPerBuilding(PointOfInterest* poi);
 	UtilityInfo GetFightFireUtilityPerFire(Fire* fire);
 	UtilityInfo GetGatherUitlityPerBuilding(PointOfInterest* poi);
 	UtilityInfo GetHealUtilityPerAgent(Agent* agent);
-	UtilityInfo GetPutOutFireUtility(Fire* fire);
+	UtilityInfo GetPutOutFireUtilityPerFire(Fire* fire);
 
 	UtilityInfo GetIdleUtilityInfo();
 
@@ -102,8 +102,9 @@ public:
 	float CalculateShootUtility(float normalizedThreatUtility);
 	float CalculateIdleUtility();
 
-	//shooting helpers
+	//helpers
 	IntVector2 GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVector2& coordinate);					//O(1)
+	Vector2 GetBestAccessLocationForFireAtPosition(const Vector2& fireWorldPosition);
 
 	//optimizations
 	bool FindAgentAndCopyPath(const Vector2& endPostion);

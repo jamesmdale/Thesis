@@ -1,4 +1,3 @@
-#include "Engine\Profiler\Profiler.hpp"
 #include "Game\Agents\Planner.hpp"
 #include "Game\Map\Map.hpp"
 #include "Game\Agents\Agent.hpp"
@@ -7,6 +6,8 @@
 #include "Game\Entities\Fire.hpp"
 #include "Game\GameCommon.hpp"
 #include "Game\GameStates\PlayingState.hpp"
+#include "Engine\Profiler\Profiler.hpp"
+#include "Engine\Core\EngineCommon.hpp"
 
 UtilityStorage* Planner::m_distanceUtilityStorage = nullptr;
 UtilityStorage* Planner::m_buildingHealthUtilityStorage = nullptr;
@@ -274,7 +275,7 @@ void Planner::UpdatePlan()
 	m_utilityHistory.m_lastHeal = compareUtilityInfo.utility;
 
 	//utility for fighting fires  ----------------------------------------------
-	compareUtilityInfo = GetPutOutFireUtility();
+	compareUtilityInfo = GetHighestFightFireUtility();
 
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, m_agent->m_fireFightingBias);
@@ -759,7 +760,7 @@ UtilityInfo Planner::GetHealSelfUtility()
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetPutOutFireUtility()
+UtilityInfo Planner::GetHighestFightFireUtility()
 {
 	UtilityInfo highestFireUtility;
 
@@ -780,6 +781,12 @@ UtilityInfo Planner::GetPutOutFireUtility()
 		}
 	}
 
+	//if none of them are high (or none exist) return invalid utility
+	if(highestFireUtility.targetEntityId == -1)
+		return highestFireUtility;
+
+	//we have a highest, determine if the access locaiton is valid
+	highestFireUtility.endPosition = GetBestAccessLocationForFireAtPosition(highestFireUtility.endPosition);
 	return highestFireUtility;
 }
 
@@ -948,7 +955,7 @@ UtilityInfo Planner::GetHealUtilityPerAgent(Agent* agent)
 }
 
 //  =========================================================================================
-UtilityInfo Planner::GetPutOutFireUtility(Fire * fire)
+UtilityInfo Planner::GetPutOutFireUtilityPerFire(Fire * fire)
 {
 	return UtilityInfo();
 }
@@ -1231,6 +1238,95 @@ IntVector2 Planner::GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVec
 	}
 
 	return closestCoordinate;
+}
+
+//  =========================================================================================
+Vector2 Planner::GetBestAccessLocationForFireAtPosition(const Vector2& fireWorldPosition)
+{
+	//float highestDot = 0.f;
+	//dot for each cardinal direction and find the most resembling to the fire -> agent displacement
+	//north
+	//float northDot = DotProduct(directionToAgent, NORTH_VEC2);
+	//if (northDot > highestDot)
+	//{
+	//	highestDot = northDot;
+	//	direction = NORTH_VEC2;
+	//}
+
+	////south
+	//float northDot = DotProduct(directionToAgent, NORTH_VEC2);
+	//if (northDot > highestDot)
+	//{
+	//	highestDot = northDot;
+	//	direction = SOUTH_VEC2;
+	//}
+
+	////east
+	//float northDot = DotProduct(directionToAgent, NORTH_VEC2);
+	//if (northDot > highestDot)
+	//{
+	//	highestDot = northDot;
+	//	direction = WEST_VEC2;
+	//}
+
+	////west
+	//float northDot = DotProduct(directionToAgent, NORTH_VEC2);
+	//if (northDot > highestDot)
+	//{
+	//	highestDot = northDot;
+	//	direction = EAST_VEC2;
+	//}
+
+	Vector2 accessPosition = fireWorldPosition + NORTH_VEC2;
+
+	//if this coordinate doesn't work, let's just find anyone that works
+	IntVector2 tileCoordinate = m_map->GetTileCoordinateOfPosition(accessPosition);
+	if (m_map->CheckIsCoordinateValid(tileCoordinate))
+	{
+		if (!m_map->IsTileBlockingAtCoordinate(tileCoordinate))
+		{
+			return accessPosition;
+		}
+	}
+
+	accessPosition = fireWorldPosition + SOUTH_VEC2;
+	//if this coordinate doesn't work, let's just find anyone that works
+	tileCoordinate = m_map->GetTileCoordinateOfPosition(accessPosition);
+	if (m_map->CheckIsCoordinateValid(tileCoordinate))
+	{
+		if (!m_map->IsTileBlockingAtCoordinate(tileCoordinate))
+		{
+			return accessPosition;
+		}
+
+	}
+
+	accessPosition = fireWorldPosition + EAST_VEC2;
+
+	//if this coordinate doesn't work, let's just find anyone that works
+	tileCoordinate = m_map->GetTileCoordinateOfPosition(accessPosition);
+	if (m_map->CheckIsCoordinateValid(tileCoordinate))
+	{
+		if (!m_map->IsTileBlockingAtCoordinate(tileCoordinate))
+		{
+			return accessPosition;
+		}
+	}
+
+	accessPosition = fireWorldPosition + WEST_VEC2;
+
+	//if this coordinate doesn't work, let's just find anyone that works
+	tileCoordinate = m_map->GetTileCoordinateOfPosition(accessPosition);
+	if (m_map->CheckIsCoordinateValid(tileCoordinate))
+	{
+		if (!m_map->IsTileBlockingAtCoordinate(tileCoordinate))
+		{
+			return accessPosition;
+		}
+	}
+
+	//if we got this far, we haven't found a valid access position and this fire is blocked in on all sides
+	ASSERT_OR_DIE(false, "NO ACCESSIBLE PATH TO THE FIRE");
 }
 
 //  =========================================================================================
