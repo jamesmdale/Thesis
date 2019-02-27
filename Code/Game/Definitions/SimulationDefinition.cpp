@@ -15,6 +15,7 @@ SimulationDefinition::SimulationDefinition( const tinyxml2::XMLElement& element 
 	m_numArmories = ParseXmlAttribute(element, "numArmories", m_numArmories);
 	m_numLumberyards = ParseXmlAttribute(element, "numLumberyards", m_numLumberyards);
 	m_numMedStations = ParseXmlAttribute(element, "numMedStations", m_numMedStations);
+	m_numWells = ParseXmlAttribute(element, "numWells", m_numWells);
 	m_bombardmentRatePerSecond = ParseXmlAttribute(element, "bombardmentRatePerSecond", m_bombardmentRatePerSecond);
 	m_threatRatePerSecond = ParseXmlAttribute(element, "threatRatePerSecond", m_threatRatePerSecond);
 	m_startingThreat = ParseXmlAttribute(element, "startingThreat", m_startingThreat);	

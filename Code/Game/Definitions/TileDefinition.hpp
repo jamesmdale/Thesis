@@ -23,6 +23,7 @@ public:
 	SpriteSheet* m_spriteSheet = nullptr;
 
 	bool m_allowsWalking = false;
+	bool m_allowsBuilding = false;
 
 	//static variables
 	static std::map< std::string, TileDefinition* >	s_tileDefinitions;

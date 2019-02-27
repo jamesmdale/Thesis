@@ -1,19 +1,19 @@
 <MapDefinitions>
-	<MapDefinition name="50x50" defaultTile="Grass" width="50" height="50">
+	<MapDefinition name="50x50" defaultTile="Ground" width="50" height="50">
 		<GenerationSteps iterations="1" chanceToRun="1.0">
-			<FillAndEdge fillTile="Grass" edgeTile="Wall"></FillAndEdge>
+			<FillAndEdge fillTile="Ground" edgeTile="Wall"></FillAndEdge>
     	</GenerationSteps>
 	</MapDefinition>
 
-	<MapDefinition name="30x30" defaultTile="Grass" width="30" height="30">
+	<MapDefinition name="30x30" defaultTile="Ground" width="30" height="30">
 		<GenerationSteps iterations="1" chanceToRun="1.0">
-			<FillAndEdge fillTile="Grass" edgeTile="Wall"></FillAndEdge>
+			<FillAndEdge fillTile="Ground" edgeTile="Wall"></FillAndEdge>
     </GenerationSteps>
 	</MapDefinition>
 
-	<MapDefinition name="20x20" defaultTile="Grass" width="20" height="20">
+	<MapDefinition name="20x20" defaultTile="Ground" width="20" height="20">
 		<GenerationSteps iterations="1" chanceToRun="1.0">
-			<FillAndEdge fillTile="Grass" edgeTile="Wall"></FillAndEdge>
+			<FillAndEdge fillTile="Ground" edgeTile="Wall"></FillAndEdge>
     </GenerationSteps>
 	</MapDefinition>
 

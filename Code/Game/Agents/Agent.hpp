@@ -86,6 +86,7 @@ public:
 	int m_arrowCount = 0;
 	int m_bandageCount = 0;
 	int m_lumberCount = 0;
+	int m_waterCount = 0;
 
 	// position logic ----------------------------------------------
 	float m_movespeed = 1.f;

@@ -14,6 +14,7 @@ TileDefinition::TileDefinition( const tinyxml2::XMLElement& element )
 	m_baseSpriteTint = ParseXmlAttribute(element, "baseSpriteTint", m_baseSpriteTint);	
 
 	m_allowsWalking = ParseXmlAttribute(element, "allowsWalking", m_allowsWalking);
+	m_allowsBuilding = ParseXmlAttribute(element, "allowsBuilding", m_allowsBuilding);
 
 	//load spritesheet name and definition
 	std::string defaultSpriteSheetName = "Terrain_8x8.png";

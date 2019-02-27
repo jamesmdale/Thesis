@@ -128,7 +128,9 @@ extern Rgba MED_TINT;
 extern Rgba GATHER_ARROWS_TINT;
 extern Rgba GATHER_LUMBER_TINT;
 extern Rgba GATHER_BANDAGES_TINT;
+extern Rgba GATHER_WATER_TINT;
 
 extern Rgba SHOOT_TINT;
 extern Rgba REPAIR_TINT;
 extern Rgba HEAL_TINT;
+extern Rgba PUT_OUT_FIRE_TINT;

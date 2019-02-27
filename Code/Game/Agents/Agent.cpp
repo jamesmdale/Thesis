@@ -196,7 +196,10 @@ bool Agent::GetPathToDestination(const Vector2& goalDestination)
 	}		
 	else
 	{
-		isDestinationFound = AStarSearchOnGrid(m_currentPath, startCoord, endCoord, m_planner->m_map->GetAsGrid(), m_planner->m_map);
+		Grid<int> mapGrid;
+		m_planner->m_map->GetAsGrid(mapGrid);
+
+		isDestinationFound = AStarSearchOnGrid(m_currentPath, startCoord, endCoord, &mapGrid, m_planner->m_map);
 	}
 
 #ifdef PathingDataAnalysis

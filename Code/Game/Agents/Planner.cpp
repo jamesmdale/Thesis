@@ -4,6 +4,7 @@
 #include "Game\Agents\Agent.hpp"
 #include "Game\Entities\PointOfInterest.hpp"
 #include "Game\Agents\Agent.hpp"
+#include "Game\Entities\Fire.hpp"
 #include "Game\GameCommon.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 
@@ -728,6 +729,9 @@ UtilityInfo Planner::GetGatherUitlityPerBuilding(PointOfInterest* poi)
 		break;
 	case MED_STATION_POI_TYPE:
 		inventoryCountPerType = m_agent->m_bandageCount;
+		break;
+	case WELL_POI_TYPE:
+		inventoryCountPerType = m_agent->m_waterCount;
 		break;
 	}
 

@@ -20,6 +20,7 @@ public:
 	int m_numArmories = 0;
 	int m_numLumberyards = 0;
 	int m_numMedStations = 0;
+	int m_numWells = 0;
 	float m_bombardmentRatePerSecond = 0.f;
 	float m_threatRatePerSecond = 0.f;
 	int m_startingThreat = 0;

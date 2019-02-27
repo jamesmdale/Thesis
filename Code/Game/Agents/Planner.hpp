@@ -5,6 +5,7 @@
 
 struct ActionData;
 class Agent;
+class Fire;
 class Map;
 class PointOfInterest;
 enum eAgentSortType;
@@ -15,9 +16,11 @@ enum ePlanTypes
 	GATHER_ARROWS_PLAN_TYPE,
 	GATHER_LUMBER_PLAN_TYPE,
 	GATHER_BANDAGES_PLAN_TYPE,
+	GATHER_WATER_PLAN_TYPE,
 	SHOOT_PLAN_TYPE,
 	REPAIR_PLAN_TYPE,
 	HEAL_PLAN_TYPE,
+	PUT_OUT_FIRE_PLAN_TYPE,
 	NUM_PLAN_TYPE
 };
 
@@ -59,6 +62,7 @@ public:
 	void QueueGatherArrowsAction(const UtilityInfo& info);
 	void QueueGatherLumberAction(const UtilityInfo& info);
 	void QueueGatherBandagesAction(const UtilityInfo& info);
+	void QueueGatherWaterAction(const UtilityInfo& info);
 	void QueueShootActions(const UtilityInfo& info);
 	void QueueRepairActions(const UtilityInfo& info);
 	void QueueHealActions(const UtilityInfo& info);
@@ -69,14 +73,17 @@ public:
 	UtilityInfo GetHighestGatherArrowsUtility();
 	UtilityInfo GetHighestGatherLumberUtility();
 	UtilityInfo GetHighestGatherBandagesUtility();
+	UtilityInfo GetHighestGatherWaterUtility();
 
 	UtilityInfo GetHighestShootUtility();
 	UtilityInfo GetHighestRepairUtility();
 	UtilityInfo GetHealSelfUtility();
+	UtilityInfo GetPutOutFireUtility();
 
 	UtilityInfo GetRepairUtilityPerBuilding(PointOfInterest* poi);
 	UtilityInfo GetGatherUitlityPerBuilding(PointOfInterest* poi);
 	UtilityInfo GetHealUtilityPerAgent(Agent* agent);
+	UtilityInfo GetPutOutFireUtility(Fire* fire);
 
 	UtilityInfo GetIdleUtilityInfo();
 

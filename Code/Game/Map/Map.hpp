@@ -62,7 +62,6 @@ public:
 
 	//optimized mesh generation  ----------------------------------------------
 	void CreateMapMesh();
-
 	Mesh* CreateDynamicAgentMesh();
 	Mesh* CreateDynamicBombardmentMesh();
 	Mesh* CreateDynamicFireMesh();
@@ -91,8 +90,11 @@ public:
 	Vector2 GetRandomNonBlockedPositionInMapBounds();
 	IntVector2 GetRandomNonBlockedCoordinateInMapBounds();
 	IntVector2 GetRandomCoordinateInMapBounds();
-	Grid<int>* GetAsGrid();
+	void GetAsGrid(Grid<int>& outMapGrid);
+	void InitializeMapGrid();
+	void UpdateMapGrid();
 	bool IsTileBlockingAtCoordinate(const IntVector2& coordinate);
+	bool DoesTilePreventBuilding(const IntVector2& coordinate);
 	Tile* GetTileAtCoordinate(const IntVector2& coordinate);
 
 	//point of interest helpers  ----------------------------------------------
@@ -104,7 +106,7 @@ public:
 	void DetectBombardmentToPOICollision(Bombardment* bombardment);
 
 	bool DoesBombardmentStartFire();
-	void SpawnFire(const IntVector2& coordinate);
+	void SpawnFire(Tile* spawnTile);
 
 	//agent to tile collision  ----------------------------------------------
 	void DetectAgentToTileCollision(Agent* agent);
@@ -131,6 +133,7 @@ public:
 	std::vector<PointOfInterest*> m_armories;
 	std::vector<PointOfInterest*> m_lumberyards;
 	std::vector<PointOfInterest*> m_medStations;
+	std::vector<PointOfInterest*> m_wells;
 
 	std::vector<Bombardment*> m_activeBombardments;
 	std::vector<Fire*> m_fires;
@@ -150,3 +153,5 @@ public:
 private:
 	bool m_isFullMapView = false;
 };
+
+

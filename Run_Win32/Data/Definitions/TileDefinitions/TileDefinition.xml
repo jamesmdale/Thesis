@@ -5,15 +5,37 @@
   baseSpriteCoords="0,4"
   baseSpriteTint="180,180,180"
   allowsWalking="true"
+  allowsBuilding="true"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+  />
+
+  <TileDefinition
+  name="Ground"
+  baseSpriteCoords="5,3"
+  baseSpriteTint="180,180,180"
+  allowsWalking="true"
+  allowsBuilding="true"
   spriteSheetName="Terrain_8x8.png"
   spriteSheetDimensions="8,8"
   />
 
   <TileDefinition
   name="Wall"
-  baseSpriteCoords="0,6"
+  baseSpriteCoords="7,3"
   baseSpriteTint="255,255,255"
   allowsWalking="false" 
+  allowsBuilding="false" 
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+  />
+
+   <TileDefinition
+  name="Fire"
+  baseSpriteCoords="7,7"
+  baseSpriteTint="255,255,255"
+  allowsWalking="false" 
+  allowsBuilding="false" 
   spriteSheetName="Terrain_8x8.png"
   spriteSheetDimensions="8,8"
   />
@@ -23,15 +45,57 @@
   baseSpriteCoords="1,7"
   baseSpriteTint="255,255,255"
   allowsWalking="true"
+  allowsBuilding="false"
   spriteSheetName="Terrain_8x8.png"
   spriteSheetDimensions="8,8"
   />
+
+  <TileDefinition
+  name="Armory"
+  baseSpriteCoords="3,6"
+  baseSpriteTint="255,255,255"
+  allowsWalking="false"
+  allowsBuilding="false"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+    />
+
+  <TileDefinition
+  name="Lumberyard"
+  baseSpriteCoords="1,6"
+  baseSpriteTint="255,255,255"
+  allowsWalking="false"
+  allowsBuilding="false"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+    />
+
+  <TileDefinition
+  name="MedStation"
+  baseSpriteCoords="4,6"
+  baseSpriteTint="255,255,255"
+  allowsWalking="false"
+  allowsBuilding="false"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+    />
+
+  <TileDefinition
+  name="Well"
+  baseSpriteCoords="4,7"
+  baseSpriteTint="255,255,255"
+  allowsWalking="false"
+  allowsBuilding="false"
+  spriteSheetName="Terrain_8x8.png"
+  spriteSheetDimensions="8,8"
+    />
 
   <TileDefinition
   name="Building"
   baseSpriteCoords="2,6"
   baseSpriteTint="255,255,255"
   allowsWalking="false"
+  allowsBuilding="false"
   spriteSheetName="Terrain_8x8.png"
   spriteSheetDimensions="8,8"
     />
@@ -41,6 +105,7 @@
   baseSpriteCoords="7,2"
   baseSpriteTint="255,255,255"
   allowsWalking="true"
+  allowsBuilding="false"
   spriteSheetName="Terrain_8x8.png"
   spriteSheetDimensions="8,8"
     />

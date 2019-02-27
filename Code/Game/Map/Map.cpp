@@ -181,7 +181,7 @@ void Map::Initialize()
 		m_pointsOfInterest.push_back(poiLocation);
 	}
 
-	//create lumberyards
+	//create medstations
 	for (int medStationIndex = 0; medStationIndex < m_activeSimulationDefinition->m_numMedStations; ++medStationIndex)
 	{
 		//add random point of interest
@@ -191,6 +191,19 @@ void Map::Initialize()
 
 		m_pointsOfInterest.push_back(poiLocation);
 	}
+
+	//create wells
+	for (int wellIndex = 0; wellIndex < m_activeSimulationDefinition->m_numWells; ++wellIndex)
+	{
+		//add random point of interest
+		PointOfInterest* poiLocation = GeneratePointOfInterest(WELL_POI_TYPE);
+		m_medStations.push_back(poiLocation);
+		poiLocation->m_map = this;
+
+		m_pointsOfInterest.push_back(poiLocation);
+	}
+
+	TODO("Add POI access points after everything is created in the map");
 
 	IntVector2 dimensions = GetDimensions();
 	AABB2 mapBounds = AABB2(Vector2::ZERO, Vector2(dimensions));
@@ -235,13 +248,17 @@ void Map::Initialize()
 	SortAgentsByY();
 
 	CreateMapMesh();
-	m_mapAsGrid = GetAsGrid();
+	InitializeMapGrid();
+	UpdateMapGrid();
 }
 
 //  =========================================================================================
 void Map::Update(float deltaSeconds)
 {
 	PROFILER_PUSH();
+
+	if(m_isMapGridDirty)
+		UpdateMapGrid();
 
 	//udpate timers
 	if (m_threatTimer->DecrementAll() > 0)
@@ -563,6 +580,9 @@ Mesh* Map::CreateDynamicAgentMesh()
 		case GATHER_BANDAGES_PLAN_TYPE:
 			agentColor = GATHER_BANDAGES_TINT;
 			break;
+		case GATHER_WATER_PLAN_TYPE:
+			agentColor = GATHER_WATER_TINT;
+			break;
 		case SHOOT_PLAN_TYPE:
 			agentColor = SHOOT_TINT;
 			break;
@@ -571,6 +591,9 @@ Mesh* Map::CreateDynamicAgentMesh()
 			break;
 		case HEAL_PLAN_TYPE:
 			agentColor = HEAL_TINT;
+			break;
+		case PUT_OUT_FIRE_PLAN_TYPE:
+			agentColor = PUT_OUT_FIRE_TINT;
 			break;
 		}
 
@@ -693,9 +716,10 @@ void Map::DeleteDeadBombardmentsAndRandomlyStartFire()
 			if (DoesBombardmentStartFire())
 			{
 				IntVector2 tileCoordinate = GetTileCoordinateOfPosition(m_activeBombardments[bombardmentIndex]->m_disc.center);
-				if (!IsTileBlockingAtCoordinate(tileCoordinate))
+				Tile* tile = GetTileAtCoordinate(tileCoordinate);
+				if (tile->m_tileDefinition->m_allowsWalking && tile->m_tileDefinition->m_allowsBuilding)
 				{
-					SpawnFire(tileCoordinate);
+					SpawnFire(tile);
 				}				
 			}
 
@@ -841,21 +865,38 @@ void Map::SwapAgents(int indexI, int indexJ, eAgentSortType type)
 }
 
 //  =========================================================================================
-Grid<int>* Map::GetAsGrid()
+void Map::GetAsGrid(Grid<int>& outMapGrid)
 {
-	Grid<int>* grid = new Grid<int>();
-
-	grid->InitializeGrid(0, m_dimensions.x, m_dimensions.y);
+	outMapGrid.InitializeGrid(0, m_dimensions.x, m_dimensions.y);
 
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); tileIndex++)
 	{
 		int value = m_tiles[tileIndex]->m_tileDefinition->m_allowsWalking ? 0 : 1;
 
 		if(value != 0)
-			grid->SetValueAtIndex(value, tileIndex);
+			outMapGrid.SetValueAtIndex(value, tileIndex);
+	}
+}
+
+//  =========================================================================================
+void Map::InitializeMapGrid()
+{
+	m_mapAsGrid = new Grid<int>();
+	m_mapAsGrid->InitializeGrid(0, m_dimensions.x, m_dimensions.y);
+}
+
+//  =========================================================================================
+void Map::UpdateMapGrid()
+{
+	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); tileIndex++)
+	{
+		int value = m_tiles[tileIndex]->m_tileDefinition->m_allowsWalking ? 0 : 1;
+
+		if(value != 0)
+			m_mapAsGrid->SetValueAtIndex(value, tileIndex);
 	}
 
-	return grid;
+	m_isMapGridDirty = false;
 }
 
 //  =========================================================================================
@@ -863,6 +904,13 @@ bool Map::IsTileBlockingAtCoordinate(const IntVector2& coordinate)
 {
 	bool isBlocking = !GetTileAtCoordinate(coordinate)->m_tileDefinition->m_allowsWalking;
 	return isBlocking;	
+}
+
+//  =========================================================================================
+bool Map::DoesTilePreventBuilding(const IntVector2& coordinate)
+{
+	bool doesAllowBuilding = !GetTileAtCoordinate(coordinate)->m_tileDefinition->m_allowsBuilding;
+	return doesAllowBuilding;	
 }
 
 //  =========================================================================================
@@ -935,13 +983,15 @@ void Map::DetectBombardmentToPOICollision(Bombardment* bombardment)
 //  =========================================================================================
 bool Map::DoesBombardmentStartFire()
 {
-	return Game::GetGlobalRNG()->GetRandomZeroToOne() >= RANDOM_FIRE_THRESHOLD ? true : false;
+	//Game::GetGlobalRNG()->GetRandomZeroToOne()
+	return GetRandomFloatInRange(0.f, 1.f) >= RANDOM_FIRE_THRESHOLD ? true : false;
 }
 
 //  =========================================================================================
-void Map::SpawnFire(const IntVector2& coordinate)
+void Map::SpawnFire(Tile* spawnTile)
 {
-	Fire* fire = new Fire((int)m_fires.size(), coordinate);
+	spawnTile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("Fire")->second;
+	Fire* fire = new Fire((int)m_fires.size(), spawnTile->m_tileCoords);
 	m_fires.push_back(fire);
 
 	m_isMapGridDirty = true;
@@ -1122,10 +1172,12 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 	//determine if random location is unblocked
 	bool isLocationValid = false;
 	IntVector2 randomCoordinate = IntVector2::ONE;
-	IntVector2 accessCoordinate = IntVector2::ONE;
+	IntVector2 accessCoordinate = IntVector2::NEGATIVE_ONE;
 
 	while (!isLocationValid)
 	{
+		randomCoordinate = IntVector2::ONE;
+		accessCoordinate = IntVector2::NEGATIVE_ONE;
 		randomCoordinate = GetRandomNonBlockedCoordinateInMapBounds();
 		
 		//check tile to north, to the right, and to the northeast to see if they are even good
@@ -1138,14 +1190,7 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 				&& !IsTileBlockingAtCoordinate(IntVector2(randomCoordinate.x, randomCoordinate.y + 1))
 				&& !IsTileBlockingAtCoordinate(IntVector2(randomCoordinate.x + 1, randomCoordinate.y + 1)))
 			{
-				/*now we should get a random location for our access location for the poi
-				there are potentially eight acceptable locations
-				   [5][4]
-				[6][X][X][3]
-				[7][X][X][2]
-				   [0][1]
-				*/
-
+				
 				bool isAccessLocationValid =  false;
 				int accessIterationAttemptCount = 0;
 
@@ -1158,7 +1203,7 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 						accessCoordinate = IntVector2(randomCoordinate.x, randomCoordinate.y - 1);
 						break;
 					case 1:
-						accessCoordinate = IntVector2(randomCoordinate.x + 2, randomCoordinate.y - 1);
+						accessCoordinate = IntVector2(randomCoordinate.x + 1, randomCoordinate.y - 1);
 						break;
 					case 2:
 						accessCoordinate = IntVector2(randomCoordinate.x + 2, randomCoordinate.y);
@@ -1184,62 +1229,74 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 					{
 						isAccessLocationValid = true;
 						isLocationValid = true;
+						////building access tile
+						//Tile* tile = GetTileAtCoordinate(accessCoordinate);
+						//tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("BuildingAccess")->second;
 					}
 
-					if (!isAccessLocationValid)				
-						++accessIterationAttemptCount;					
+					if (!isAccessLocationValid)
+					{
+						++accessIterationAttemptCount;
+
+						if(accessIterationAttemptCount == 7)
+							accessCoordinate = IntVector2::NEGATIVE_ONE;
+					}
+											
 				}
 
-				if(isAccessLocationValid)
-					isLocationValid = true;
+				isLocationValid = true;
 			}
 		}		
 	}
 
 	//Location is valid, therefore we can replace tiles with building tiles
-
 	Rgba buildingColor = Rgba::WHITE;
+	std::string spriteName = "Building";
 	switch (poiType)
 	{
 	case ARMORY_POI_TYPE:
 		buildingColor = Rgba::LIGHT_RED_TRANSPARENT;
+		spriteName = "Armory";
 		break;
 	case LUMBERYARD_POI_TYPE:
-		buildingColor = Rgba::LIGHT_BLUE_TRANSPARENT;
+		buildingColor = Rgba::LIGHT_YELLOW_TRANSPARENT;
+		spriteName = "Lumberyard";
 		break;
 	case MED_STATION_POI_TYPE:
 		buildingColor = Rgba::LIGHT_GREEN_TRANSPARENT;
+		spriteName = "MedStation";
+		break;
+	case WELL_POI_TYPE:
+		buildingColor = Rgba::LIGHT_BLUE_TRANSPARENT;
+		spriteName = "Well";
 		break;
 	}
 
 	//starting tile
 	Tile* tile = GetTileAtCoordinate(randomCoordinate);
-	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("Building")->second;
+	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find(spriteName.c_str())->second;
 	tile->m_tint = buildingColor;
 
 	//tile to east
 	tile = GetTileAtCoordinate(IntVector2(randomCoordinate.x + 1, randomCoordinate.y));
-	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("Building")->second;
+	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find(spriteName.c_str())->second;
 	tile->m_tint = buildingColor;
 
 	//tile to northeast
 	tile = GetTileAtCoordinate(IntVector2(randomCoordinate.x + 1, randomCoordinate.y + 1));
-	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("Building")->second;
+	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find(spriteName.c_str())->second;
 	tile->m_tint = buildingColor;
 
 	//tile to north
 	tile = GetTileAtCoordinate(IntVector2(randomCoordinate.x, randomCoordinate.y + 1));
-	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("Building")->second;
+	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find(spriteName.c_str())->second;
 	tile->m_tint = buildingColor;
 
-	//building access tile
-	tile = GetTileAtCoordinate(accessCoordinate);
+	tile = GetTileAtCoordinate(IntVector2(accessCoordinate.x, accessCoordinate.y));
 	tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("BuildingAccess")->second;
+	tile->m_tint = buildingColor;
 
 	PointOfInterest* poi = new PointOfInterest(type, randomCoordinate, accessCoordinate, this);
-
-	//cleanup
-	tile = nullptr;
 
 	return poi;
 }
