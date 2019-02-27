@@ -24,6 +24,8 @@ class SimulationDefinition;
 bool GetIsOptimized();
 bool GetIsAgentUpdateBudgeted();
 
+constexpr float RANDOM_FIRE_THRESHOLD = 0.95f;
+
 //following line will go here when any engine side globals are declared and need to be used
 //#include "Engine/Core/EngineCommon.hpp"
 

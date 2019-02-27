@@ -13,6 +13,7 @@ enum ePointOfInterestType;
 class Agent;
 class PointOfInterest;
 class Bombardment;
+class Fire;
 class Stopwatch;
 class Mesh;
 class PlayingState;
@@ -63,11 +64,14 @@ public:
 	void CreateMapMesh();
 
 	Mesh* CreateDynamicAgentMesh();
-	Mesh* CreateDynamicBombardmentMesh();	
+	Mesh* CreateDynamicBombardmentMesh();
+	Mesh* CreateDynamicFireMesh();
 	Mesh* CreateTextMesh();
 
 	//Cleanup functions  ----------------------------------------------
 	void DeleteDeadEntities();
+	void DeleteDeadFires();
+	void DeleteDeadBombardmentsAndRandomlyStartFire();	
 
 	//agent sorting  ----------------------------------------------
 	void SortAgentsByX();
@@ -95,9 +99,12 @@ public:
 	PointOfInterest* GeneratePointOfInterest(int poiType);
 	PointOfInterest* GetPointOfInterestById(int poiId);
 
-	//bombardment collision  ----------------------------------------------
+	//bombardment  ----------------------------------------------
 	void DetectBombardmentToAgentCollision(Bombardment* bombardment);
 	void DetectBombardmentToPOICollision(Bombardment* bombardment);
+
+	bool DoesBombardmentStartFire();
+	void SpawnFire(const IntVector2& coordinate);
 
 	//agent to tile collision  ----------------------------------------------
 	void DetectAgentToTileCollision(Agent* agent);
@@ -111,6 +118,7 @@ public:
 	std::vector<Tile*> m_tiles;
 	Grid<int>* m_mapAsGrid = nullptr;
 	AABB2 m_mapWorldBounds;
+	bool m_isMapGridDirty = false;
 
 	//lists
 	std::vector<Agent*> m_agentsOrderedByPriority;
@@ -125,6 +133,7 @@ public:
 	std::vector<PointOfInterest*> m_medStations;
 
 	std::vector<Bombardment*> m_activeBombardments;
+	std::vector<Fire*> m_fires;
 
 	//meshes for rendering
 	Mesh* m_mapMesh = nullptr;

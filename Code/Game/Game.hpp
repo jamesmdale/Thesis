@@ -8,24 +8,17 @@
 #include "Engine\Renderer\ForwardRenderingPath.hpp"
 #include "Engine\ParticleSystem\ParticleEmitter.hpp"
 #include "Engine\Renderer\ForwardRenderingPath2D.hpp"
+#include "Engine\Math\RNG.hpp"
 #include <vector>
 
 class Game
 {
-public:  
-
-	//camera members
-	Camera* m_gameCamera = nullptr;
-	Clock* m_gameClock = nullptr;
-
-	//rendering members
-	ForwardRenderingPath2D* m_forwardRenderingPath2D = nullptr;
-
 public:
 	Game();
 	~Game();
 	static Game* GetInstance();
 	static Game* CreateInstance();
+	static RNG* GetGlobalRNG();
 
 	void Update(); //use internal clock for delta seconds;
 	void PreRender();
@@ -39,6 +32,14 @@ public:
 	void InitializeAgentDefinitions();
 	void InitializeSimulationDefinitions();
 
+public:  
+
+	//camera members
+	Camera* m_gameCamera = nullptr;
+	Clock* m_gameClock = nullptr;
+
+	//rendering members
+	ForwardRenderingPath2D* m_forwardRenderingPath2D = nullptr;
 };
 
 Clock* GetGameClock();

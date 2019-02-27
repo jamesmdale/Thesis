@@ -17,6 +17,7 @@
 
 //game instance
 static Game* g_theGame = nullptr;
+static RNG* g_globalRNG = nullptr;
 
 bool m_isPaused = false;
 
@@ -57,9 +58,16 @@ Game* Game::CreateInstance()
 	if (g_theGame == nullptr)
 	{
 		g_theGame = new Game();
+		g_globalRNG = new RNG();
 	}
 
 	return g_theGame;
+}
+
+//  =========================================================================================
+RNG* Game::GetGlobalRNG()
+{
+	return g_globalRNG;
 }
 
 //  =========================================================================================

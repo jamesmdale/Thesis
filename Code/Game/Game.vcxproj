@@ -294,6 +294,7 @@
   <ItemGroup>
     <ClCompile Include="Agents\Agent.cpp" />
     <ClCompile Include="Entities\Bombardment.cpp" />
+    <ClCompile Include="Entities\Fire.cpp" />
     <ClCompile Include="UI\DebugInputBox.cpp" />
     <ClCompile Include="Definitions\AgentDefinition.cpp" />
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.cpp" />
@@ -331,6 +332,7 @@
   <ItemGroup>
     <ClInclude Include="Agents\Agent.hpp" />
     <ClInclude Include="Entities\Bombardment.hpp" />
+    <ClInclude Include="Entities\Fire.hpp" />
     <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp" />

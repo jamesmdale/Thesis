@@ -112,6 +112,9 @@
     <ClCompile Include="Entities\PointOfInterest.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Entities\Fire.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.hpp">
@@ -157,5 +160,6 @@
     <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Entities\Bombardment.hpp" />
     <ClInclude Include="Entities\PointOfInterest.hpp" />
+    <ClInclude Include="Entities\Fire.hpp" />
   </ItemGroup>
 </Project>

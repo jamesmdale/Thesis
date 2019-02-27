@@ -10,6 +10,7 @@
 #include "Game\Agents\Planner.hpp"
 #include "Game\Map\Tile.hpp"
 #include "Game\Entities\Bombardment.hpp"
+#include "Game\Entities\Fire.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Game\SimulationData.hpp"
 #include "Engine\Window\Window.hpp"
@@ -391,6 +392,7 @@ void Map::Render()
 	theRenderer->SetShader(theRenderer->CreateOrGetShader("agents"));
 	theRenderer->DrawMesh(agentMesh);
 
+	//create and render text
 	Mesh* textMesh = CreateTextMesh();	
 	if (textMesh != nullptr)
 	{
@@ -398,10 +400,29 @@ void Map::Render()
 		theRenderer->DrawMesh(textMesh);
 	}	
 
-	Mesh* bombardmentMesh = CreateDynamicBombardmentMesh();
-	theRenderer->SetTexture(*theRenderer->CreateOrGetTexture("Data/Images/AirStrike.png"));
-	theRenderer->SetShader(theRenderer->CreateOrGetShader("agents"));
-	theRenderer->DrawMesh(bombardmentMesh);
+	//create and render bombardments
+	if (m_activeBombardments.size() > 0)
+	{
+		Mesh* bombardmentMesh = CreateDynamicBombardmentMesh();
+		theRenderer->SetTexture(*theRenderer->CreateOrGetTexture("Data/Images/AirStrike.png"));
+		theRenderer->SetShader(theRenderer->CreateOrGetShader("agents"));
+		theRenderer->DrawMesh(bombardmentMesh);
+
+		delete(bombardmentMesh);
+		bombardmentMesh = nullptr;
+	}
+
+	//create and render fires
+	if (m_fires.size() > 0)
+	{
+		Mesh* fireMesh = CreateDynamicFireMesh();
+		theRenderer->SetTexture(*theRenderer->CreateOrGetTexture("Data/Images/Fire.png"));
+		theRenderer->SetShader(theRenderer->CreateOrGetShader("agents"));
+		theRenderer->DrawMesh(fireMesh);
+
+		delete(fireMesh);
+		fireMesh = nullptr;
+	}
 
 	//set back to default
 	theRenderer->SetTexture(*theRenderer->m_defaultTexture);
@@ -410,9 +431,6 @@ void Map::Render()
 	//cleanup
 	delete(agentMesh);
 	agentMesh = nullptr;
-
-	delete(bombardmentMesh);
-	bombardmentMesh = nullptr;
 
 	theRenderer = nullptr;
 }
@@ -500,15 +518,15 @@ void Map::Reload(SimulationDefinition* definition)
 //  =========================================================================================
 void Map::CreateMapMesh()
 {
-	MeshBuilder* builder = new MeshBuilder();
+	MeshBuilder builder;
 	
 	//create mesh for static tiles and buildings
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); ++tileIndex)
 	{
-		builder->CreateTexturedQuad2D(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.mins, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.maxs, m_tiles[tileIndex]->m_tint );
+		builder.CreateTexturedQuad2D(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.mins, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.maxs, m_tiles[tileIndex]->m_tint );
 	}
 
-	m_mapMesh = builder->CreateMesh<VertexPCU>();
+	m_mapMesh = builder.CreateMesh<VertexPCU>();
 
 
 	//create debug mesh to show blocking states
@@ -517,14 +535,10 @@ void Map::CreateMapMesh()
 		int value = m_tiles[tileIndex]->m_tileDefinition->m_allowsWalking == true ? 0 : 1;
 		std::string doesBlock = Stringf("%i", value);
 
-		builder->CreateText2DInAABB2(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, 1.f, doesBlock, m_tiles[tileIndex]->m_tint );
+		builder.CreateText2DInAABB2(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, 1.f, doesBlock, m_tiles[tileIndex]->m_tint );
 	}
 
-	m_debugMapMesh = builder->CreateMesh<VertexPCU>();
-
-	//cleanup
-	delete(builder);
-	builder = nullptr;
+	m_debugMapMesh = builder.CreateMesh<VertexPCU>();
 }
 
 //  =========================================================================================
@@ -611,26 +625,63 @@ Mesh* Map::CreateTextMesh()
 //  =========================================================================================
 Mesh* Map::CreateDynamicBombardmentMesh()
 {
-	MeshBuilder* builder = new MeshBuilder();
+	MeshBuilder builder;
 
 	for (int bombardmentIndex = 0; bombardmentIndex < (int)m_activeBombardments.size(); ++bombardmentIndex)
 	{	
 		AABB2 bombardmentBox = AABB2(m_activeBombardments[bombardmentIndex]->m_disc.center, m_activeBombardments[bombardmentIndex]->m_disc.radius, m_activeBombardments[bombardmentIndex]->m_disc.radius);
-		builder->CreateTexturedQuad2D(m_activeBombardments[bombardmentIndex]->m_disc.center, bombardmentBox.GetDimensions(), Vector2::ZERO, Vector2::ONE, Rgba(1.f, 1.f, 1.f, .5f));
+		builder.CreateTexturedQuad2D(m_activeBombardments[bombardmentIndex]->m_disc.center, bombardmentBox.GetDimensions(), Vector2::ZERO, Vector2::ONE, Rgba(1.f, 1.f, 1.f, .5f));
 	}
 
-	Mesh* bombardmentMesh = builder->CreateMesh<VertexPCU>();
-
-	//cleanup
-	delete(builder);
-	builder = nullptr;
+	Mesh* bombardmentMesh = builder.CreateMesh<VertexPCU>();
 
 	return bombardmentMesh;
 }
 
 //  =========================================================================================
+Mesh* Map::CreateDynamicFireMesh()
+{
+	MeshBuilder builder;;
+
+	for (int fireIndex = 0; fireIndex < (int)m_fires.size(); ++fireIndex)
+	{	
+		Vector2 fireCenter = Vector2(m_fires[fireIndex]->m_coordinate) + Vector2(0.5f, 0.6f);
+		AABB2 fireBox = AABB2(fireCenter, 0.5f, 0.5f);
+		builder.CreateTexturedQuad2D(fireBox.GetCenter(), fireBox.GetDimensions(), Vector2::ZERO, Vector2::ONE, Rgba(1.f, 1.f, 1.f, 0.7f));
+	}
+
+	Mesh* fireMesh = builder.CreateMesh<VertexPCU>();
+
+	//cleanup
+	return fireMesh;
+}
+
+//  =========================================================================================
 void Map::DeleteDeadEntities()
 {
+	DeleteDeadFires();
+	DeleteDeadBombardmentsAndRandomlyStartFire();
+}
+
+//  =========================================================================================
+void Map::DeleteDeadFires()
+{
+	Game* theGame = Game::GetInstance();
+
+	for (int fireIndex = 0; fireIndex < (int)m_fires.size(); ++fireIndex)
+	{
+		if (m_fires[fireIndex]->IsDead())
+		{
+			m_fires.erase(m_fires.begin() + fireIndex);
+			--fireIndex;
+		}			
+	}
+}
+
+//  =========================================================================================
+void Map::DeleteDeadBombardmentsAndRandomlyStartFire()
+{
+	Game* theGame = Game::GetInstance();
 	for (int bombardmentIndex = 0; bombardmentIndex < (int)m_activeBombardments.size(); ++bombardmentIndex)
 	{
 		if (m_activeBombardments[bombardmentIndex]->IsExplosionComplete())
@@ -638,6 +689,15 @@ void Map::DeleteDeadEntities()
 			//check collision to all characters and buildings
 			DetectBombardmentToAgentCollision(m_activeBombardments[bombardmentIndex]);
 			DetectBombardmentToPOICollision(m_activeBombardments[bombardmentIndex]);
+
+			if (DoesBombardmentStartFire())
+			{
+				IntVector2 tileCoordinate = GetTileCoordinateOfPosition(m_activeBombardments[bombardmentIndex]->m_disc.center);
+				if (!IsTileBlockingAtCoordinate(tileCoordinate))
+				{
+					SpawnFire(tileCoordinate);
+				}				
+			}
 
 			m_activeBombardments.erase(m_activeBombardments.begin() + bombardmentIndex);
 			--bombardmentIndex;
@@ -870,6 +930,21 @@ void Map::DetectBombardmentToPOICollision(Bombardment* bombardment)
 			m_pointsOfInterest[poiIndex]->TakeDamage(g_bombardmentDamage);
 		}
 	}
+}
+
+//  =========================================================================================
+bool Map::DoesBombardmentStartFire()
+{
+	return Game::GetGlobalRNG()->GetRandomZeroToOne() >= RANDOM_FIRE_THRESHOLD ? true : false;
+}
+
+//  =========================================================================================
+void Map::SpawnFire(const IntVector2& coordinate)
+{
+	Fire* fire = new Fire((int)m_fires.size(), coordinate);
+	m_fires.push_back(fire);
+
+	m_isMapGridDirty = true;
 }
 
 //  =========================================================================================
