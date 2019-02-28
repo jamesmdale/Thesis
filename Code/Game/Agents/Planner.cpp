@@ -6,6 +6,8 @@
 #include "Game\Entities\Fire.hpp"
 #include "Game\GameCommon.hpp"
 #include "Game\GameStates\PlayingState.hpp"
+#include "Game\Game.hpp"
+#include "Engine\Time\Stopwatch.hpp"
 #include "Engine\Profiler\Profiler.hpp"
 #include "Engine\Core\EngineCommon.hpp"
 
@@ -35,7 +37,12 @@ Planner::Planner(Map* mapReference, Agent* agentReference)
 		m_agentGatherUtilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
 		m_shootUtilityStorageUtility = new UtilityStorage(0.f, 1.f, 20.f);
 	}
-	
+
+	m_updatePlanTimer = new Stopwatch(GetGameClock());
+	Game::GetGlobalRNG()->GetRandomInRange(0.f, 5.f);	
+
+	//set a random timer so we can stagger the first update plans over 5 seconds
+	m_updatePlanTimer->SetTimer(Game::GetGlobalRNG()->GetRandomInRange(0.f, 5.f));
 }
 
 //  =========================================================================================
@@ -82,7 +89,8 @@ void Planner::ProcessActionStack(float deltaSeconds)
 	//  ----------------------------------------------
 #endif
 
-	if (m_actionStack.size() == 0)
+	//if we don't have a plan, we need an immediate update, or our timer for checking our plan has elapsed
+	if (m_actionStack.size() == 0 || m_isCurrentPlanDirty || m_updatePlanTimer->HasElapsed())
 	{
 		UpdatePlan();
 	}
@@ -136,7 +144,7 @@ void Planner::AddActionToStack(ActionData* actionData)
 }
 
 //  =========================================================================================
-void Planner::ClearStack()
+void Planner::ClearActionStack()
 {
 	while (m_actionStack.size() > 0)
 	{
@@ -162,7 +170,9 @@ void Planner::UpdatePlan()
 #endif
 
 	PROFILER_PUSH();
-	ClearStack();
+	ClearActionStack();
+	m_agent->ClearCurrentPath();
+	
 
 	//set preset to 
 	ePlanTypes chosenOutcome = NONE_PLAN_TYPE;
@@ -298,6 +308,10 @@ void Planner::UpdatePlan()
 	m_utilityHistory.m_chosenOutcome = chosenOutcome;
 
 	QueueActionsFromCurrentPlan(m_currentPlan, highestUtilityInfo);
+
+	//reset necessary flags
+	ResetAgentUpdatePlanTimer();
+	m_isCurrentPlanDirty = false;
 
 #ifdef UpdatePlanAnalysis
 	// profiling ----------------------------------------------
@@ -1321,6 +1335,13 @@ Vector2 Planner::GetBestAccessLocationForFireAtPosition(const Vector2& fireWorld
 
 	//if we got this far, we haven't found a valid access position and this fire is blocked in on all sides
 	ASSERT_OR_DIE(false, "NO ACCESSIBLE PATH TO THE FIRE");
+}
+
+//  =========================================================================================
+void Planner::ResetAgentUpdatePlanTimer()
+{
+	m_updatePlanTimer->SetTimer(UPDATE_PLAN_TIMER);
+	m_updatePlanTimer->Reset();
 }
 
 //  =========================================================================================

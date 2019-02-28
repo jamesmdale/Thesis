@@ -53,6 +53,7 @@ public:
 
 	void UpdateAgents(float deltaSeconds);
 	void UpdateAgentsBudgeted(float deltaSeconds);
+	void UpdateFPSCounters();
 	void Render();
 
 	void Reload(SimulationDefinition* definition);

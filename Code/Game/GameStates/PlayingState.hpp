@@ -27,6 +27,8 @@ public:
 	virtual void PostRender() override;
 	virtual float UpdateFromInput(float deltaSeconds) override;
 
+	void UpdateFPSCounters();
+
 	void RenderGame();
 	void RenderDebugUI();
 

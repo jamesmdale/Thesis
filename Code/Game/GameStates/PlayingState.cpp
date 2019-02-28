@@ -23,6 +23,10 @@ float ORTHO_MAX = 0.f;
 float ORTHO_MIN = 0.f;
 float g_orthoZoom = 0.f;
 
+float g_currentFps = 0.f;
+float g_minFPS = 0.f;
+Stopwatch* g_minFPSResetStopwatch = nullptr;
+
 float ZOOM_RATE = 5.f;
 
 std::string simDataOutputDirectory = "";
@@ -86,6 +90,9 @@ void PlayingState::Initialize()
 	//move camera to starting location
 	m_camera->SetPosition(Vector3::ZERO);
 
+	g_minFPSResetStopwatch = new Stopwatch(GetMasterClock());
+	g_minFPSResetStopwatch->SetTimer(10.f);
+
 	//cleanup
 	theRenderer = nullptr;
 	theWindow = nullptr;
@@ -98,11 +105,13 @@ void PlayingState::Update(float deltaSeconds)
 	{
 		m_map->Update(deltaSeconds);
 
+		UpdateFPSCounters();
+
 		if (m_simulationTimer->ResetAndDecrementIfElapsed())
 		{
 			isResetingSimulation = true;
-		}
-	}	
+		}		
+	}
 }
 
 //  =============================================================================
@@ -288,6 +297,21 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	}
 	
 	return deltaSeconds; //new deltaSeconds
+}
+
+//  =========================================================================================
+void PlayingState::UpdateFPSCounters()
+{
+	g_currentFps = GetUnclampedFPS();
+	if (g_currentFps < g_minFPS)
+	{
+		g_minFPS = g_currentFps;
+	}
+	if (g_minFPSResetStopwatch->ResetAndDecrementIfElapsed())
+	{
+		g_minFPS = g_currentFps;
+	}
+	
 }
 
 //  =========================================================================================
@@ -645,22 +669,25 @@ Mesh* PlayingState::CreateUIDebugTextMesh()
 
 	// fps counter ----------------------------------------------		
 	AABB2 fpsBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.9f), Vector2(0.95f, 0.975f));
-	builder.CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("FPS: %f", GetUnclampedFPS()), Rgba::WHITE);
+	builder.CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("FPS: %f", g_currentFps), Rgba::WHITE);
+
+	fpsBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.85f), Vector2(0.95f, 0.9f));
+	builder.CreateText2DInAABB2( fpsBox.GetCenter(), fpsBox.GetDimensions(), 1.f, Stringf("MIN FPS: %f", g_minFPS), Rgba::WHITE);
 
 	//cam position information ----------------------------------------------
-	AABB2 camPosBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.85f), Vector2(0.95f, 0.9f));
+	AABB2 camPosBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.85f));
 	Vector3 camPosition = m_camera->m_transform->GetWorldPosition();
 	builder.CreateText2DInAABB2( camPosBox.GetCenter(), camPosBox.GetDimensions(), 1.f, Stringf("Cam Pos: %f,%f", camPosition.x, camPosition.y));
 
 	//agent update per frameinfo ----------------------------------------------
 	if (GetIsAgentUpdateBudgeted())
 	{
-		AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.85f));
+		AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.75f), Vector2(0.95f, 0.8f));
 		builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);
 	}
 	
 	//threat ----------------------------------------------
-	AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.8f), Vector2(0.95f, 0.85f));
+	AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.7f), Vector2(0.95f, 0.8f));
 	builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Threat: %i/%i", (int)m_map->m_threat, (int)g_maxThreat), Rgba::WHITE);
 
 	//debug input ----------------------------------------------

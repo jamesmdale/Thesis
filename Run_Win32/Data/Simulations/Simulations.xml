@@ -2,18 +2,18 @@
 
     <SimulationDefinition
   name="default_optimized"
-  mapName="30x30"
-  numAgents="100"
-  numArmories="3"
-  numLumberyards="3"
-  numMedStations="3"
-  numWells="3"
-  bombardmentRatePerSecond="3.0"
-  threatRatePerSecond = "5.0"
-  startingThreat="200"
+  mapName="20x20"
+  numAgents="10"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="2"
+  numWells="2"
+  bombardmentRatePerSecond="1.0"
+  threatRatePerSecond = "1.0"
+  startingThreat="400"
   processTimerInSeconds="180"
   isOptimized="true" 
-  isBudgeted="false"
+  isBudgeted="true"
   />
 
       <SimulationDefinition
@@ -35,6 +35,22 @@
 </SimulationDefinitions>
 
  <!-->
+  <SimulationDefinition
+  name="default_optimized"
+  mapName="50x50"
+  numAgents="1000"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  bombardmentRatePerSecond="8.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="true" 
+  isBudgeted="false"
+  />
+
+
     <SimulationDefinition
   name="default_optimized"
   mapName="50x50"

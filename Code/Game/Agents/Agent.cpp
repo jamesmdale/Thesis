@@ -259,6 +259,19 @@ void Agent::UpdatePhysicsData()
 	m_pathDisc.center = m_position;
 }
 
+//  =========================================================================================
+bool Agent::IsHazardAhead()
+{
+	Map* map = m_planner->m_map;
+
+	Vector2 positionAhead = m_position + m_forward;
+	Tile* forwardTile = map->GetTileAtWorldPosition(positionAhead);
+	if(forwardTile->m_tileDefinition->m_name == "Fire")
+		return true;
+
+	return false;
+}
+
 //  =============================================================================
 void Agent::UpdateCombatPerformanceTime()
 {
@@ -406,6 +419,20 @@ void Agent::ResetPriority()
 }
 
 //  =========================================================================================
+void Agent::ResetPlannerAndPathing()
+{
+	m_planner->ClearActionStack();
+	ClearCurrentPath();
+}
+
+//  =========================================================================================
+void Agent::ClearCurrentPath()
+{
+	m_currentPath.clear();
+	m_currentPathIndex = UINT8_MAX;
+}
+
+//  =========================================================================================
 //  Actions
 //  =========================================================================================
 
@@ -417,8 +444,7 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 	if (agent->m_isFirstLoopThroughAction)
 	{
 		//do first pass logic
-		agent->m_currentPath.clear();
-		agent->m_currentPathIndex = UINT8_MAX;
+		agent->ClearCurrentPath();
 		agent->m_isFirstLoopThroughAction = false;
 	}
 
@@ -436,12 +462,21 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 		agent->UpdatePhysicsData();
 		return true;
 	}		
+	
+	//look ahead a tile to make sure we aren't about to walk into fire
+	if(agent->IsHazardAhead())
+	{
+		//by reseting loop in action, we will reset the path
+		agent->m_isFirstLoopThroughAction = true;
+		agent->UpdatePhysicsData();
+		return false;
+	}
 
 	//if we don't have a path to the destination or have completed our previous path, get a new path
 	if (agent->m_currentPath.size() == 0 || agent->m_currentPathIndex == UINT8_MAX)
 	{
 		agent->GetPathToDestination(goalDestination);
-		agent->m_currentPathIndex = agent->m_currentPath.size() - 1;
+		agent->m_currentPathIndex = (uint8)agent->m_currentPath.size() - 1;
 	}	
 
 	//We have a path, follow it.

@@ -4,6 +4,7 @@
 #include <stack>
 
 struct ActionData;
+class Stopwatch;
 class Agent;
 class Fire;
 class Map;
@@ -54,7 +55,7 @@ public:
 	//queue management
 	void ProcessActionStack(float deltaSeconds);
 	void AddActionToStack(ActionData* actionData);
-	void ClearStack();
+	void ClearActionStack();
 	inline size_t GetActionStackSize() { return m_actionStack.size(); }
 
 	//planning
@@ -104,6 +105,7 @@ public:
 	//helpers
 	IntVector2 GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVector2& coordinate);					//O(1)
 	Vector2 GetBestAccessLocationForFireAtPosition(const Vector2& fireWorldPosition);
+	void ResetAgentUpdatePlanTimer();
 
 	//optimizations
 	bool FindAgentAndCopyPath(const Vector2& endPostion);
@@ -116,6 +118,9 @@ public:
 	Map* m_map = nullptr;
 	Agent* m_agent = nullptr;
 	ePlanTypes m_currentPlan;
+
+	Stopwatch* m_updatePlanTimer = nullptr;
+	bool m_isCurrentPlanDirty = false;
 
 	UtilityHistory m_utilityHistory;
 

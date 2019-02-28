@@ -44,13 +44,17 @@ public:
 
 	void TakeDamage(int damageAmount);
 	void IncreaseUpdatePriority(int amount = 1);
-
 	void ResetPriority();
+
+	void ResetPlannerAndPathing();
+	void ClearCurrentPath();
 
 	//pathing
 	bool GetPathToDestination(const Vector2& goalDestination);
 	bool GetIsAtPosition(const Vector2& goalDestination);
 	void UpdatePhysicsData();
+
+	bool IsHazardAhead();
 
 	//stats
 	void UpdateCombatPerformanceTime();
@@ -58,6 +62,7 @@ public:
 	void UpdateHealPerformanceTime();
 	void UpdateFireFightingPerformanceTime();
 
+	//debug tools
 	void ConstructInformationAsText(std::vector<std::string>& outStrings);
 
 public:
@@ -112,6 +117,7 @@ public:
 
 	//helper references ----------------------------------------------
 	Planner* m_planner = nullptr;
+
 	uint16_t m_indexInSortedXList = UINT16_MAX;
 	uint16_t m_indexInSortedYList = UINT16_MAX;
 	uint16_t m_indexInPriorityList = UINT16_MAX;	
