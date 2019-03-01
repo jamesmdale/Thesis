@@ -39,6 +39,8 @@ public:
 	void InitializeSimulationData();
 	void ResetCurrentSimulationData();
 	void DeleteMap();
+	void LoadNextSim();
+
 	void ExportSimulationData();
 
 	void GenerateOutputDirectory();

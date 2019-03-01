@@ -164,39 +164,7 @@ void PlayingState::PostRender()
 
 	if (isResetingSimulation)
 	{
-		ExportSimulationData();
-		ResetCurrentSimulationData();
-
-		g_currentSimDefinitionIndex++;
-		isResetingSimulation = false;
-		m_disectedAgent = nullptr;
-
-		if (g_currentSimDefinitionIndex < SimulationDefinition::s_simulationDefinitions.size())
-		{
-			SimulationDefinition* definition = SimulationDefinition::s_simulationDefinitions[g_currentSimDefinitionIndex];	
-
-			//if we are on the same map, leave the spawn points the same.
-			if(definition->m_mapDefinition == g_currentSimulationDefinition->m_mapDefinition)
-			{
-				g_currentSimulationDefinition = definition;
-				ResetMapForSimulation(definition);
-				InitializeSimulation(definition);
-			}
-			else
-			{
-				g_currentSimulationDefinition = definition;
-				DeleteMap();
-				CreateMapForSimulation(definition);
-				InitializeSimulation(definition);
-			}		
-		}
-		else
-		{
-			g_isQuitting = true;
-		}	
-
-		//reset timer regardless
-		m_simulationTimer->Reset();
+		LoadNextSim();
 	}	
 }
 
@@ -537,6 +505,44 @@ void PlayingState::DeleteMap()
 {
 	delete(m_map);
 	m_map = nullptr;
+}
+
+//  =========================================================================================
+void PlayingState::LoadNextSim()
+{
+	ExportSimulationData();
+	ResetCurrentSimulationData();
+
+	g_currentSimDefinitionIndex++;
+	isResetingSimulation = false;
+	m_disectedAgent = nullptr;
+
+	if (g_currentSimDefinitionIndex < SimulationDefinition::s_simulationDefinitions.size())
+	{
+		SimulationDefinition* definition = SimulationDefinition::s_simulationDefinitions[g_currentSimDefinitionIndex];	
+
+		//if we are on the same map, leave the spawn points the same.
+	/*	if(definition->m_mapDefinition == g_currentSimulationDefinition->m_mapDefinition)
+		{
+			g_currentSimulationDefinition = definition;
+			ResetMapForSimulation(definition);
+			InitializeSimulation(definition);
+		}
+		else
+		{*/
+		g_currentSimulationDefinition = definition;
+		DeleteMap();
+		CreateMapForSimulation(definition);
+		InitializeSimulation(definition);
+		//}		
+	}
+	else
+	{
+		g_isQuitting = true;
+	}	
+
+	//reset timer regardless
+	m_simulationTimer->Reset();
 }
 
 //  =============================================================================

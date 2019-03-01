@@ -102,45 +102,67 @@ Map::~Map()
 		delete(m_activeBombardments[bombardmentIndex]);
 		m_activeBombardments[bombardmentIndex] = nullptr;
 	}
+	m_activeBombardments.clear();
+
+	//cleanup fires
+	for (int fireIndex = 0; fireIndex < (int)m_fires.size(); ++fireIndex)
+	{
+		delete(m_fires[fireIndex]);
+		m_fires[fireIndex] = nullptr;
+	}
+	m_fires.clear();
 
 	//cleanup points of interest
 	for (int poiIndex = 0; poiIndex < (int)m_armories.size(); ++poiIndex)
 	{
 		m_armories[poiIndex] = nullptr;
 	}
+	m_armories.clear();
 
 	for (int poiIndex = 0; poiIndex < (int)m_lumberyards.size(); ++poiIndex)
 	{
 		m_lumberyards[poiIndex] = nullptr;
 	}
+	m_lumberyards.clear();
 
 	for (int poiIndex = 0; poiIndex < (int)m_medStations.size(); ++poiIndex)
 	{
 		m_medStations[poiIndex] = nullptr;
 	}
+	m_medStations.clear();
+
+	for (int poiIndex = 0; poiIndex < (int)m_wells.size(); ++poiIndex)
+	{
+		m_wells[poiIndex] = nullptr;
+	}
+	m_wells.clear();
 
 	for (int poiIndex = 0; poiIndex < (int)m_pointsOfInterest.size(); ++poiIndex)
 	{
 		delete(m_pointsOfInterest[poiIndex]);
 		m_pointsOfInterest[poiIndex] = nullptr;
 	}
+	m_pointsOfInterest.clear();
 
 	//cleanup agents
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
 	{
 		m_agentsOrderedByXPosition[agentIndex] = nullptr;
 	}
+	m_agentsOrderedByXPosition.clear();
 
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
 	{
 		m_agentsOrderedByYPosition[agentIndex] = nullptr;
 	}
+	m_agentsOrderedByYPosition.clear();
 
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
 	{
 		delete(m_agentsOrderedByPriority[agentIndex]);
 		m_agentsOrderedByPriority[agentIndex] = nullptr;
 	}
+	m_agentsOrderedByPriority.clear();
 
 	//tiles
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); ++tileIndex)
@@ -148,6 +170,7 @@ Map::~Map()
 		delete(m_tiles[tileIndex]);
 		m_tiles[tileIndex] = nullptr;
 	}
+	m_tiles.clear();
 }
 
 //  =========================================================================================
@@ -479,6 +502,14 @@ void Map::Reload(SimulationDefinition* definition)
 	}
 	m_activeBombardments.clear();
 
+	//cleanup fires
+	for (int fireIndex = 0; fireIndex < (int)m_fires.size(); ++fireIndex)
+	{
+		delete(m_fires[fireIndex]);
+		m_fires[fireIndex] = nullptr;
+	}
+	m_fires.clear();
+
 	//cleanup agents
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
 	{
@@ -492,6 +523,13 @@ void Map::Reload(SimulationDefinition* definition)
 		m_agentsOrderedByYPosition[agentIndex] = nullptr;
 	}
 	m_agentsOrderedByYPosition.clear();
+
+	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
+	{
+		delete(m_agentsOrderedByPriority[agentIndex]);
+		m_agentsOrderedByPriority[agentIndex] = nullptr;
+	}
+	m_agentsOrderedByPriority.clear();
 
 	// Reload step ----------------------------------------------
 
