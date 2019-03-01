@@ -448,14 +448,16 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 		//do first pass logic
 		agent->ClearCurrentPath();
 		agent->m_isFirstLoopThroughAction = false;
+		agent->m_oldPosition = agent->m_position;
 
 		agent->m_positionStuckCheckTimer->Reset();
 	}
 
 	//catch scenarios where agent is stuck here
-	if (agent->m_positionStuckCheckTimer->CheckAndReset())
+	if (agent->m_positionStuckCheckTimer->ResetAndDecrementIfElapsed())
 	{
-		if(agent->m_physicsDisc.IsPointInside(agent->m_oldPosition))
+		//if(agent->m_physicsDisc.IsPointInside(agent->m_oldPosition))
+		if( FloorPosition(agent->m_oldPosition) == FloorPosition(agent->m_position))
 		{
 			agent->ClearCurrentPath();
 		}

@@ -59,6 +59,8 @@ public:
 
 	bool m_isCameraLockedToAgent = false;
 	Agent* m_disectedAgent = nullptr;
+
+	Stopwatch* m_inputDelayTimer = nullptr;
 };
 
 void TogglePaused(Command& cmd);

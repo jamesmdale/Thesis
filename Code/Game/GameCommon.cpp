@@ -64,7 +64,7 @@ float g_baseFireFightingAmountPerPerformance = 5.f;
 float g_minActionPerformanceRatePerSecond = 0.25f;
 
 float g_minSkillEfficiency = 0.1f;
-float g_agentOldPositionRefreshRate = 1.f;
+float g_agentOldPositionRefreshRate = 2.f;
 
 //bombardment globals
 float g_bombardmentExplosionTime = 1.f;
@@ -158,4 +158,12 @@ void ShuffleList(std::vector<int>& list)
 		list[swapVal] = list[swapVal2];
 		list[swapVal2] = tempVal;
 	}	
+}
+
+//  =========================================================================================
+Vector2 FloorPosition(const Vector2 & position)
+{
+	Vector2 tempPosition = position;
+	tempPosition.Floor();
+	return tempPosition;
 }

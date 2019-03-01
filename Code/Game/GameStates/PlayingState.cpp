@@ -43,6 +43,12 @@ PlayingState::~PlayingState()
 	//delete scene last
 	delete(m_renderScene2D);
 	m_renderScene2D = nullptr;		
+
+	delete(m_inputDelayTimer);
+	m_inputDelayTimer = nullptr;
+
+	delete(m_simulationTimer);
+	m_simulationTimer = nullptr;
 }
 
 //  =============================================================================
@@ -92,6 +98,9 @@ void PlayingState::Initialize()
 
 	g_minFPSResetStopwatch = new Stopwatch(GetMasterClock());
 	g_minFPSResetStopwatch->SetTimer(10.f);
+
+	m_inputDelayTimer = new Stopwatch(GetMasterClock());
+	m_inputDelayTimer->SetTimer(UPDATE_INPUT_DELAY);
 
 	//cleanup
 	theRenderer = nullptr;
@@ -206,6 +215,7 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	{
 		m_camera->Translate(Vector3(Vector2::UP * 5.f * GetMasterDeltaSeconds()));
 		m_isCameraLockedToAgent = false;
+
 	}
 	if (theInput->IsKeyPressed(theInput->KEYBOARD_RIGHT_ARROW) && !theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
@@ -219,7 +229,7 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	}
 
 	// cycle through agents ----------------------------------------------
-	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL) && m_inputDelayTimer->HasElapsed())
 	{
 		if (m_disectedAgent == nullptr)
 		{
@@ -234,8 +244,10 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 				m_map->GetAgentById(0);
 			}
 		}
+
+		m_inputDelayTimer->Reset();
 	}
-	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL) && m_inputDelayTimer->HasElapsed())
 	{
 		if (m_disectedAgent == nullptr)
 		{
@@ -250,6 +262,8 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 				m_map->GetAgentById(0);
 			}
 		}
+
+		m_inputDelayTimer->Reset();
 	}
 
 	// reset camera ----------------------------------------------
