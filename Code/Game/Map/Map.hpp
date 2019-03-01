@@ -53,7 +53,6 @@ public:
 
 	void UpdateAgents(float deltaSeconds);
 	void UpdateAgentsBudgeted(float deltaSeconds);
-	void UpdateFPSCounters();
 	void Render();
 
 	void Reload(SimulationDefinition* definition);
@@ -63,6 +62,7 @@ public:
 
 	//optimized mesh generation  ----------------------------------------------
 	void CreateMapMesh();
+	void CreateDebugMapMesh();
 	Mesh* CreateDynamicAgentMesh();
 	Mesh* CreateDynamicBombardmentMesh();
 	Mesh* CreateDynamicFireMesh();
@@ -115,7 +115,7 @@ public:
 	//agent to tile collision  ----------------------------------------------
 	void DetectAgentToTileCollision(Agent* agent);
 	bool PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection);
-	
+
 public:
 	std::string m_name;
 	IntVector2 m_dimensions;

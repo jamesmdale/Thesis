@@ -90,8 +90,15 @@ void Planner::ProcessActionStack(float deltaSeconds)
 #endif
 
 	//if we don't have a plan, we need an immediate update, or our timer for checking our plan has elapsed
-	if (m_actionStack.size() == 0 || m_isCurrentPlanDirty || m_updatePlanTimer->HasElapsed())
+	if (m_actionStack.size() == 0 || m_isCurrentPlanDirty)
 	{
+		//force a new plan update
+		ResetCurrentPlanData();
+		UpdatePlan();
+	}
+	else if (m_updatePlanTimer->HasElapsed())
+	{
+		//only change the plan IF it's different than our current
 		UpdatePlan();
 	}
 
@@ -170,9 +177,6 @@ void Planner::UpdatePlan()
 #endif
 
 	PROFILER_PUSH();
-	ClearActionStack();
-	m_agent->ClearCurrentPath();
-	
 
 	//set preset to 
 	ePlanTypes chosenOutcome = NONE_PLAN_TYPE;
@@ -181,7 +185,7 @@ void Planner::UpdatePlan()
 
 	//utility for gathering arrows ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherArrowsUtility();
-	if (m_currentPlan == GATHER_ARROWS_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType == GATHER_ARROWS_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -194,7 +198,7 @@ void Planner::UpdatePlan()
 		
 	//utility for gathering lumber ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherLumberUtility();
-	if (m_currentPlan == GATHER_LUMBER_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType == GATHER_LUMBER_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -207,7 +211,7 @@ void Planner::UpdatePlan()
 
 	// utility for gathering bandages ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherBandagesUtility();
-	if (m_currentPlan == GATHER_BANDAGES_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType == GATHER_BANDAGES_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -220,7 +224,7 @@ void Planner::UpdatePlan()
 
 	//utility for gathering water ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherWaterUtility();
-	if (m_currentPlan == GATHER_WATER_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType == GATHER_WATER_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -237,7 +241,7 @@ void Planner::UpdatePlan()
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, m_agent->m_combatBias);
 
-	if (m_currentPlan == SHOOT_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType == SHOOT_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -255,7 +259,7 @@ void Planner::UpdatePlan()
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, m_agent->m_repairBias);
 
-	if (m_currentPlan == REPAIR_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType == REPAIR_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -272,7 +276,7 @@ void Planner::UpdatePlan()
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, m_agent->m_healBias);
 
-	if (m_currentPlan == HEAL_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType == HEAL_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -290,7 +294,7 @@ void Planner::UpdatePlan()
 	if(compareUtilityInfo.utility != 0.f)
 		SkewUtilityForBias(compareUtilityInfo, m_agent->m_fireFightingBias);
 
-	if (m_currentPlan ==  FIGHT_FIRE_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
+	if (m_currentPlan.m_chosenPlanType ==  FIGHT_FIRE_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
 	}
@@ -302,13 +306,22 @@ void Planner::UpdatePlan()
 	m_utilityHistory.m_lastFightFire = compareUtilityInfo.utility; 	//debug info
 
 	// set final plan ----------------------------------------------
-	m_currentPlan = chosenOutcome;
+	highestUtilityInfo.m_chosenPlanType = chosenOutcome;
 	
 	//debug
 	m_utilityHistory.m_chosenOutcome = chosenOutcome;
 
-	QueueActionsFromCurrentPlan(m_currentPlan, highestUtilityInfo);
-
+	if (!IsPlanSameAsCurrent(highestUtilityInfo))
+	{
+		ClearActionStack();
+		m_agent->ClearCurrentPath();
+		QueueActionsFromCurrentPlan(highestUtilityInfo);
+	}
+	else
+	{
+		int i = 0;//for debug testing
+	}
+		
 	//reset necessary flags
 	ResetAgentUpdatePlanTimer();
 	m_isCurrentPlanDirty = false;
@@ -342,7 +355,27 @@ void Planner::UpdatePlan()
 }
 
 //  =========================================================================================
-void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo& info)
+void Planner::ResetCurrentPlanData()
+{
+	m_currentPlan = UtilityInfo();
+}
+
+//  =========================================================================================
+bool Planner::IsPlanSameAsCurrent(const UtilityInfo& newPlan)
+{
+	if (m_currentPlan.endPosition == newPlan.endPosition &&
+		m_currentPlan.targetEntityId == newPlan.targetEntityId &&
+		m_currentPlan.m_chosenPlanType == newPlan.m_chosenPlanType)
+	{
+		return true;
+	}
+
+	m_currentPlan = newPlan;
+	return false;
+}
+
+//  =========================================================================================
+void Planner::QueueActionsFromCurrentPlan(const UtilityInfo& info)
 {
 	++g_numQueueActionPathCalls;
 
@@ -356,7 +389,7 @@ void Planner::QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo
 	//  ----------------------------------------------
 #endif
 
-	switch (planType)
+	switch (info.m_chosenPlanType)
 	{
 	case GATHER_ARROWS_PLAN_TYPE:
 		QueueGatherArrowsAction(info);
@@ -532,7 +565,7 @@ void Planner::QueueFireFightingActions(const UtilityInfo& info)
 std::string Planner::GetPlanTypeAsText()
 {
 	std::string planAsText = "";
-	switch (m_currentPlan)
+	switch (m_currentPlan.m_chosenPlanType)
 	{
 	case NONE_PLAN_TYPE:
 		planAsText = "NONE";

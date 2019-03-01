@@ -30,6 +30,7 @@ struct UtilityInfo
 	float utility = 0.0f;
 	Vector2 endPosition = Vector2::ZERO;
 	int targetEntityId = -1;
+	ePlanTypes m_chosenPlanType = NUM_PLAN_TYPE;
 };
 
 struct UtilityHistory 
@@ -59,8 +60,10 @@ public:
 	inline size_t GetActionStackSize() { return m_actionStack.size(); }
 
 	//planning
-	void UpdatePlan();	
-	void QueueActionsFromCurrentPlan(ePlanTypes planType, const UtilityInfo& info);
+	void UpdatePlan();
+	void ResetCurrentPlanData();
+	bool IsPlanSameAsCurrent(const UtilityInfo& newPlan);
+	void QueueActionsFromCurrentPlan(const UtilityInfo& info);
 
 	void QueueGatherArrowsAction(const UtilityInfo& info);
 	void QueueGatherLumberAction(const UtilityInfo& info);
@@ -117,7 +120,7 @@ public:
 public:
 	Map* m_map = nullptr;
 	Agent* m_agent = nullptr;
-	ePlanTypes m_currentPlan;
+	UtilityInfo m_currentPlan;
 
 	Stopwatch* m_updatePlanTimer = nullptr;
 	bool m_isCurrentPlanDirty = false;

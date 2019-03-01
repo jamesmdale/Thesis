@@ -36,11 +36,8 @@ Agent::Agent(Vector2 startingPosition, IsoSpriteAnimSet* animationSet, Map* mapR
 	GenerateRandomStats();
 	
 	//setup physics
-	m_physicsDisc.radius = 0.25f;
+	m_physicsDisc.radius = 0.3f;
 	m_physicsDisc.center = m_position;
-
-	m_pathDisc.radius = 0.30f;
-	m_pathDisc.center = m_position;
 
 	//precompute sprite data
 	m_animationSet = animationSet;
@@ -53,6 +50,9 @@ Agent::Agent(Vector2 startingPosition, IsoSpriteAnimSet* animationSet, Map* mapR
 	//m_spriteRenderBounds.maxs.x = m_spriteRenderBounds.mins.x + 1.f * 1.f;
 	//m_spriteRenderBounds.mins.y = 0.f - (spritePivot.y) * 1.f;
 	//m_spriteRenderBounds.maxs.y = m_spriteRenderBounds.mins.y + 1.f * 1.f;
+
+	m_positionStuckCheckTimer = new Stopwatch(GetGameClock());
+	m_positionStuckCheckTimer->SetTimer(g_agentOldPositionRefreshRate);
 }
 
 //  =========================================================================================
@@ -63,6 +63,9 @@ Agent::~Agent()
 
 	delete(m_actionTimer);
 	m_actionTimer = nullptr;
+
+	delete(m_positionStuckCheckTimer);
+	m_positionStuckCheckTimer = nullptr;
 
 	m_animationSet = nullptr;
 }
@@ -249,14 +252,13 @@ bool Agent::GetPathToDestination(const Vector2& goalDestination)
 //  =========================================================================================
 bool Agent::GetIsAtPosition(const Vector2& position)
 {
-	return m_pathDisc.IsPointInside(position);
+	return m_physicsDisc.IsPointInside(position);
 }
 
 //  =========================================================================================
 void Agent::UpdatePhysicsData()
 {
 	m_physicsDisc.center = m_position;
-	m_pathDisc.center = m_position;
 }
 
 //  =========================================================================================
@@ -446,6 +448,19 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 		//do first pass logic
 		agent->ClearCurrentPath();
 		agent->m_isFirstLoopThroughAction = false;
+
+		agent->m_positionStuckCheckTimer->Reset();
+	}
+
+	//catch scenarios where agent is stuck here
+	if (agent->m_positionStuckCheckTimer->CheckAndReset())
+	{
+		if(agent->m_physicsDisc.IsPointInside(agent->m_oldPosition))
+		{
+			agent->ClearCurrentPath();
+		}
+
+		agent->m_oldPosition = agent->m_position;
 	}
 
 	UNUSED(interactEntityId);
@@ -467,9 +482,10 @@ bool MoveAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 	if(agent->IsHazardAhead())
 	{
 		//by reseting loop in action, we will reset the path
-		agent->m_isFirstLoopThroughAction = true;
+		/*agent->m_isFirstLoopThroughAction = true;
 		agent->UpdatePhysicsData();
-		return false;
+		return false;*/
+		agent->ClearCurrentPath();
 	}
 
 	//if we don't have a path to the destination or have completed our previous path, get a new path

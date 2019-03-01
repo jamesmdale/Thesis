@@ -219,7 +219,7 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 	}
 
 	// cycle through agents ----------------------------------------------
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_UP_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		if (m_disectedAgent == nullptr)
 		{
@@ -235,7 +235,7 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 			}
 		}
 	}
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
+	if (theInput->IsKeyPressed(theInput->KEYBOARD_DOWN_ARROW) && theInput->IsKeyPressed(theInput->KEYBOARD_CONTROL))
 	{
 		if (m_disectedAgent == nullptr)
 		{
@@ -373,8 +373,7 @@ void PlayingState::RenderDebugUI()
 		}	
 
 		theRenderer->BindMaterial(theRenderer->CreateOrGetMaterial("default"));
-		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_physicsDisc, Rgba::ORANGE, 10);
-		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_pathDisc, Rgba::PINK, 10);
+		theRenderer->DrawDottedDisc2WithColor(m_disectedAgent->m_physicsDisc, Rgba::PINK, 10);
 	}
 }
 

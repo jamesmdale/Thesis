@@ -72,6 +72,7 @@ public:
 	int m_health = 100;
 	bool m_isFirstLoopThroughAction = true;
 	Stopwatch* m_actionTimer = nullptr;
+	Stopwatch* m_positionStuckCheckTimer = nullptr;
 
 	// bias ----------------------------------------------
 	float m_combatBias = 0.5f;
@@ -104,7 +105,8 @@ public:
 	Vector2 m_forward;
 	Vector2 m_intermediateGoalPosition;	//used for temp locations while pathing
 	
-	Disc2 m_pathDisc;
+	Vector2 m_oldPosition;
+
 	Disc2 m_physicsDisc;
 
 	//goal logic ----------------------------------------------

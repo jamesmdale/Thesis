@@ -547,6 +547,19 @@ void Map::CreateMapMesh()
 
 	m_mapMesh = builder.CreateMesh<VertexPCU>();
 
+	CreateDebugMapMesh();
+}
+
+//  =========================================================================================
+void Map::CreateDebugMapMesh()
+{
+	if (m_debugMapMesh != nullptr)
+	{
+		delete(m_debugMapMesh);
+		m_debugMapMesh = nullptr;
+	}
+
+	MeshBuilder builder;
 
 	//create debug mesh to show blocking states
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); ++tileIndex)
@@ -571,7 +584,7 @@ Mesh* Map::CreateDynamicAgentMesh()
 		Sprite sprite = *m_agentsOrderedByXPosition[agentIndex]->m_animationSet->GetCurrentSprite(m_agentsOrderedByXPosition[agentIndex]->m_spriteDirection);
 
 		Rgba agentColor = Rgba::WHITE;
-		switch (m_agentsOrderedByXPosition[agentIndex]->m_planner->m_currentPlan)
+		switch (m_agentsOrderedByXPosition[agentIndex]->m_planner->m_currentPlan.m_chosenPlanType)
 		{
 		case GATHER_ARROWS_PLAN_TYPE:
 			agentColor = GATHER_ARROWS_TINT;
@@ -904,6 +917,10 @@ void Map::UpdateMapGrid()
 			m_mapAsGrid->SetValueAtIndex(value, tileIndex);
 	}
 
+	//redraw debug mesh
+	if(g_isDebugDataShown)
+		CreateDebugMapMesh();
+
 	m_isMapGridDirty = false;
 }
 
@@ -1204,8 +1221,13 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 	IntVector2 randomCoordinate = IntVector2::ONE;
 	IntVector2 accessCoordinate = IntVector2::NEGATIVE_ONE;
 
+	std::vector<int> potentialAccessPoints = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+
+	int locationPlacementAttemptCount = 0;
 	while (!isLocationValid)
 	{
+		ASSERT_OR_DIE(locationPlacementAttemptCount != 100, "NO SPACE TO PLACE POI!!!");
+
 		randomCoordinate = IntVector2::ONE;
 		accessCoordinate = IntVector2::NEGATIVE_ONE;
 		randomCoordinate = GetRandomNonBlockedCoordinateInMapBounds();
@@ -1216,18 +1238,20 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 			&& CheckIsCoordinateValid(IntVector2(randomCoordinate.x + 1, randomCoordinate.y + 1)))
 		{
 			//check tile to north, to the right, and to the northeast to see if they are blocked
-			if (!IsTileBlockingAtCoordinate(IntVector2(randomCoordinate.x + 1, randomCoordinate.y))
-				&& !IsTileBlockingAtCoordinate(IntVector2(randomCoordinate.x, randomCoordinate.y + 1))
-				&& !IsTileBlockingAtCoordinate(IntVector2(randomCoordinate.x + 1, randomCoordinate.y + 1)))
+			if (!DoesTilePreventBuilding(IntVector2(randomCoordinate.x + 1, randomCoordinate.y))
+				&& !DoesTilePreventBuilding(IntVector2(randomCoordinate.x, randomCoordinate.y + 1))
+				&& !DoesTilePreventBuilding(IntVector2(randomCoordinate.x + 1, randomCoordinate.y + 1)))
 			{
 				
 				bool isAccessLocationValid =  false;
 				int accessIterationAttemptCount = 0;
 
-				while (!isAccessLocationValid && accessIterationAttemptCount < 7)
+				ShuffleList(potentialAccessPoints);
+
+				int accessIndex = 0;
+				while (!isAccessLocationValid && accessIndex < (int)potentialAccessPoints.size())
 				{
-					int randomAccessLocation = GetRandomIntInRange(0, 7);
-					switch (randomAccessLocation)
+					switch (potentialAccessPoints[accessIndex])
 					{
 					case 0:
 						accessCoordinate = IntVector2(randomCoordinate.x, randomCoordinate.y - 1);
@@ -1255,26 +1279,24 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 						break;
 					}
 
-					if (CheckIsCoordinateValid(accessCoordinate) && !IsTileBlockingAtCoordinate(accessCoordinate))
+					if (CheckIsCoordinateValid(accessCoordinate) && !DoesTilePreventBuilding(accessCoordinate))
 					{
 						isAccessLocationValid = true;
 						isLocationValid = true;
-						////building access tile
-						//Tile* tile = GetTileAtCoordinate(accessCoordinate);
-						//tile->m_tileDefinition = TileDefinition::s_tileDefinitions.find("BuildingAccess")->second;
 					}
 
 					if (!isAccessLocationValid)
 					{
-						++accessIterationAttemptCount;
-
-						if(accessIterationAttemptCount == 7)
-							accessCoordinate = IntVector2::NEGATIVE_ONE;
-					}
-											
+						++accessIndex;
+					}											
 				}
 
-				isLocationValid = true;
+				if (isAccessLocationValid)
+				{
+					isLocationValid = true;
+				}
+
+				locationPlacementAttemptCount++;
 			}
 		}		
 	}
@@ -1397,7 +1419,7 @@ IntVector2 Map::GetRandomNonBlockedCoordinateInMapBounds()
 	while (isBlocked)
 	{
 		randomPoint = IntVector2(GetRandomIntInRange(0, m_dimensions.x - 1), GetRandomIntInRange(0, m_dimensions.y - 1));
-		isBlocked = IsTileBlockingAtCoordinate(randomPoint);
+		isBlocked = IsTileBlockingAtCoordinate(randomPoint) || DoesTilePreventBuilding(randomPoint);
 	}
 
 	return randomPoint;

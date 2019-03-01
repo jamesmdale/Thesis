@@ -1,5 +1,6 @@
 #include "Game\GameCommon.hpp"
 #include "Game\SimulationData.hpp"
+#include "Game\Game.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
 #include "Engine\Window\Window.hpp"
 
@@ -53,7 +54,7 @@ float g_skewForCurrentPlan = 0.05f;
 
 //poi globals
 float g_baseResourceRefillTimePerSecond = 0.5f;
-int g_maxResourceCarryAmount = 1;
+int g_maxResourceCarryAmount = 3;
 
 //action performance globals
 float g_baseRepairAmountPerPerformance = 5.f;
@@ -63,6 +64,7 @@ float g_baseFireFightingAmountPerPerformance = 5.f;
 float g_minActionPerformanceRatePerSecond = 0.25f;
 
 float g_minSkillEfficiency = 0.1f;
+float g_agentOldPositionRefreshRate = 1.f;
 
 //bombardment globals
 float g_bombardmentExplosionTime = 1.f;
@@ -131,4 +133,29 @@ bool GetIsAgentUpdateBudgeted()
 
 	//else
 	return false;
+}
+
+//  =========================================================================================
+void ShuffleList(std::vector<int>& list)
+{
+	RNG* theRNG = Game::GetGlobalRNG();
+
+	//no need to shuffle
+	if(list.size() <= 1)
+		return;
+
+	int maxIndex = (int)list.size() - 1;
+
+	//not totally random would need to revisit this, but will do for now.
+	for (int shuffleCount = 0; shuffleCount < (int)list.size(); ++shuffleCount)
+	{
+		int swapVal = (int)theRNG->GetRandomUintInRange(0, maxIndex);
+		int swapVal2 = (int)theRNG->GetRandomUintInRange(0, maxIndex);
+
+		int tempVal = 0;
+		// swap cards around in array
+		tempVal = list[swapVal];
+		list[swapVal] = list[swapVal2];
+		list[swapVal2] = tempVal;
+	}	
 }

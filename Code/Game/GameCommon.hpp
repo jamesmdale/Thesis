@@ -4,6 +4,7 @@
 #include "Engine\Math\Vector2.hpp"
 #include "Engine\Math\Vector3.hpp"
 #include "Engine\Core\Rgba.hpp"
+#include <vector>
 
 #define ActionStackAnalysis
 #define UpdatePlanAnalysis
@@ -23,9 +24,10 @@ class SimulationDefinition;
 
 bool GetIsOptimized();
 bool GetIsAgentUpdateBudgeted();
+void ShuffleList(std::vector<int>& list);
 
 constexpr float RANDOM_FIRE_THRESHOLD = 0.90f;
-constexpr float UPDATE_PLAN_TIMER = 1.f;
+constexpr float UPDATE_PLAN_TIMER = 10.f;
 
 //sim data
 extern SimulationDefinition* g_currentSimulationDefinition;
@@ -93,8 +95,9 @@ extern float g_baseShootDamageAmountPerPerformance;
 extern float g_baseHealAmountPerPerformance;
 extern float g_baseFireFightingAmountPerPerformance;
 extern float g_minActionPerformanceRatePerSecond;
-
 extern float g_minSkillEfficiency;
+
+extern float g_agentOldPositionRefreshRate;
 
 //bombardment globals
 extern float g_bombardmentExplosionTime;
