@@ -1235,7 +1235,7 @@ IntVector2 Planner::GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVec
 	IntVector2 maxTileCoordinates = IntVector2(m_map->m_dimensions.x - 2.f, m_map->m_dimensions.y - 2.f);
 
 	/*ex:
-	the coordinate (3,6) on a map the size of (8,8) will return (3,7);
+	the coordinate (3,5) on a map the size of (8,8) will return (3,6);
 	*/
 
 	//find the shortest distance on the X plane
@@ -1277,6 +1277,42 @@ IntVector2 Planner::GetNearestTileCoordinateOfMapEdgeFromCoordinate(const IntVec
 		else
 			closestCoordinate.x = 1;	
 	}
+
+	////figure out what edge we are on
+	//IntVector2 compareVector;
+	//IntVector2 compareVector1;
+
+	//if (closestCoordinate.x == 1 || closestCoordinate.x == maxTileCoordinates.x)
+	//{
+	//	compareVector = IntVector2::UP;
+	//	compareVector1 = IntVector2::DOWN;
+	//}
+	//if (closestCoordinate.y == 1 || closestCoordinate.x == maxTileCoordinates.y)
+	//{
+	//	compareVector = IntVector2::RIGHT;
+	//	compareVector1 = IntVector2::LEFT;
+	//}
+	//
+	//int iterationCount = 1;
+	//while (m_map->IsTileBlockingAtCoordinate(closestCoordinate))
+	//{
+	//	//get neighboring coordinates
+	//	IntVector2 nextCoordinate = closestCoordinate + (compareVector * iterationCount);
+	//	if (!m_map->IsTileBlockingAtCoordinate(nextCoordinate))
+	//	{
+	//		closestCoordinate = nextCoordinate;
+	//		return closestCoordinate;
+	//	}
+
+	//	nextCoordinate = closestCoordinate + (compareVector * iterationCount);
+	//	if (!m_map->IsTileBlockingAtCoordinate(nextCoordinate))
+	//	{
+	//		closestCoordinate = nextCoordinate;
+	//		return closestCoordinate;
+	//	}		
+	//	
+	//	++iterationCount;
+	//}
 
 	return closestCoordinate;
 }

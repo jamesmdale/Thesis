@@ -165,6 +165,7 @@ void PlayingState::PostRender()
 	if (isResetingSimulation)
 	{
 		LoadNextSim();
+		m_camera->SetPosition(Vector3(m_map->GetCenter()));
 	}	
 }
 

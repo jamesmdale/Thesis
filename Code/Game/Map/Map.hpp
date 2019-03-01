@@ -98,6 +98,7 @@ public:
 	bool DoesTilePreventBuilding(const IntVector2& coordinate);
 	Tile* GetTileAtCoordinate(const IntVector2& coordinate);
 	Tile* GetTileAtWorldPosition(const Vector2& position);
+	Vector2 GetCenter();
 
 	//point of interest helpers  ----------------------------------------------
 	PointOfInterest* GeneratePointOfInterest(int poiType);

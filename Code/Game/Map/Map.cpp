@@ -995,6 +995,12 @@ Tile* Map::GetTileAtWorldPosition(const Vector2& position)
 }
 
 //  =========================================================================================
+Vector2 Map::GetCenter()
+{
+	return Vector2(m_dimensions) * 0.5f;
+}
+
+//  =========================================================================================
 Agent* Map::GetAgentById(int agentId)
 {
 	//invalid input
@@ -1456,7 +1462,7 @@ IntVector2 Map::GetRandomNonBlockedCoordinateInMapBounds()
 
 	while (isBlocked)
 	{
-		randomPoint = IntVector2(GetRandomIntInRange(0, m_dimensions.x - 1), GetRandomIntInRange(0, m_dimensions.y - 1));
+		randomPoint = IntVector2(GetRandomIntInRange(OUTER_WALL_THICKNESS, m_dimensions.x - OUTER_WALL_THICKNESS - BUILDING_DIMENSIONS.x), GetRandomIntInRange(OUTER_WALL_THICKNESS, m_dimensions.y - OUTER_WALL_THICKNESS - BUILDING_DIMENSIONS.y));
 		isBlocked = IsTileBlockingAtCoordinate(randomPoint) || DoesTilePreventBuilding(randomPoint);
 	}
 

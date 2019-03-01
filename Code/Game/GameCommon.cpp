@@ -4,6 +4,7 @@
 #include "Game\Definitions\SimulationDefinition.hpp"
 #include "Engine\Window\Window.hpp"
 
+IntVector2 BUILDING_DIMENSIONS = IntVector2(2, 2);
 
 SimulationDefinition* g_currentSimulationDefinition = nullptr;
 

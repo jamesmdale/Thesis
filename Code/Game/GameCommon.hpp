@@ -3,6 +3,7 @@
 #include "Engine\Renderer\Renderer.hpp"
 #include "Engine\Math\Vector2.hpp"
 #include "Engine\Math\Vector3.hpp"
+#include "Engine\Math\IntVector2.hpp"
 #include "Engine\Core\Rgba.hpp"
 #include <vector>
 
@@ -32,6 +33,10 @@ Vector2 FloorPosition(const Vector2& position);
 constexpr float RANDOM_FIRE_THRESHOLD = 0.95f;
 constexpr float UPDATE_PLAN_TIMER = 10.f;
 constexpr float UPDATE_INPUT_DELAY = 0.25f;
+
+//building globals
+constexpr int OUTER_WALL_THICKNESS = 2;
+extern IntVector2 BUILDING_DIMENSIONS;
 
 //sim data
 extern SimulationDefinition* g_currentSimulationDefinition;
