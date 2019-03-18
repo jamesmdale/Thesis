@@ -40,6 +40,7 @@ public:
 
 	//rendering members
 	ForwardRenderingPath2D* m_forwardRenderingPath2D = nullptr;
+	SimulationDefinition* m_selectedSimulationDefinitions = nullptr;
 };
 
 Clock* GetGameClock();

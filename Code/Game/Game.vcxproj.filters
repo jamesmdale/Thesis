@@ -94,9 +94,6 @@
     <ClCompile Include="Definitions\SimulationDefinition.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="UtilityHelpers\UtilityStorage.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
     <ClCompile Include="Agents\Agent.cpp">
       <Filter>General</Filter>
     </ClCompile>
@@ -113,6 +110,12 @@
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="Entities\Fire.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\UtilityStorage.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStates\SimSelectState.cpp">
       <Filter>General</Filter>
     </ClCompile>
   </ItemGroup>
@@ -154,12 +157,13 @@
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="SimulationData.hpp" />
     <ClInclude Include="Definitions\SimulationDefinition.hpp" />
-    <ClInclude Include="UtilityHelpers\UtilityStorage.hpp" />
     <ClInclude Include="Agents\Agent.hpp" />
     <ClInclude Include="Agents\Planner.hpp" />
     <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Entities\Bombardment.hpp" />
     <ClInclude Include="Entities\PointOfInterest.hpp" />
     <ClInclude Include="Entities\Fire.hpp" />
+    <ClInclude Include="Helpers\UtilityStorage.hpp" />
+    <ClInclude Include="GameStates\SimSelectState.hpp" />
   </ItemGroup>
 </Project>

@@ -681,6 +681,12 @@ void PlayingState::FinalizeGeneralSimulationData()
 }
 
 //  =========================================================================================
+Mesh* PlayingState::CreateUITextMesh()
+{
+	return nullptr;
+}
+
+//  =========================================================================================
 Mesh* PlayingState::CreateUIDebugTextMesh()
 {
 	MeshBuilder builder = MeshBuilder();
@@ -721,11 +727,11 @@ Mesh* PlayingState::CreateUIDebugTextMesh()
 		std::vector<std::string> agentInfo;
 		m_disectedAgent->ConstructInformationAsText(agentInfo);
 
-		float printHeight = 0.75f;
+		float printHeight = 0.65f;
 
 		for (int agentInfoIndex = 0; agentInfoIndex < agentInfo.size(); ++agentInfoIndex)
 		{
-			builder.CreateText2DFromPoint( Vector2(theWindow->GetClientWidth() * 0.85f , theWindow->GetClientHeight() * printHeight), theWindow->GetClientHeight() * 0.01, 1.f, agentInfo[agentInfoIndex].c_str(), Rgba::WHITE );
+			builder.CreateText2DFromPoint( Vector2(theWindow->GetClientWidth() * 0.8f , theWindow->GetClientHeight() * printHeight), theWindow->GetClientHeight() * 0.01, 1.f, agentInfo[agentInfoIndex].c_str(), Rgba::WHITE );
 			printHeight -= 0.02;
 		}
 	}

@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine\Math\IntVector2.hpp"
-#include "Game\UtilityHelpers\UtilityStorage.hpp"
+#include "Game\Helpers\UtilityStorage.hpp"
 #include <stack>
 
 struct ActionData;

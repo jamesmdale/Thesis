@@ -1,4 +1,4 @@
-#include "Game\UtilityHelpers\UtilityStorage.hpp"
+#include "Game\Helpers\UtilityStorage.hpp"
 
 //  =============================================================================
 UtilityStorage::UtilityStorage(const float min, const float max, uint divisions)

@@ -389,6 +389,7 @@
     <ClCompile Include="Agents\Agent.cpp" />
     <ClCompile Include="Entities\Bombardment.cpp" />
     <ClCompile Include="Entities\Fire.cpp" />
+    <ClCompile Include="GameStates\SimSelectState.cpp" />
     <ClCompile Include="UI\DebugInputBox.cpp" />
     <ClCompile Include="Definitions\AgentDefinition.cpp" />
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.cpp" />
@@ -421,12 +422,13 @@
     <ClCompile Include="TheApp.cpp" />
     <ClCompile Include="Map\Tile.cpp" />
     <ClCompile Include="Definitions\TileDefinition.cpp" />
-    <ClCompile Include="UtilityHelpers\UtilityStorage.cpp" />
+    <ClCompile Include="Helpers\UtilityStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agents\Agent.hpp" />
     <ClInclude Include="Entities\Bombardment.hpp" />
     <ClInclude Include="Entities\Fire.hpp" />
+    <ClInclude Include="GameStates\SimSelectState.hpp" />
     <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp" />
@@ -459,7 +461,7 @@
     <ClInclude Include="TheApp.hpp" />
     <ClInclude Include="Map\Tile.hpp" />
     <ClInclude Include="Definitions\TileDefinition.hpp" />
-    <ClInclude Include="UtilityHelpers\UtilityStorage.hpp" />
+    <ClInclude Include="Helpers\UtilityStorage.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Engine\Code\Engine\Engine.vcxproj">

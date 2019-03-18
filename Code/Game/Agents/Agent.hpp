@@ -105,6 +105,7 @@ public:
 	Vector2 m_forward;
 	Vector2 m_intermediateGoalPosition;	//used for temp locations while pathing
 	
+	//used for detecting cases where the agent could get stuck
 	Vector2 m_oldPosition;
 
 	Disc2 m_physicsDisc;

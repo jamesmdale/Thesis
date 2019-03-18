@@ -47,6 +47,7 @@ public:
 	void FinalizeGeneralSimulationData();
 
 	//render helpers	
+	Mesh* CreateUITextMesh();
 	Mesh* CreateUIDebugTextMesh();
 	Mesh* CreateWorldDebugTextMesh();
 	Mesh* CreateDisectedAgentPathMesh();	

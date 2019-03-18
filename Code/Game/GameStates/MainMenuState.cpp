@@ -2,20 +2,24 @@
 #include "Engine\Window\Window.hpp"
 #include "Engine\Debug\DebugRender.hpp"
 
+//  =========================================================================================
 MainMenuState::~MainMenuState()
 {
 	m_backGroundTexture = nullptr;
 }
 
+//  =========================================================================================
 void MainMenuState::Update(float deltaSeconds)
 {
 	UNUSED(deltaSeconds);
 }
 
+//  =========================================================================================
 void MainMenuState::PreRender()
 {
 }
 
+//  =========================================================================================
 void MainMenuState::Render()
 {
 	Renderer* theRenderer = Renderer::GetInstance();
@@ -54,10 +58,10 @@ void MainMenuState::Render()
 	theRenderer = nullptr;
 }
 
+//  =========================================================================================
 float MainMenuState::UpdateFromInput(float deltaSeconds)
 {
 	InputSystem* theInput = InputSystem::GetInstance();
-
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
 	{
@@ -107,12 +111,15 @@ float MainMenuState::UpdateFromInput(float deltaSeconds)
 	return deltaSeconds; //new deltaSeconds
 }
 
+//  =========================================================================================
 void MainMenuState::ResetState()
 {
 	m_selectedMenuOption = PLAY;
 }
 
+//  =========================================================================================
 void MainMenuState::PostRender()
 {
+
 }
 

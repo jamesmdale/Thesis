@@ -1,20 +1,24 @@
 #include "Game\GameStates\ReadyState.hpp"
 #include "Engine\Window\Window.hpp"
 
+//  =========================================================================================
 ReadyState::~ReadyState()
 {
 	m_backGroundTexture = nullptr;
 }
 
+//  =========================================================================================
 void ReadyState::Update(float deltaSeconds)
 {
 	UNUSED(deltaSeconds);
 }
 
+//  =========================================================================================
 void ReadyState::PreRender()
 {
 }
 
+//  =========================================================================================
 void ReadyState::Render()
 {
 	Renderer* theRenderer = Renderer::GetInstance();
@@ -38,6 +42,7 @@ void ReadyState::Render()
 	theRenderer = nullptr;
 }
 
+//  =========================================================================================
 float ReadyState::UpdateFromInput(float deltaSeconds)
 {
 	InputSystem* theInput = InputSystem::GetInstance();
@@ -61,6 +66,7 @@ float ReadyState::UpdateFromInput(float deltaSeconds)
 	return deltaSeconds; //new deltaSeconds
 }
 
+//  =========================================================================================
 void ReadyState::PostRender()
 {
 }

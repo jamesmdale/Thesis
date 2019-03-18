@@ -349,7 +349,6 @@ void Map::UpdateAgents(float deltaSeconds)
 //  =============================================================================
 void Map::UpdateAgentsBudgeted(float deltaSeconds)
 {
-	TODO("WARNING: Could possibly overflow but very unlikely");
 	int64_t remainingAgentUpdateBudget = int64_t(g_perFrameHPCBudget - g_previousFrameNonAgentUpdateTime - g_previousFrameRenderTime);
 	g_agentsUpdatedThisFrame = 0;
 
@@ -363,7 +362,7 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 	bool canUpdate = true;
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
 	{
-		//if there is still budget left for update
+		//if there is still budget left for update, continue..
 		if (canUpdate)
 		{
 			agentUpdateTimer.Start();
@@ -386,9 +385,8 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 
 			g_agentsUpdatedThisFrame++;
 		}	
-		else
+		else //we are out of budgets
 		{
-			//update by one
 			m_agentsOrderedByPriority[agentIndex]->QuickUpdate(deltaSeconds);
 		}		
 

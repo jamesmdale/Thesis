@@ -16,8 +16,8 @@ private:
 	
 private:
 	float m_min = 0.f;
-	float m_max = 0.f;
-	uint m_divisions = 1;
+	float m_max = 0.f;	
 	float m_incrementPerDivision = 0.f;
+	uint m_divisions = 1;
 	std::vector<float> m_storage;
 };

@@ -5,11 +5,13 @@
 
 static bool s_isLoading = false;
 
+//  =========================================================================================
 LoadingState::~LoadingState()
 {
 	m_backGroundTexture = nullptr;
 }
 
+//  =========================================================================================
 void LoadingState::Update(float deltaSeconds)
 {
 	UNUSED(deltaSeconds);
@@ -30,10 +32,12 @@ void LoadingState::Update(float deltaSeconds)
 	}	
 }
 
+//  =========================================================================================
 void LoadingState::PreRender()
 {
 }
 
+//  =========================================================================================
 void LoadingState::Render()
 {
 	Renderer* theRenderer = Renderer::GetInstance();
@@ -61,11 +65,13 @@ void LoadingState::Render()
 	theRenderer = nullptr;
 }
 
+//  =========================================================================================
 float LoadingState::UpdateFromInput(float deltaSeconds)
 {
 	return deltaSeconds;
 }
 
+//  =========================================================================================
 void LoadingState::PostRender()
 {
 }
