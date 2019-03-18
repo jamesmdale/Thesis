@@ -1,6 +1,7 @@
 THESIS - README
 
 Controls:
+- SPACE			 	= Select menu uption
 - UP, DOWN, LEFT, RIGHT 	= Pan Camera
 - PAGEUP, PAGEDOWN			= Zoom In/Out
 - R                         = Reset Camera Position
@@ -13,19 +14,17 @@ Controls:
 
 Optimizations:
 
-1. Map Saving After Initialization. 
-	- (Map doesn't change so no reconstruction is needed during A* calculations)
-
-2. Memoization
+1. Memoization
 	- We store off utility calculations made into a map for quicker access for already computed utilities
 	- Uses a rounded threshold
 
 3. Copy Pathing
-	- Agents will look for other agents heading in a similar direction (objective) that they are. If so, they copy the path of the agent
-	and skip calculating their own path.
+	- Agents will look for other agents heading in a similar direction (objective) that they are. If so, they copy the path of the agent and skip calculating their own path.
 
-	- We maintain a list of agents sorted by their X coordinate and a list sorted by their Y.  When we conduct our path copy, we just find the nearest
-	on X and on Y and find if any match our destination to copy.
+	- We maintain a list of agents sorted by their X coordinate and a list sorted by their Y.  When we conduct our path copy, we just find the nearest on X and on Y and find if any match our destination to copy.
+4. Ammortization
+	- A minimum 60 fps will be maintained when running a simulation with the 'IsBudgeted' flag set.
+	- Debug information regarding how many agents were updated in the last frame will be displayed
 
 4. Agent Budgetting
 	- Keep queue of agents to update based on time since last update
@@ -34,11 +33,3 @@ Optimizations:
 
 
 ************************************************************************************************
-
-	**Potential Other Categories**
-
-	- JPS - *NOTE* - Evaluate jump point search (JPS) - GDC 2016(maybe)  - Steve Rabin
-	- Cache Friendliness / Data Oriented / AoS (Array of Structs) vs SoA (Structs of Array)
-	- Progressive Path Quality (A valid path vs best possible path)
-	- Bidirecitonal A* - Nathan Sturtavant (going from opposite directions)
-	- Check calling new in A* calculation (across your system you need to check calling new and remove as much memory allocation as possible)
