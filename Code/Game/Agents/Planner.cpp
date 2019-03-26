@@ -1027,7 +1027,6 @@ void Planner::SkewUtilityForBias(UtilityInfo& outInfo, float biasValue)
 //  =========================================================================================
 float Planner::CalculateDistanceUtility(float normalizedDistance)
 {
-
 #ifdef DistanceMemoizationDataAnalysis
 	// profiling ----------------------------------------------
 	static int iterations = 0;
@@ -1061,8 +1060,6 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 		m_distanceUtilityStorage->StoreValueForInputAtIndex(utility, outIndex);
 	}
 	//  ----------------------------------------------
-
-
 
 #ifdef DistanceMemoizationDataAnalysis
 	// profiling ----------------------------------------------
