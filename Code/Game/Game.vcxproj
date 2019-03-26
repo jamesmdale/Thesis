@@ -387,6 +387,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Agents\Agent.cpp" />
+    <ClCompile Include="Helpers\AnalysisData.cpp" />
     <ClCompile Include="Entities\Bombardment.cpp" />
     <ClCompile Include="Entities\Fire.cpp" />
     <ClCompile Include="GameStates\SimSelectState.cpp" />
@@ -426,6 +427,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agents\Agent.hpp" />
+    <ClInclude Include="Helpers\AnalysisData.hpp" />
     <ClInclude Include="Entities\Bombardment.hpp" />
     <ClInclude Include="Entities\Fire.hpp" />
     <ClInclude Include="GameStates\SimSelectState.hpp" />
