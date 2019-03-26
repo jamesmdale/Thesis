@@ -1,25 +1,23 @@
 #pragma once
 #include "Game\GameStates\GameState.hpp"
 
-enum eMainMenuOptions
+enum eAnalysisStateOptions
 {
 	PLAY,
-	SIM_SELECT,
-	ANALYSIS,
 	EXIT,
 	NUM_MAIN_MENU_OPTIONS
 };
 
-class MainMenuState : public GameState
+class AnalysisState : public GameState
 {
 public:
-	MainMenuState(Camera* camera) : GameState(camera)
+	AnalysisState(Camera* camera) : GameState(camera)
 	{
-		m_type = MAIN_MENU_GAME_STATE;
+		m_type = ANALYSIS_STATE;
 		m_backGroundTexture = Renderer::GetInstance()->CreateOrGetTexture("default");
 	}
 
-	virtual ~MainMenuState() override;
+	virtual ~AnalysisState() override;
 
 	virtual void Update(float deltaSeconds) override;
 	virtual void PreRender() override;
@@ -31,6 +29,6 @@ public:
 
 public:
 	Texture* m_backGroundTexture;
-	eMainMenuOptions m_selectedMenuOption = PLAY;
+	eAnalysisStateOptions m_selectedAnalysisStateOption = PLAY;
 };
 

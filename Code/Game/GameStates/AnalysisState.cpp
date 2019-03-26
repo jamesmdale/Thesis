@@ -1,45 +1,36 @@
-#include "Game\GameStates\MainMenuState.hpp"
+#include "Game\GameStates\AnalysisState.hpp"
 #include "Engine\Window\Window.hpp"
-#include "Engine\Debug\DebugRender.hpp"
 
 //  =========================================================================================
-MainMenuState::~MainMenuState()
+AnalysisState::~AnalysisState()
 {
 	m_backGroundTexture = nullptr;
 }
 
 //  =========================================================================================
-void MainMenuState::Update(float deltaSeconds)
+void AnalysisState::Update(float deltaSeconds)
 {
 	UNUSED(deltaSeconds);
 }
 
 //  =========================================================================================
-void MainMenuState::PreRender()
+void AnalysisState::PreRender()
 {
 }
 
 //  =========================================================================================
-void MainMenuState::Render()
+void AnalysisState::Render()
 {
 	Renderer* theRenderer = Renderer::GetInstance();
 	Window* theWindow = Window::GetInstance();
 
 	Rgba playColor = Rgba::GRAY;
-	Rgba simSelectColor = Rgba::GRAY;
-	Rgba analysisColor = Rgba::GRAY;
 	Rgba quitColor = Rgba::GRAY;
 
-	switch (m_selectedMenuOption)
+	switch (m_selectedAnalysisStateOption)
 	{
 	case PLAY:
 		playColor = Rgba::WHITE;
-		break;
-	case SIM_SELECT:
-		simSelectColor = Rgba::WHITE;
-		break;
-	case ANALYSIS:
-		analysisColor = Rgba::WHITE;
 		break;
 	case EXIT:
 		quitColor = Rgba::WHITE;
@@ -58,10 +49,8 @@ void MainMenuState::Render()
 
 	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .66666f), "Thesis", theWindow->m_clientHeight * .1f, Rgba::WHITE, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .45), "Play", theWindow->m_clientHeight * .075f, playColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .35f), "Sim Select", theWindow->m_clientHeight * .075f, simSelectColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .25f), "Analysis", theWindow->m_clientHeight * .075f, analysisColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .15f), "Quit", theWindow->m_clientHeight * .075f, quitColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .35f), "Play", theWindow->m_clientHeight * .075f, playColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .25f), "Quit", theWindow->m_clientHeight * .075f, quitColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
 	theRenderer->m_defaultShader->DisableBlending();
 
@@ -69,45 +58,39 @@ void MainMenuState::Render()
 }
 
 //  =========================================================================================
-float MainMenuState::UpdateFromInput(float deltaSeconds)
+float AnalysisState::UpdateFromInput(float deltaSeconds)
 {
 	InputSystem* theInput = InputSystem::GetInstance();
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
 	{
-		int option = (int)m_selectedMenuOption - 1;
-		if (option < 0)
+		if (m_selectedAnalysisStateOption == PLAY)
 		{
-			option = NUM_MAIN_MENU_OPTIONS - 1;
+			m_selectedAnalysisStateOption = EXIT;
 		}
-
-		m_selectedMenuOption = (eMainMenuOptions)option;
+		else
+		{
+			m_selectedAnalysisStateOption = PLAY;
+		}
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
-		int option = (int)m_selectedMenuOption + 1;
-		if (option == NUM_MAIN_MENU_OPTIONS)
+		if (m_selectedAnalysisStateOption == PLAY)
 		{
-			option = 0;
+			m_selectedAnalysisStateOption = EXIT;
 		}
-
-		m_selectedMenuOption = (eMainMenuOptions)option;
+		else
+		{
+			m_selectedAnalysisStateOption = PLAY;
+		}
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_SPACE))
 	{
-		switch (m_selectedMenuOption)
+		switch (m_selectedAnalysisStateOption)
 		{
 		case(PLAY):
-			ResetState();
-			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
-			break;
-		case(SIM_SELECT):
-			ResetState();
-			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
-			break;
-		case(ANALYSIS):
 			ResetState();
 			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
 			break;
@@ -128,13 +111,13 @@ float MainMenuState::UpdateFromInput(float deltaSeconds)
 }
 
 //  =========================================================================================
-void MainMenuState::ResetState()
+void AnalysisState::ResetState()
 {
-	m_selectedMenuOption = PLAY;
+	m_selectedAnalysisStateOption = PLAY;
 }
 
 //  =========================================================================================
-void MainMenuState::PostRender()
+void AnalysisState::PostRender()
 {
 
 }
