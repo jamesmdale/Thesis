@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "Engine\File\CSVWriter.hpp"
+#include "Engine\File\CSVEditor.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
 
 
@@ -11,7 +11,7 @@ struct SimulationDataEntry
 	std::string m_timeStamp = "";	
 };
 
-class SimulationData : public CSVWriter
+class SimulationData : public CSVEditor
 {
 public:
 	SimulationData();

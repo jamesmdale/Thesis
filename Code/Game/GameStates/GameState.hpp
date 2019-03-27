@@ -14,6 +14,7 @@ enum eGameState
 	READY_UP_GAME_STATE,
 	PLAYING_GAME_STATE,
 	SIM_SELECT_GAME_STATE,
+	ANALYSIS_SELECT_GAME_STATE,
 	ANALYSIS_GAME_STATE,
 	NUM_GAME_STATES
 };
@@ -51,7 +52,7 @@ public:
 	static GameState* GetTransitionGameState();
 
 	//list managers
-	TODO("6/5 - Add better way of managing these. For now, we assume they only have one max of each possibel type");
+	TODO("6/5 - Add better way of managing these. For now, we assume they only have one max of each possible type");
 	static GameState* GetGameStateFromGlobalListByType(eGameState gameStateType);
 	static void AddGameState(GameState* gameState);
 

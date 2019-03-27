@@ -7,6 +7,7 @@
 #include "Game\GameStates\LoadingState.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Game\GameStates\SimSelectState.hpp"
+#include "Game\GameStates\AnalysisSelectState.hpp"
 #include "Game\GameStates\AnalysisState.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
 #include "Engine\Renderer\Renderer.hpp"
@@ -101,6 +102,7 @@ void Game::Initialize()
 	GameState::AddGameState(new MainMenuState(m_gameCamera));
 	GameState::AddGameState(new LoadingState(m_gameCamera));
 	GameState::AddGameState(new PlayingState(m_gameCamera));
+	GameState::AddGameState(new AnalysisSelectState(m_gameCamera));
 	GameState::AddGameState(new AnalysisState(m_gameCamera));
 	GameState::AddGameState(new SimSelectState(m_gameCamera));
 
@@ -117,10 +119,6 @@ void Game::Initialize()
 	// cleanup
 	theRenderer = nullptr;
 	theWindow = nullptr;
-
-	//testing
-	std::vector<std::string> outContents;
-	ReadSubFolderNamesForPath("Data/ExportedSimulationData", outContents);
 }
 
 //  =========================================================================================

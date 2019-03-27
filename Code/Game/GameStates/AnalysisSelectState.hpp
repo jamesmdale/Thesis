@@ -2,16 +2,17 @@
 #include "Game\GameStates\GameState.hpp"
 #include "Engine\Core\Rgba.hpp"
 
-class AnalysisState : public GameState
+
+class AnalysisSelectState : public GameState
 {
 public:
-	AnalysisState(Camera* camera) : GameState(camera)
+	AnalysisSelectState(Camera* camera) : GameState(camera)
 	{
-		m_type = ANALYSIS_GAME_STATE;
+		m_type = ANALYSIS_SELECT_GAME_STATE;
 		m_backGroundTexture = Renderer::GetInstance()->CreateOrGetTexture("default");
 	}
 
-	virtual ~AnalysisState() override;
+	virtual ~AnalysisSelectState() override;
 
 	virtual void Update(float deltaSeconds) override;
 	virtual void PreRender() override;
@@ -26,10 +27,11 @@ public:
 
 	virtual void ResetState() override;
 
-public:
-	Texture * m_backGroundTexture;
+	void InitializeAnalysisStateFromSelectedSim();
 
-	std::string m_simulationDataFilePath = "";
-	//int m_selectedSimulationPathIndex = 0;
-	//std::vector<std::string> m_simulationPaths;
+public:
+	Texture* m_backGroundTexture;
+
+	int m_selectedSimulationPathIndex = 0;
+	std::vector<std::string> m_simulationPaths;
 };

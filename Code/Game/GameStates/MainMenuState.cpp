@@ -57,11 +57,18 @@ void MainMenuState::Render()
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .66666f), "Thesis", theWindow->m_clientHeight * .1f, Rgba::WHITE, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .66666f), "Thesis", theWindow->m_clientHeight * .1f, Rgba::YELLOW, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .45), "Play", theWindow->m_clientHeight * .075f, playColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .35f), "Sim Select", theWindow->m_clientHeight * .075f, simSelectColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .25f), "Analysis", theWindow->m_clientHeight * .075f, analysisColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .15f), "Quit", theWindow->m_clientHeight * .075f, quitColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.025f),
+		"Press 'ENTER' to Select OR 'ESCAPE' to Quit",
+		theWindow->m_clientHeight * 0.015f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
 	theRenderer->m_defaultShader->DisableBlending();
 
@@ -95,7 +102,7 @@ float MainMenuState::UpdateFromInput(float deltaSeconds)
 		m_selectedMenuOption = (eMainMenuOptions)option;
 	}
 
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_SPACE))
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ENTER))
 	{
 		switch (m_selectedMenuOption)
 		{
@@ -109,7 +116,7 @@ float MainMenuState::UpdateFromInput(float deltaSeconds)
 			break;
 		case(ANALYSIS):
 			ResetState();
-			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_GAME_STATE));
+			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_SELECT_GAME_STATE));
 			break;
 		case(EXIT):
 			g_isQuitting = true;

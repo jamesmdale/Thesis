@@ -1,3 +1,4 @@
+#include "Game\GameStates\AnalysisSelectState.hpp"
 #include "Game\GameStates\AnalysisState.hpp"
 #include "Engine\File\File.hpp"
 #include "Engine\File\FileHelpers.hpp"
@@ -5,24 +6,24 @@
 #include "Engine\Core\StringUtils.hpp"
 
 //  =========================================================================================
-AnalysisState::~AnalysisState()
+AnalysisSelectState::~AnalysisSelectState()
 {
 	m_backGroundTexture = nullptr;
 }
 
 //  =========================================================================================
-void AnalysisState::Update(float deltaSeconds)
+void AnalysisSelectState::Update(float deltaSeconds)
 {
 	UNUSED(deltaSeconds);
 }
 
 //  =========================================================================================
-void AnalysisState::PreRender()
+void AnalysisSelectState::PreRender()
 {
 }
 
 //  =========================================================================================
-void AnalysisState::Render()
+void AnalysisSelectState::Render()
 {
 	static Rgba selectedColor = Rgba::WHITE;
 	static Rgba nonSelectedColor = Rgba::GRAY;
@@ -49,21 +50,21 @@ void AnalysisState::Render()
 		1.f,
 		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
-	//float simulationStartHeight = 0.9f;
-	//float simulationHeightDecrease = 0.02f;
-	//for (int simulationIndex = 0; simulationIndex < m_simulationPaths.size(); ++simulationIndex)
-	//{
-	//	Rgba textColor;
-	//	m_selectedSimulationPathIndex == simulationIndex ? textColor = selectedColor : textColor = nonSelectedColor;
+	float simulationStartHeight = 0.9f;
+	float simulationHeightDecrease = 0.02f;
+	for (int simulationIndex = 0; simulationIndex < m_simulationPaths.size(); ++simulationIndex)
+	{
+		Rgba textColor;
+		m_selectedSimulationPathIndex == simulationIndex ? textColor = selectedColor : textColor = nonSelectedColor;
 
-	//	//draw simulation paths
-	//	theRenderer->DrawText2D(Vector2(theWindow->m_clientWidth * .05f, theWindow->m_clientHeight * (simulationStartHeight - (float(simulationIndex) * simulationHeightDecrease))),
-	//		Stringf("%i) %s", simulationIndex, m_simulationPaths[simulationIndex].c_str()).c_str(),
-	//		theWindow->m_clientHeight * 0.015f,
-	//		textColor,
-	//		1.f,
-	//		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	//}
+		//draw simulation paths
+		theRenderer->DrawText2D(Vector2(theWindow->m_clientWidth * .05f, theWindow->m_clientHeight * (simulationStartHeight - (float(simulationIndex) * simulationHeightDecrease))),
+			Stringf("%i) %s", simulationIndex,  m_simulationPaths[simulationIndex].c_str()).c_str(),
+			theWindow->m_clientHeight * 0.015f,
+			textColor,
+			1.f,
+			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	}
 
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.025f),
 		"Press 'ENTER' to Select OR 'ESCAPE' to Return to Main",
@@ -78,66 +79,76 @@ void AnalysisState::Render()
 }
 
 //  =========================================================================================
-float AnalysisState::UpdateFromInput(float deltaSeconds)
+float AnalysisSelectState::UpdateFromInput(float deltaSeconds)
 {
 	InputSystem* theInput = InputSystem::GetInstance();
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
 	{
-		//m_selectedSimulationPathIndex = (m_selectedSimulationPathIndex + 1) % m_simulationPaths.size();
+		m_selectedSimulationPathIndex = (m_selectedSimulationPathIndex + 1) % m_simulationPaths.size();
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
-		//m_selectedSimulationPathIndex = (m_selectedSimulationPathIndex - 1) % m_simulationPaths.size();
+		m_selectedSimulationPathIndex = (m_selectedSimulationPathIndex - 1) % m_simulationPaths.size();
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ENTER))
 	{
-
+		InitializeAnalysisStateFromSelectedSim();
+		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_GAME_STATE));
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ESCAPE))
 	{
-		ResetState();
-		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_SELECT_GAME_STATE));
+		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(MAIN_MENU_GAME_STATE));
 	}
 
 	return deltaSeconds; //new deltaSeconds
 }
 
 //  =========================================================================================
-void AnalysisState::Initialize()
+void AnalysisSelectState::Initialize()
 {
 
 }
 
 //  =========================================================================================
-void AnalysisState::TransitionIn(float secondsTransitioning)
+void AnalysisSelectState::TransitionIn(float secondsTransitioning)
 {
 	//detect all simulations
-	//ReadSubFolderNamesForPath("Data/ExportedSimulationData", m_simulationPaths);
 	ResetState();
+	ReadSubFolderNamesForPath("Data/ExportedSimulationData", m_simulationPaths);
 	s_isFinishedTransitioningIn = true;
 }
 
 //  =========================================================================================
-void AnalysisState::TransitionOut(float secondsTransitioning)
+void AnalysisSelectState::TransitionOut(float secondsTransitioning)
 {
 	ResetState();
 	s_isFinishedTransitioningOut = true;
 }
 
 //  =========================================================================================
-void AnalysisState::ResetState()
+void AnalysisSelectState::ResetState()
 {
-	//m_simulationPaths.clear();
+	m_simulationPaths.clear();
 }
 
 
 //  =========================================================================================
-void AnalysisState::PostRender()
+void AnalysisSelectState::PostRender()
 {
 
 }
+
+//  =========================================================================================
+void AnalysisSelectState::InitializeAnalysisStateFromSelectedSim()
+{
+	AnalysisState* analysisState = (AnalysisState*)GameState::GetGameStateFromGlobalListByType(ANALYSIS_GAME_STATE);
+	ASSERT_OR_DIE(analysisState != nullptr, "ANALYSIS GAME STATE UNINITIALIZED!!");
+
+	analysisState->m_simulationDataFilePath = m_simulationPaths[m_selectedSimulationPathIndex];
+}
+
 

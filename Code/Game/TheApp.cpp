@@ -17,7 +17,7 @@
 #include "Game\GameStates\GameState.hpp"
 #include "Engine\File\File.hpp"
 #include "Engine\Core\LogSystem.hpp"
-#include "Engine\File\CSVWriter.hpp"
+#include "Engine\File\CSVEditor.hpp"
 #include <thread>
 #include <fstream>
 #include "Game\SimulationData.hpp"
@@ -239,7 +239,7 @@ void WriteTestCSV()
 {
 	RemoveFile("Data\\ConsoleLogs\\CSVTest.csv");
 
-	CSVWriter writer;
+	CSVEditor writer;
 
 	writer.AddCell("Cell A1");
 	writer.AddCell("Cell A2");

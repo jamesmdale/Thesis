@@ -13,7 +13,7 @@
 #include "Engine\Utility\AStar.hpp"
 #include "Engine\Time\Stopwatch.hpp"
 #include "Engine\Profiler\Profiler.hpp"
-#include "Engine\File\CSVWriter.hpp"
+#include "Engine\File\CSVEditor.hpp"
 
 //  =========================================================================================
 Agent::Agent()

@@ -556,15 +556,10 @@ void PlayingState::LoadNextSim()
 //  =============================================================================
 void PlayingState::ExportSimulationData()
 {
-	//std::string newFolderName = Stringf("SIMULATION_TEST_%s", GetCurrentDateTime().c_str());
-	//std::string newPath =  Stringf("%s%s", "Data\\ExportedSimulationData\\", newFolderName);
-	//CreateFolder(newPath.c_str());	
-
 	std::string newFolder = Stringf("%s%s%s", simDataOutputDirectory.c_str(), "Simulation_Definition_", g_currentSimulationDefinition->m_name.c_str());
 	CreateFolder(newFolder.c_str());
 
 	std::string finalFilePath = Stringf("%s%s", newFolder.c_str(), "\\");
-
 
 	//general data
 	FinalizeGeneralSimulationData();

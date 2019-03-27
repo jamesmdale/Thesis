@@ -121,6 +121,9 @@
     <ClCompile Include="Helpers\AnalysisData.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="GameStates\AnalysisSelectState.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
     <ClCompile Include="GameStates\AnalysisState.cpp">
       <Filter>General</Filter>
     </ClCompile>
@@ -172,6 +175,7 @@
     <ClInclude Include="Helpers\UtilityStorage.hpp" />
     <ClInclude Include="GameStates\SimSelectState.hpp" />
     <ClInclude Include="Helpers\AnalysisData.hpp" />
+    <ClInclude Include="GameStates\AnalysisSelectState.hpp" />
     <ClInclude Include="GameStates\AnalysisState.hpp" />
   </ItemGroup>
 </Project>
