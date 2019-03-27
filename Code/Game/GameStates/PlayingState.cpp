@@ -278,6 +278,12 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 		//toggle pause
 		GetGameClock()->SetPaused(!GetGameClock()->IsPaused());
 	}
+
+	//  =========================================================================================
+	if (InputSystem::GetInstance()->WasKeyJustPressed(InputSystem::GetInstance()->KEYBOARD_ESCAPE))
+	{
+		g_isQuitting = true;
+	}
 	
 	return deltaSeconds; //new deltaSeconds
 }
@@ -539,7 +545,8 @@ void PlayingState::LoadNextSim()
 	}
 	else
 	{
-		g_isQuitting = true;
+		ResetState();
+		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(MAIN_MENU_GAME_STATE));
 	}	
 
 	//reset timer regardless

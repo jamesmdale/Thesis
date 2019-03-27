@@ -187,12 +187,6 @@ float TheApp::UpdateInput(float deltaSeconds)
 			DevConsole::GetInstance()->Close();
 		}		
 	}
-
-	if(InputSystem::GetInstance()->WasKeyJustPressed(InputSystem::GetInstance()->KEYBOARD_ESCAPE))
-	{
-		g_isQuitting = true;
-	}
-
 	
 	if (!DevConsole::GetInstance()->IsOpen())
 	{

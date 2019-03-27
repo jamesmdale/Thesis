@@ -3,9 +3,9 @@
 
 enum eAnalysisStateOptions
 {
-	PLAY,
-	EXIT,
-	NUM_MAIN_MENU_OPTIONS
+	EXECUTE_SELECTED_ANALYSIS_STATE,
+	EXIT_ANALYSIS_STATE,
+	ANALYSIS_STATE_OPTIONS
 };
 
 class AnalysisState : public GameState
@@ -13,7 +13,7 @@ class AnalysisState : public GameState
 public:
 	AnalysisState(Camera* camera) : GameState(camera)
 	{
-		m_type = ANALYSIS_STATE;
+		m_type = ANALYSIS_GAME_STATE;
 		m_backGroundTexture = Renderer::GetInstance()->CreateOrGetTexture("default");
 	}
 
@@ -25,10 +25,11 @@ public:
 	virtual void PostRender() override;
 	virtual float UpdateFromInput(float deltaSeconds) override;
 
+	virtual void Initialize();
 	virtual void ResetState() override;
 
 public:
 	Texture* m_backGroundTexture;
-	eAnalysisStateOptions m_selectedAnalysisStateOption = PLAY;
+	eAnalysisStateOptions m_selectedAnalysisStateOption = EXECUTE_SELECTED_ANALYSIS_STATE;
 };
 

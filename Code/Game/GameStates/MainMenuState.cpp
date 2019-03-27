@@ -105,11 +105,11 @@ float MainMenuState::UpdateFromInput(float deltaSeconds)
 			break;
 		case(SIM_SELECT):
 			ResetState();
-			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
+			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(SIM_SELECT_GAME_STATE));
 			break;
 		case(ANALYSIS):
 			ResetState();
-			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
+			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_GAME_STATE));
 			break;
 		case(EXIT):
 			g_isQuitting = true;
@@ -122,9 +122,16 @@ float MainMenuState::UpdateFromInput(float deltaSeconds)
 		g_isQuitting = true;
 	}
 
-	theInput = nullptr;
-	delete(theInput);
 	return deltaSeconds; //new deltaSeconds
+}
+
+//  =========================================================================================
+void MainMenuState::TransitionIn(float secondsTransitioning)
+{
+	Window* theWindow = Window::GetInstance();	
+	Game::GetInstance()->m_gameCamera->SetOrtho(0.f, theWindow->m_clientWidth, 0.f, theWindow->m_clientHeight, -1000.f, 1000.f);
+
+	s_isFinishedTransitioningIn = true;
 }
 
 //  =========================================================================================

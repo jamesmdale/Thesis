@@ -20,7 +20,7 @@ class SimSelectState : public GameState
 public:
 	SimSelectState(Camera* camera) : GameState(camera)
 	{
-		m_type = SELECT_SIM_STATE;
+		m_type = SIM_SELECT_GAME_STATE;
 		m_backGroundTexture = Renderer::GetInstance()->CreateOrGetTexture("default");
 	}
 

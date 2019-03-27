@@ -6,11 +6,14 @@
 #include "Game\GameStates\MainMenuState.hpp"
 #include "Game\GameStates\LoadingState.hpp"
 #include "Game\GameStates\PlayingState.hpp"
+#include "Game\GameStates\SimSelectState.hpp"
+#include "Game\GameStates\AnalysisState.hpp"
+#include "Game\Definitions\SimulationDefinition.hpp"
 #include "Engine\Renderer\Renderer.hpp"
 #include "Engine\Core\EngineCommon.hpp"
 #include "Engine\Window\Window.hpp"
 #include "Engine\Core\EngineCommon.hpp"
-#include "Game\Definitions\SimulationDefinition.hpp"
+#include "Engine\File\FIleHelpers.hpp"
 #include <vector>
 #include <string>
 
@@ -78,9 +81,9 @@ void Game::Initialize()
 
 	//set game common values after window has been started up
 	g_tileSize = 1.f;
-	g_divideTileSize = 1 / g_tileSize;
+	g_divideTileSize = 1.f / g_tileSize;
 	g_halfTileSize = g_tileSize * 0.5f;
-	g_bombardmentExplosionSize = g_halfTileSize * 4;
+	g_bombardmentExplosionSize = g_halfTileSize * 4.f;
 
 	theRenderer->SetAmbientLightIntensity(0.15f);
 
@@ -98,6 +101,8 @@ void Game::Initialize()
 	GameState::AddGameState(new MainMenuState(m_gameCamera));
 	GameState::AddGameState(new LoadingState(m_gameCamera));
 	GameState::AddGameState(new PlayingState(m_gameCamera));
+	GameState::AddGameState(new AnalysisState(m_gameCamera));
+	GameState::AddGameState(new SimSelectState(m_gameCamera));
 
 	// set to initial menu
 	GameState::TransitionGameStatesImmediate(GameState::GetGameStateFromGlobalListByType(MAIN_MENU_GAME_STATE));
@@ -112,6 +117,10 @@ void Game::Initialize()
 	// cleanup
 	theRenderer = nullptr;
 	theWindow = nullptr;
+
+	//testing
+	std::vector<std::string> outContents;
+	ReadSubFolderNamesForPath("Data/ExportedSimulationData", outContents);
 }
 
 //  =========================================================================================

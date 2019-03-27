@@ -79,8 +79,7 @@ float SimSelectState::UpdateFromInput(float deltaSeconds)
 		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(MAIN_MENU_GAME_STATE));
 	}
 
-	theInput = nullptr;
-	delete(theInput);
+
 	return deltaSeconds; //new deltaSeconds
 }
 

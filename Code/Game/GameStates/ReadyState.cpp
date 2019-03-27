@@ -61,8 +61,6 @@ float ReadyState::UpdateFromInput(float deltaSeconds)
 		TransitionGameStatesImmediate(GetGameStateFromGlobalListByType(MAIN_MENU_GAME_STATE));
 	}
 
-	theInput = nullptr;
-	delete(theInput);
 	return deltaSeconds; //new deltaSeconds
 }
 

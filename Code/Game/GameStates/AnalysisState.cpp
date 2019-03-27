@@ -1,4 +1,6 @@
 #include "Game\GameStates\AnalysisState.hpp"
+#include "Engine\File\File.hpp"
+#include "Engine\File\FileHelpers.hpp"
 #include "Engine\Window\Window.hpp"
 
 //  =========================================================================================
@@ -24,15 +26,15 @@ void AnalysisState::Render()
 	Renderer* theRenderer = Renderer::GetInstance();
 	Window* theWindow = Window::GetInstance();
 
-	Rgba playColor = Rgba::GRAY;
+	Rgba executeAnalysisColor = Rgba::GRAY;
 	Rgba quitColor = Rgba::GRAY;
 
 	switch (m_selectedAnalysisStateOption)
 	{
-	case PLAY:
-		playColor = Rgba::WHITE;
+	case EXECUTE_SELECTED_ANALYSIS_STATE:
+		executeAnalysisColor = Rgba::WHITE;
 		break;
-	case EXIT:
+	case EXIT_ANALYSIS_STATE:
 		quitColor = Rgba::WHITE;
 		break;
 	}
@@ -49,7 +51,7 @@ void AnalysisState::Render()
 
 	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .66666f), "Thesis", theWindow->m_clientHeight * .1f, Rgba::WHITE, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .35f), "Play", theWindow->m_clientHeight * .075f, playColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .35f), "Play", theWindow->m_clientHeight * .075f, executeAnalysisColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .25f), "Quit", theWindow->m_clientHeight * .075f, quitColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
 	theRenderer->m_defaultShader->DisableBlending();
@@ -62,58 +64,30 @@ float AnalysisState::UpdateFromInput(float deltaSeconds)
 {
 	InputSystem* theInput = InputSystem::GetInstance();
 
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
-	{
-		if (m_selectedAnalysisStateOption == PLAY)
-		{
-			m_selectedAnalysisStateOption = EXIT;
-		}
-		else
-		{
-			m_selectedAnalysisStateOption = PLAY;
-		}
-	}
-
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
-	{
-		if (m_selectedAnalysisStateOption == PLAY)
-		{
-			m_selectedAnalysisStateOption = EXIT;
-		}
-		else
-		{
-			m_selectedAnalysisStateOption = PLAY;
-		}
-	}
-
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_SPACE))
 	{
-		switch (m_selectedAnalysisStateOption)
-		{
-		case(PLAY):
-			ResetState();
-			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
-			break;
-		case(EXIT):
-			g_isQuitting = true;
-			break;
-		}
+	
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ESCAPE))
 	{
-		g_isQuitting = true;
+		ResetState();
+		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(MAIN_MENU_GAME_STATE));
 	}
 
-	theInput = nullptr;
-	delete(theInput);
 	return deltaSeconds; //new deltaSeconds
+}
+
+//  =========================================================================================
+void AnalysisState::Initialize()
+{
+
 }
 
 //  =========================================================================================
 void AnalysisState::ResetState()
 {
-	m_selectedAnalysisStateOption = PLAY;
+	m_selectedAnalysisStateOption = EXECUTE_SELECTED_ANALYSIS_STATE;
 }
 
 //  =========================================================================================

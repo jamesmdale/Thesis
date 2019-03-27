@@ -13,8 +13,8 @@ enum eGameState
 	MAIN_MENU_GAME_STATE,
 	READY_UP_GAME_STATE,
 	PLAYING_GAME_STATE,
-	SELECT_SIM_STATE,
-	ANALYSIS_STATE,
+	SIM_SELECT_GAME_STATE,
+	ANALYSIS_GAME_STATE,
 	NUM_GAME_STATES
 };
 
@@ -57,10 +57,6 @@ public:
 
 	static float GetSecondsInCurrentState();
 
-private:
-	static void FinishTransition();
-	bool m_isInitialized = false;	
-
 public:
 	eGameState m_type = NONE_GAME_STATE;
 	Camera* m_camera = nullptr;
@@ -68,12 +64,16 @@ public:
 
 	bool m_doesResetOnTransition = true;	
 
-private:
+protected:
 	static float s_secondsInState;
 	static float s_secondsTransitioning;
 	static bool s_isFinishedTransitioningOut;
 	static bool s_isFinishedTransitioningIn;
 	static std::vector<GameState*> s_gameStates;
+
+private:
+	static void FinishTransition();
+	bool m_isInitialized = false;
 };
 
 //static variables

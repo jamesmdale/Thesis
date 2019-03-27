@@ -32,8 +32,8 @@
   isBudgeted="false"
   />
 
-<!--
-	    <SimulationDefinition
+
+  <SimulationDefinition
   name="100_optimized"
   mapName="20x20"
   numAgents="100"
@@ -64,8 +64,6 @@
   isOptimized="false" 
   isBudgeted="false"
   />
-
--->
 
 </SimulationDefinitions>
 
