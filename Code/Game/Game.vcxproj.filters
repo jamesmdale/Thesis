@@ -127,6 +127,9 @@
     <ClCompile Include="GameStates\AnalysisState.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Helpers\AnalysisGraph.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.hpp">
@@ -177,5 +180,6 @@
     <ClInclude Include="Helpers\AnalysisData.hpp" />
     <ClInclude Include="GameStates\AnalysisSelectState.hpp" />
     <ClInclude Include="GameStates\AnalysisState.hpp" />
+    <ClInclude Include="Helpers\AnalysisGraph.hpp" />
   </ItemGroup>
 </Project>

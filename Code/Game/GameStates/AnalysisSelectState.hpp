@@ -27,6 +27,8 @@ public:
 
 	virtual void ResetState() override;
 
+	void RenderAnalysisSelect();
+	void RenderAnalysisLoading();
 	void InitializeAnalysisStateFromSelectedSim();
 
 public:

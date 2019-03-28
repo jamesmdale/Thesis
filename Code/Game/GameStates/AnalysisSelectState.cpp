@@ -25,57 +25,16 @@ void AnalysisSelectState::PreRender()
 //  =========================================================================================
 void AnalysisSelectState::Render()
 {
-	static Rgba selectedColor = Rgba::WHITE;
-	static Rgba nonSelectedColor = Rgba::GRAY;
 
-	Renderer* theRenderer = Renderer::GetInstance();
-	Window* theWindow = Window::GetInstance();
-
-	theRenderer->SetCamera(m_camera);
-
-	theRenderer->ClearDepth(1.f);
-	theRenderer->ClearColor(Rgba::BLACK);
-
-	theRenderer->SetTexture(*m_backGroundTexture);
-	theRenderer->SetShader(theRenderer->m_defaultShader);
-
-	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
-	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
-
-	//draw simulation paths
-	theRenderer->DrawText2D(Vector2(theWindow->m_clientWidth * .05f, theWindow->m_clientHeight * 0.95f),
-		"Select Simulation",
-		theWindow->m_clientHeight * 0.025f,
-		Rgba::YELLOW,
-		1.f,
-		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-
-	float simulationStartHeight = 0.9f;
-	float simulationHeightDecrease = 0.02f;
-	for (int simulationIndex = 0; simulationIndex < m_simulationPaths.size(); ++simulationIndex)
+	if (g_transitionState != nullptr)
 	{
-		Rgba textColor;
-		m_selectedSimulationPathIndex == simulationIndex ? textColor = selectedColor : textColor = nonSelectedColor;
-
-		//draw simulation paths
-		theRenderer->DrawText2D(Vector2(theWindow->m_clientWidth * .05f, theWindow->m_clientHeight * (simulationStartHeight - (float(simulationIndex) * simulationHeightDecrease))),
-			Stringf("%i) %s", simulationIndex,  m_simulationPaths[simulationIndex].c_str()).c_str(),
-			theWindow->m_clientHeight * 0.015f,
-			textColor,
-			1.f,
-			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	}
-
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.025f),
-		"Press 'ENTER' to Select OR 'ESCAPE' to Return to Main",
-		theWindow->m_clientHeight * 0.015f,
-		Rgba::YELLOW,
-		1.f,
-		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-
-	theRenderer->m_defaultShader->DisableBlending();
-
-	theRenderer = nullptr;
+		if (g_transitionState->m_type == ANALYSIS_GAME_STATE)
+		{
+			RenderAnalysisLoading();
+		}
+	}		
+	else
+		RenderAnalysisSelect();
 }
 
 //  =========================================================================================
@@ -135,6 +94,87 @@ void AnalysisSelectState::ResetState()
 	m_simulationPaths.clear();
 }
 
+//  =========================================================================================
+void AnalysisSelectState::RenderAnalysisSelect()
+{
+	Renderer* theRenderer = Renderer::GetInstance();
+	Window* theWindow = Window::GetInstance();
+
+	static Rgba selectedColor = Rgba::WHITE;
+	static Rgba nonSelectedColor = Rgba::GRAY;
+
+	theRenderer->SetCamera(m_camera);
+
+	theRenderer->ClearDepth(1.f);
+	theRenderer->ClearColor(Rgba::BLACK);
+
+	theRenderer->SetTexture(*m_backGroundTexture);
+	theRenderer->SetShader(theRenderer->m_defaultShader);
+
+	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
+	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
+
+	//draw simulation paths
+	theRenderer->DrawText2D(Vector2(theWindow->m_clientWidth * .05f, theWindow->m_clientHeight * 0.95f),
+		"Select Simulation",
+		theWindow->m_clientHeight * 0.025f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	float simulationStartHeight = 0.9f;
+	float simulationHeightDecrease = 0.02f;
+	for (int simulationIndex = 0; simulationIndex < m_simulationPaths.size(); ++simulationIndex)
+	{
+		Rgba textColor;
+		m_selectedSimulationPathIndex == simulationIndex ? textColor = selectedColor : textColor = nonSelectedColor;
+
+		//draw simulation paths
+		theRenderer->DrawText2D(Vector2(theWindow->m_clientWidth * .05f, theWindow->m_clientHeight * (simulationStartHeight - (float(simulationIndex) * simulationHeightDecrease))),
+			Stringf("%i) %s", simulationIndex, m_simulationPaths[simulationIndex].c_str()).c_str(),
+			theWindow->m_clientHeight * 0.015f,
+			textColor,
+			1.f,
+			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	}
+
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.025f),
+		"Press 'ENTER' to Select OR 'ESCAPE' to Return to Main",
+		theWindow->m_clientHeight * 0.015f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	theRenderer->m_defaultShader->DisableBlending();
+}
+
+//  =========================================================================================
+void AnalysisSelectState::RenderAnalysisLoading()
+{
+	Renderer* theRenderer = Renderer::GetInstance();
+	Window* theWindow = Window::GetInstance();
+
+	theRenderer->SetCamera(m_camera);
+
+	theRenderer->ClearDepth(1.f);
+	theRenderer->ClearColor(Rgba::BLACK);
+
+	theRenderer->SetTexture(*m_backGroundTexture);
+	theRenderer->SetShader(theRenderer->m_defaultShader);
+
+	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
+	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
+
+	//draw simulation paths
+	theRenderer->DrawText2D(Vector2(theWindow->m_clientWidth * .05f, theWindow->m_clientHeight * 0.95f),
+		"Loading Simulation Data...",
+		theWindow->m_clientHeight * 0.025f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	theRenderer->m_defaultShader->DisableBlending();
+}
 
 //  =========================================================================================
 void AnalysisSelectState::PostRender()

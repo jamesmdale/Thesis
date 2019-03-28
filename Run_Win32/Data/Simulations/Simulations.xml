@@ -46,7 +46,7 @@
   startingThreat="400"
   processTimerInSeconds="60"
   isOptimized="true" 
-  isBudgeted="false"
+  isBudgeted="true"
   />
 
 <SimulationDefinition

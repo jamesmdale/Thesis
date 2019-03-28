@@ -393,6 +393,7 @@
     <ClCompile Include="Entities\Bombardment.cpp" />
     <ClCompile Include="Entities\Fire.cpp" />
     <ClCompile Include="GameStates\SimSelectState.cpp" />
+    <ClCompile Include="Helpers\AnalysisGraph.cpp" />
     <ClCompile Include="UI\DebugInputBox.cpp" />
     <ClCompile Include="Definitions\AgentDefinition.cpp" />
     <ClCompile Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.cpp" />
@@ -435,6 +436,7 @@
     <ClInclude Include="Entities\Bombardment.hpp" />
     <ClInclude Include="Entities\Fire.hpp" />
     <ClInclude Include="GameStates\SimSelectState.hpp" />
+    <ClInclude Include="Helpers\AnalysisGraph.hpp" />
     <ClInclude Include="UI\DebugInputBox.hpp" />
     <ClInclude Include="Definitions\AgentDefinition.hpp" />
     <ClInclude Include="Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp" />
