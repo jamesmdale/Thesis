@@ -239,7 +239,105 @@ ImportedProfiledSimulationData* AnalysisState::GenerateProfiledSimulationDataFro
 	//perform calculation
 	ImportedProfiledSimulationData* simData = new ImportedProfiledSimulationData();
 
+	ComputeDescriptiveStatistics(simData, contentAsFloats);
+
 	return simData;
+}
+
+//  =========================================================================================
+void AnalysisState::ComputeDescriptiveStatistics(ImportedProfiledSimulationData* simData, const std::vector<float>& data)
+{
+	//first calculate mean
+	bool success = FillSimData(simData, data);
+
+	if (!success)
+		return;
+}
+
+//  =========================================================================================
+bool AnalysisState::FillSimData(ImportedProfiledSimulationData* simData, const std::vector<float>& data)
+{
+	float nCount = (float)data.size();
+	
+	//early out in case our count is 0
+	if (nCount == 0)
+		return false;
+
+	float sum = 0.f;
+	float minValue = INT_MAX;
+	float maxValue = INT_MIN;
+	float median = INT_MIN;
+
+	//compute sum to be used for average and get max and min values while we are at it
+	for (int dataIndex = 0; dataIndex < (int)nCount; ++dataIndex)
+	{
+		sum += data[dataIndex];
+
+		if (data[dataIndex] > maxValue)
+			maxValue = data[dataIndex];
+		else if (data[dataIndex] < minValue)
+			minValue = data[dataIndex];
+	}
+
+	//calculate median
+	float medianIndex = nCount * 0.5f;
+	if (floorf(medianIndex) == medianIndex)
+	{
+		//we need to get an average of this index and index - 1
+		median = (data[(int)medianIndex] + data[(int)medianIndex - 1]) * 0.5f;
+	}
+	else
+	{
+		median = data[(int)medianIndex];
+	}	
+
+	//fill data
+	simData->m_entries = (int)nCount;
+	simData->m_minValue = minValue;
+	simData->m_maxValue = maxValue;
+	simData->m_median = median;
+	simData->m_average = sum / nCount;
+	simData->m_standardDeviation = CalculateStandardDeviation(simData->m_average, data);
+	Calculate95PercentConfidenceInterval(simData);
+
+	return true;
+}
+
+//  =========================================================================================
+float AnalysisState::CalculateAverage(const std::vector<float>& data)
+{
+	float nCount = (float)data.size();
+	float sum = 0.f;
+	for (int dataIndex = 0; dataIndex < (int)nCount; ++dataIndex)
+	{
+		sum += data[dataIndex];
+	}
+
+	return sum / nCount;
+}
+
+//  =========================================================================================
+float AnalysisState::CalculateStandardDeviation(float average, const std::vector<float>& data)
+{
+	float adjustedSum = 0.f;
+
+	for (int dataIndex = 0; dataIndex < (int)data.size(); ++dataIndex)
+	{
+		float indexMinusMean = data[dataIndex] - average;
+		adjustedSum += (indexMinusMean * indexMinusMean);
+	}
+
+	return sqrt((1.f / float(data.size()) * adjustedSum));
+}
+
+//  =========================================================================================
+void AnalysisState::Calculate95PercentConfidenceInterval(ImportedProfiledSimulationData* simData)
+{
+	//1.96 corresponds to the z value
+	simData->m_confidenceInterval95 = 1.96f * (simData->m_standardDeviation / (sqrtf((float)simData->m_entries)));
+
+	simData->m_confidenceIntervalRangeLow = simData->m_average - simData->m_confidenceInterval95;
+	simData->m_confidenceIntervalRangeHigh = simData->m_average + simData->m_confidenceInterval95;	
 }
 
 //  =========================================================================================
