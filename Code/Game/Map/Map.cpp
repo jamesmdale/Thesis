@@ -1185,7 +1185,8 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 
 		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
 
-		g_collisionData->AddCell(Stringf("%f", secondsAverage), true);
+		if(g_collisionData != nullptr)
+			g_collisionData->AddCell(Stringf("%f", secondsAverage), true);
 
 		//reset data
 		iterationStartHPC = GetPerformanceCounter();

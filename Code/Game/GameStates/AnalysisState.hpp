@@ -69,8 +69,6 @@ public:
 	virtual void ResetState() override;
 
 	void InitializeSimulationAnalysisData();
-	void RenderOptionsList();
-	void RenderGraph();
 
 	//string helper functions
 	std::string GetDefinitionNameFromPath(const std::string& path);
@@ -86,12 +84,28 @@ public:
 	float CalculateStandardDeviation(float average, const std::vector<float>& data);
 	void Calculate95PercentConfidenceInterval(ImportedProfiledSimulationData* simData);
 
+	//rendering functions
+	void RenderGraph();
+	void RenderLoadedDefinitionOptions();
+	void RenderLoadedDataContent();
+	void RenderSelectedLoadedDataContentDetails();
+
+	//graph helpers
+	bool IsOptionSelectedForGraph(int optionIndex);
+	void DeselectOptionForGraph(int optionIndex);
+	void ToggleOptionToGraph(int optionIndex);
+
 public:
 	Texture* m_backGroundTexture = nullptr;
 	AnalysisGraph* m_analysisGraph = nullptr;
+	bool m_isGraphRendering = false;
 
 	std::string m_simulationDataFilePath = "";
+	int m_selectedGraphOption = 0;
+	int m_totalSelectableGraphOptions = 0;
 
 	//matched using ID
 	std::map<std::string, SimulationContents*> m_definitionsForExecutionMap;	
+
+	std::vector<int> m_optionsSelectedForAnalysis;
 };

@@ -110,9 +110,10 @@ void Agent::Update(float deltaSeconds)
 #ifdef AgentUpdateAnalysis
 	// profiling ----------------------------------------------
 	uint64_t endHPC = GetPerformanceCounter();
-	g_agentUpdateData->AddCell(Stringf("%f", (float)PerformanceCounterToSeconds(endHPC - startHPC)), true);
+	if(g_agentUpdateData != nullptr )
+		g_agentUpdateData->AddCell(Stringf("%f", (float)PerformanceCounterToSeconds(endHPC - startHPC)), true);
 	//  ----------------------------------------------
-#endif
+#endif	
 }
 
 //  =============================================================================
@@ -224,7 +225,8 @@ bool Agent::GetPathToDestination(const Vector2& goalDestination)
 		//DevConsolePrintf(Rgba::LIGHT_BLUE, "Average Time After 100 iterations (Pathing) %f", secondsAverage);
 		//DevConsolePrintf(Rgba::LIGHT_BLUE, "Iterations per second %f (Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds);
 
-		g_pathingData->AddCell(Stringf("%f", secondsAverage), true);
+		if(g_pathingData != nullptr)
+			g_pathingData->AddCell(Stringf("%f", secondsAverage), true);
 
 		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds));
 

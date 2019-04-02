@@ -52,6 +52,11 @@ void SimulationData::CreateComprehensiveDataSet()
 	AddCell(Stringf("%i", m_simulationDefinitionReference->m_numMedStations));
 	AddNewLine();
 
+	//num med stations
+	AddCell("NumWells");
+	AddCell(Stringf("%i", m_simulationDefinitionReference->m_numWells));
+	AddNewLine();
+
 	//bombardment rate
 	AddCell("BombardmentRate");
 	AddCell(Stringf("%f", m_simulationDefinitionReference->m_bombardmentRatePerSecond));

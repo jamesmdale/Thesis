@@ -289,6 +289,26 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 }
 
 //  =========================================================================================
+void PlayingState::TransitionIn(float secondsTransitioning)
+{
+	s_isFinishedTransitioningIn = true;
+}
+
+//  =========================================================================================
+void PlayingState::TransitionOut(float secondsTransitioning)
+{
+	ResetCurrentSimulationData();
+	ResetState();
+	s_isFinishedTransitioningOut = true;
+}
+
+//  =========================================================================================
+void PlayingState::ResetState()
+{
+	g_currentSimDefinitionIndex = 0;
+}
+
+//  =========================================================================================
 void PlayingState::UpdateFPSCounters()
 {
 	g_currentFps = GetUnclampedFPS();
@@ -562,9 +582,14 @@ void PlayingState::ExportSimulationData()
 	std::string finalFilePath = Stringf("%s%s", newFolder.c_str(), "\\");
 
 	//general data
+	std::string generalInfoFolder = Stringf("%s%s", finalFilePath.c_str(), "GeneralInfo");
+	std::string generalInfoFilePath = Stringf("%s%s", finalFilePath.c_str(), "GeneralInfo\\");
+
+	CreateFolder(generalInfoFolder.c_str());
 	FinalizeGeneralSimulationData();
+
 	std::string fileName = Stringf("GeneralInfo_%s.csv", g_currentSimulationDefinition->m_name.c_str());
-	bool success = g_generalSimulationData->ExportCSV(finalFilePath, fileName.c_str());
+	bool success = g_generalSimulationData->ExportCSV(generalInfoFilePath, fileName.c_str());
 	ASSERT_OR_DIE(success, "Action data broken");
 
 #ifdef ActionStackAnalysis

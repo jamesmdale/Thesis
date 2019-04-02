@@ -131,7 +131,8 @@ void Planner::ProcessActionStack(float deltaSeconds)
 		//DevConsolePrintf(Rgba::GREEN, "Average Time After 10000 iterations (Process Action Stack) %f", secondsAverage);
 		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Process Action Stack) (total time %f)", iterationsPerSecond, totalSeconds);
 
-		g_processActionStackData->AddCell(Stringf("%f", secondsAverage), true);
+		if (g_processActionStackData != nullptr)
+			g_processActionStackData->AddCell(Stringf("%f", secondsAverage), true);
 		
 		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Process Action Stack) (total time between: %f)", iterationsPerSecond, totalSeconds));
 
@@ -341,7 +342,8 @@ void Planner::UpdatePlan()
 		//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (UpdatePlan) %f", secondsAverage);
 		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (UpdatePlan) (total time %f)", iterationsPerSecond, totalSeconds);
 
-		g_updatePlanData->AddCell(Stringf("%f", secondsAverage), true);
+		if(g_updatePlanData != nullptr)
+			g_updatePlanData->AddCell(Stringf("%f", secondsAverage), true);
 
 		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (UpdatePlan) (total time between: %f)", iterationsPerSecond, totalSeconds));
 
@@ -457,7 +459,8 @@ void Planner::QueueActionsFromCurrentPlan(const UtilityInfo& info)
 			//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
 			//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
 
-			g_queueActionPathingData->AddCell(Stringf("%f", secondsAverage), true);
+			if(g_queueActionPathingData != nullptr)
+				g_queueActionPathingData->AddCell(Stringf("%f", secondsAverage), true);
 
 			//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Queue Action Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds));
 
@@ -1076,7 +1079,8 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 		//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
 		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
 
-		g_distanceMemoizationData->AddCell(Stringf("%f", secondsAverage), true);
+		if(g_distanceMemoizationData != nullptr)
+			g_distanceMemoizationData->AddCell(Stringf("%f", secondsAverage), true);
 
 		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Distance Utility Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds));
 
@@ -1537,7 +1541,8 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 		//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
 		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
 
-		g_copyPathData->AddCell(Stringf("%f", secondsAverage), true);
+		if(g_copyPathData != nullptr)
+			g_copyPathData->AddCell(Stringf("%f", secondsAverage), true);
 
 		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Copy Path) (total time between: %f)", iterationsPerSecond, totalSeconds));
 		
