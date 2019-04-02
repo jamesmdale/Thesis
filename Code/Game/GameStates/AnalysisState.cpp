@@ -238,7 +238,7 @@ void AnalysisState::RenderLoadedDefinitionOptions()
 		for (int analyzedFunctionIndex = 0; analyzedFunctionIndex < (int)simContents->importedStatisticData.size(); ++analyzedFunctionIndex)
 		{
 			if (IsOptionSelectedForGraph(selectableOptionCount))
-				textColor = colorInSelectedList;
+				m_selectedGraphOption == selectableOptionCount ? textColor = hoveredColor : textColor = colorInSelectedList;
 			else
 				m_selectedGraphOption == selectableOptionCount ? textColor = hoveredColor : textColor = nonHoveredColor;
 
