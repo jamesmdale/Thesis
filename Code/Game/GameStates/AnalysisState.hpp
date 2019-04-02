@@ -4,8 +4,19 @@
 #include "Engine\Core\Rgba.hpp"
 #include <map>
 
+//  ----------------------------------------------
 struct ImportedProfiledSimulationData
 {
+	ImportedProfiledSimulationData(const std::string& path)
+	{
+		m_path = path;
+	}
+
+	bool IsValid()
+	{
+		return m_entries == -1;
+	}
+
 	std::string m_profiledName;
 	std::string m_path;
 
@@ -20,17 +31,19 @@ struct ImportedProfiledSimulationData
 	float m_confidenceIntervalRangeHigh = 0.f;
 };
 
+//  ----------------------------------------------
 struct SimulationContents
 {
 	SimulationContents() {};
 	~SimulationContents()
 	{
-		m_dataContents.clear();
+		importedStatisticData.clear();
 	}
 
-	std::vector<ImportedProfiledSimulationData*> m_dataContents;
+	std::vector<ImportedProfiledSimulationData*> importedStatisticData;
 };
 
+//  ----------------------------------------------
 class AnalysisState : public GameState
 {
 public:
@@ -67,8 +80,8 @@ public:
 	ImportedProfiledSimulationData* GenerateProfiledSimulationDataFromFile(const std::string& filePath);
 
 	//computations
-	void ComputeDescriptiveStatistics(ImportedProfiledSimulationData* simData, const std::vector<float>& data);
-	bool FillSimData(ImportedProfiledSimulationData* simData, const std::vector<float>& data);
+	void FillSimData(ImportedProfiledSimulationData* simData, const std::vector<float>& data);
+	bool ComputeDescriptiveStatistics(ImportedProfiledSimulationData* simData, const std::vector<float>& data);
 	float CalculateAverage(const std::vector<float>& data);
 	float CalculateStandardDeviation(float average, const std::vector<float>& data);
 	void Calculate95PercentConfidenceInterval(ImportedProfiledSimulationData* simData);

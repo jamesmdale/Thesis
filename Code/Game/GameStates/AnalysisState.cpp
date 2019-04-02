@@ -104,8 +104,7 @@ void AnalysisState::Initialize()
 void AnalysisState::TransitionIn(float secondsTransitioning)
 {	
 	//detect all simulations
-	InitializeSimulationAnalysisData();
-	
+	InitializeSimulationAnalysisData();	
 	s_isFinishedTransitioningIn = true;
 }
 
@@ -160,7 +159,7 @@ void AnalysisState::InitializeSimulationAnalysisData()
 		for (int fileIndex = 0; fileIndex < (int)containedFilePaths.size(); ++fileIndex)
 		{
 			ImportedProfiledSimulationData* profiledData = GenerateProfiledSimulationDataFromFile(containedFilePaths[fileIndex]);
-			dataContents->m_dataContents.push_back(profiledData);
+			dataContents->importedStatisticData.push_back(profiledData);
 		}
 	}
 }
@@ -222,10 +221,12 @@ std::string AnalysisState::GetProfiledNameFromFileName(const std::string& filePa
 //  =========================================================================================
 ImportedProfiledSimulationData* AnalysisState::GenerateProfiledSimulationDataFromFile(const std::string& filePath)
 {
-	std::string fileName = GetProfiledNameFromFileName(filePath);
+	//perform calculation
+	ImportedProfiledSimulationData* simData = new ImportedProfiledSimulationData(filePath);
 
 	CSVEditor editor;
-	editor.ReadFromFile(filePath);
+	if (!editor.ReadFromFile(filePath))
+		return simData;
 
 	std::vector<float> contentAsFloats;
 	for (int entryIndex = 0; entryIndex < (int)editor.m_content.size(); ++entryIndex)
@@ -234,31 +235,29 @@ ImportedProfiledSimulationData* AnalysisState::GenerateProfiledSimulationDataFro
 		ASSERT_OR_DIE(valueAsFloat != NULL, "INVALID READ FOR SIMULATION DATA FILE!!");
 
 		contentAsFloats.push_back(valueAsFloat);
-	}
+	}	
 
-	//perform calculation
-	ImportedProfiledSimulationData* simData = new ImportedProfiledSimulationData();
-
-	ComputeDescriptiveStatistics(simData, contentAsFloats);
+	FillSimData(simData, contentAsFloats);
 
 	return simData;
 }
 
 //  =========================================================================================
-void AnalysisState::ComputeDescriptiveStatistics(ImportedProfiledSimulationData* simData, const std::vector<float>& data)
+void AnalysisState::FillSimData(ImportedProfiledSimulationData* simData, const std::vector<float>& data)
 {
-	//first calculate mean
-	bool success = FillSimData(simData, data);
+	//get the file name
+	simData->m_profiledName = GetProfiledNameFromFileName(simData->m_path);
 
-	if (!success)
-		return;
+	//compute average, median, standard deviation, population size, and 95% confidence interval
+	bool success = ComputeDescriptiveStatistics(simData, data);
+	UNUSED(success);
 }
 
-//  =========================================================================================
-bool AnalysisState::FillSimData(ImportedProfiledSimulationData* simData, const std::vector<float>& data)
+// Computes average, median, standard deviation, pop size, and 95% confidence interval =========================================================================================
+bool AnalysisState::ComputeDescriptiveStatistics(ImportedProfiledSimulationData* simData, const std::vector<float>& data)
 {
 	float nCount = (float)data.size();
-	
+
 	//early out in case our count is 0
 	if (nCount == 0)
 		return false;
@@ -282,14 +281,10 @@ bool AnalysisState::FillSimData(ImportedProfiledSimulationData* simData, const s
 	//calculate median
 	float medianIndex = nCount * 0.5f;
 	if (floorf(medianIndex) == medianIndex)
-	{
 		//we need to get an average of this index and index - 1
 		median = (data[(int)medianIndex] + data[(int)medianIndex - 1]) * 0.5f;
-	}
 	else
-	{
 		median = data[(int)medianIndex];
-	}	
 
 	//fill data
 	simData->m_entries = (int)nCount;
