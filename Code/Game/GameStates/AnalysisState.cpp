@@ -39,15 +39,16 @@ void AnalysisState::Render()
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
 
-	//draw options
+	//draw options	
 	RenderInfoAndInstructions();
 	RenderLoadedDefinitionOptions();
-	RenderLoadedDataContent();
+	RenderLoadedDataContent();	
 
 	//draw graph if we are showing it
-	if(m_isGraphRendering)
+	if (m_currentRenderState == ANALYSIS_STATE_GRAPH_RENDER_STATE)
+	{
 		RenderGraph();
-
+	}
 
 	theRenderer->m_defaultShader->DisableBlending();
 
@@ -57,31 +58,15 @@ void AnalysisState::Render()
 //  =========================================================================================
 float AnalysisState::UpdateFromInput(float deltaSeconds)
 {
-	InputSystem* theInput = InputSystem::GetInstance();
-
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
+	switch (m_currentRenderState)
 	{
-		int newSelectedOption = (m_currentHoveredGraphOption - 1);
-		if (newSelectedOption == -1)
-			newSelectedOption = (int)m_allSelectableOptions.size() - 1;
-		m_currentHoveredGraphOption = newSelectedOption % (int)m_allSelectableOptions.size();
-	}
-
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
-	{
-		m_currentHoveredGraphOption = (m_currentHoveredGraphOption + 1) % (int)m_allSelectableOptions.size();
-	}
-
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ENTER))
-	{
-		ToggleOptionToGraph(m_currentHoveredGraphOption);
-	}
-
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ESCAPE))
-	{
-		ResetState();
-		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_SELECT_GAME_STATE));
-	}
+	case ANALYSIS_STATE_INFO_RENDER_STATE:
+		deltaSeconds = UpdateInputInfoState(deltaSeconds);
+		break;
+	case ANALYSIS_STATE_GRAPH_RENDER_STATE:
+		deltaSeconds = UpdateInputGraphState(deltaSeconds);
+		break;
+	}	
 
 	return deltaSeconds; //new deltaSeconds
 }
@@ -178,15 +163,16 @@ void AnalysisState::RenderGraph()
 	Renderer* theRenderer = Renderer::GetInstance();
 	Window* theWindow = Window::GetInstance();
 
-	static AABB2 graphBox = AABB2(Vector2(theWindow->m_clientWidth * 0.4, theWindow->m_clientHeight * 0.05), Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.95));
-
 	//reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);
 	theRenderer->SetShader(theRenderer->m_defaultShader);
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
+	//draw transparent overlay on what we've already drawn
+	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 0.85f));
+
 	//draw the graph
-	theRenderer->DrawAABB(graphBox, Rgba(0.8f, 0.8f, 0.8f, 0.8f));
+	m_analysisGraph->Render();
 }
 
 //  =========================================================================================
@@ -347,9 +333,69 @@ void AnalysisState::ToggleOptionToGraph(int optionIndex)
 }
 
 //  =========================================================================================
-ImportedProfiledSimulationData * AnalysisState::GetImportedProfiledSimulationDataForOptionIndex(int optionIndex)
+void AnalysisState::GenerateGraphFromSelectedOptions()
 {
-	
+	m_analysisGraph = new AnalysisGraph();
+
+	//for every option selected, add it to the list
+	for (int optionIndex = 0; optionIndex < (int)m_allSelectableOptions.size(); ++optionIndex)
+	{
+		if (m_allSelectableOptions[optionIndex].m_isSelectedForGraph)
+			m_analysisGraph->AddDataToGraph(m_allSelectableOptions[optionIndex].m_data);
+	}
+
+	m_analysisGraph->GenerateGraph();
+}
+
+//  =========================================================================================
+float AnalysisState::UpdateInputInfoState(float deltaSeconds)
+{
+	InputSystem* theInput = InputSystem::GetInstance();
+
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
+	{
+		int newSelectedOption = (m_currentHoveredGraphOption - 1);
+		if (newSelectedOption == -1)
+			newSelectedOption = (int)m_allSelectableOptions.size() - 1;
+		m_currentHoveredGraphOption = newSelectedOption % (int)m_allSelectableOptions.size();
+	}
+
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
+	{
+		m_currentHoveredGraphOption = (m_currentHoveredGraphOption + 1) % (int)m_allSelectableOptions.size();
+	}
+
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ENTER))
+	{
+		ToggleOptionToGraph(m_currentHoveredGraphOption);
+	}
+
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_SPACE))
+	{
+		GenerateGraphFromSelectedOptions();
+		m_currentRenderState = ANALYSIS_STATE_GRAPH_RENDER_STATE;
+	}
+
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ESCAPE))
+	{
+		ResetState();
+		GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_SELECT_GAME_STATE));
+	}
+
+	return deltaSeconds;
+}
+
+//  =========================================================================================
+float AnalysisState::UpdateInputGraphState(float deltaSeconds)
+{
+	InputSystem* theInput = InputSystem::GetInstance();
+
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ESCAPE))
+	{
+		m_currentRenderState = ANALYSIS_STATE_INFO_RENDER_STATE;
+	}
+
+	return deltaSeconds;
 }
 
 //  =========================================================================================

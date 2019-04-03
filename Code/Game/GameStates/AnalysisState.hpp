@@ -101,6 +101,10 @@ public:
 
 private:
 
+	//input functions
+	float UpdateInputInfoState(float deltaSeconds);
+	float UpdateInputGraphState(float deltaSeconds);
+
 	//string helper functions
 	std::string GetDefinitionNameFromPath(const std::string& path);
 	std::string GetProfiledNameFromFileName(const std::string& filePath);
@@ -115,24 +119,25 @@ private:
 	float CalculateStandardDeviation(float average, const std::vector<float>& data);
 	void Calculate95PercentConfidenceInterval(ImportedProfiledSimulationData* simData);
 
-	//rendering functions
-	void RenderGraph();
+	//rendering functions	
 	void RenderLoadedDefinitionOptions();
 	void RenderLoadedDataContent();
 	void RenderSelectedLoadedDataContentDetails();
 	void RenderInfoAndInstructions();
+	void RenderGraph();
 
-	//graph helpers
+	//ui helpers
 	bool IsOptionSelectedForGraph(int optionIndex);
 	void SelectOptionForGraph(int optionIndex);
 	void DeselectOptionForGraph(int optionIndex);
 	void ToggleOptionToGraph(int optionIndex);
-	ImportedProfiledSimulationData* GetImportedProfiledSimulationDataForOptionIndex(int optionIndex);
+
+	//graph helpers
+	void GenerateGraphFromSelectedOptions();
 
 private:
 	Texture* m_backGroundTexture = nullptr;
 	AnalysisGraph* m_analysisGraph = nullptr;
-	bool m_isGraphRendering = false;
 
 	std::string m_simulationDataFilePath = "";
 	int m_currentHoveredGraphOption = 0;
