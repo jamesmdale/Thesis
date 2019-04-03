@@ -120,26 +120,62 @@ void AnalysisGraph::Render()
 	}
 	
 	//  ----------------------------------------------
-	//reset texture
-	theRenderer->SetTexture(*theRenderer->CreateOrGetTexture("default"));
-	theRenderer->SetShader(theRenderer->m_defaultShader);
-	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
-
 	//draw data points for confidence intervals vertically
 	int simDataContentCount = (int)m_simulationDataContents.size();
 	float percentageSpacingBetweenVerticalLines = 1.f / ((float)simDataContentCount + 1.f);
 
 	for (int dataContentIndex = 0; dataContentIndex < simDataContentCount; ++dataContentIndex)
 	{
+		//reset texture
+		theRenderer->SetTexture(*theRenderer->CreateOrGetTexture("default"));
+		theRenderer->SetShader(theRenderer->m_defaultShader);
+		theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
+
+		ImportedProfiledSimulationData* data = m_simulationDataContents[dataContentIndex];
+
+		//get x position
 		float xPosition = graphBox.mins.x + (graphBoxDimensions.x * percentageSpacingBetweenVerticalLines * ((float)dataContentIndex + 1.f));
-		Vector2 lineStart = Vector2(xPosition, graphBox.mins.y);
-		Vector2 lineEnd = Vector2(xPosition, graphBox.maxs.y);
-		theRenderer->DrawLineWithColor(lineStart, lineEnd, Rgba::BLACK);
+
+		//get y range
+		float lowYPercentage = RangeMapFloat(data->m_confidenceIntervalRangeLow, m_minConfidenceValue, m_maxConfidenceValue, 0.f, 1.f);
+		float averageYPercentage = RangeMapFloat(data->m_average, m_minConfidenceValue, m_maxConfidenceValue, 0.f, 1.f);
+		float highYPercentage = RangeMapFloat(data->m_confidenceIntervalRangeHigh, m_minConfidenceValue, m_maxConfidenceValue, 0.f, 1.f);
+
+		Vector2 lineStart = Vector2(xPosition, graphBox.mins.y + (lowYPercentage * graphBoxDimensions.y));
+		Vector2 lineEnd = Vector2(xPosition, graphBox.mins.y + (highYPercentage * graphBoxDimensions.y));
+		Vector2 averagePoint = Vector2(xPosition, graphBox.mins.y + (averageYPercentage * graphBoxDimensions.y));
+
+		//create point AABBS
+		float pointRadiusY = theWindow->m_clientHeight * 0.0025f;
+		float pointRadiusX = pointRadiusY * CLIENT_ASPECT;
+		AABB2 lowConfidencePoint = AABB2(lineStart, pointRadiusX, pointRadiusY);
+		AABB2 averageConfidencePoint = AABB2(averagePoint, pointRadiusX, pointRadiusY);
+		AABB2 highConfidencePoint = AABB2(lineEnd, pointRadiusX, pointRadiusY);
+
+		Rgba drawColor = g_graphColorList[dataContentIndex % 8];
+
+		theRenderer->SetLineWidth(2.f);
+		theRenderer->DrawLineWithColor(lineStart, lineEnd, g_graphColorList[dataContentIndex % 8]);
+		theRenderer->SetLineWidth(1.f);
+
+		theRenderer->DrawAABB(lowConfidencePoint, drawColor);
+		theRenderer->DrawAABB(averageConfidencePoint, drawColor);
+		theRenderer->DrawAABB(highConfidencePoint, drawColor);
+
+		//draw text
+		theRenderer->DrawText2DCentered(Vector2(xPosition, graphBox.mins.y - (boundsBoxDimensions.y * 0.1f * 0.5f)),
+			Stringf("%s", m_simulationDataContents[dataContentIndex]->m_simulationDefinitionContentsNameKey.c_str()).c_str(),
+			theWindow->m_clientHeight * 0.0125f,
+			drawColor,
+			1.f,
+			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	}
 
+
+	//  ----------------------------------------------
 	//draw title
 	theRenderer->DrawText2DCentered(titleBox.GetCenter(),
-		Stringf("%s", "Title").c_str(),
+		Stringf("%s", m_simulationDataContents[0]->m_profiledName.c_str()).c_str(),
 		theWindow->m_clientHeight * 0.025f,
 		Rgba::BLACK,
 		1.f,
