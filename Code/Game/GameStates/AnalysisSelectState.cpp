@@ -188,7 +188,7 @@ void AnalysisSelectState::InitializeAnalysisStateFromSelectedSim()
 	AnalysisState* analysisState = (AnalysisState*)GameState::GetGameStateFromGlobalListByType(ANALYSIS_GAME_STATE);
 	ASSERT_OR_DIE(analysisState != nullptr, "ANALYSIS GAME STATE UNINITIALIZED!!");
 
-	analysisState->m_simulationDataFilePath = m_simulationPaths[m_selectedSimulationPathIndex];
+	analysisState->SetSimulationDataFilePath(m_simulationPaths[m_selectedSimulationPathIndex]);
 }
 
 

@@ -40,6 +40,7 @@ void AnalysisState::Render()
 	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
 
 	//draw options
+	RenderInfoAndInstructions();
 	RenderLoadedDefinitionOptions();
 	RenderLoadedDataContent();
 
@@ -47,20 +48,6 @@ void AnalysisState::Render()
 	if(m_isGraphRendering)
 		RenderGraph();
 
-	//draw simulation paths
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.975f),
-		Stringf("Analyzing Simulation: %s", m_simulationDataFilePath.c_str()),
-		theWindow->m_clientHeight * 0.01f,
-		Rgba::YELLOW,
-		1.f,
-		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));	
-
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.015f),
-		"Press 'ENTER' to Select OR 'ESCAPE' to Return to Analysis Select",
-		theWindow->m_clientHeight * 0.01f,
-		Rgba::YELLOW,
-		1.f,
-		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
 	theRenderer->m_defaultShader->DisableBlending();
 
@@ -74,20 +61,20 @@ float AnalysisState::UpdateFromInput(float deltaSeconds)
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
 	{
-		int newSelectedOption = (m_selectedGraphOption - 1);
+		int newSelectedOption = (m_currentHoveredGraphOption - 1);
 		if (newSelectedOption == -1)
-			newSelectedOption = m_totalSelectableGraphOptions - 1;
-		m_selectedGraphOption = newSelectedOption % m_totalSelectableGraphOptions;
+			newSelectedOption = (int)m_allSelectableOptions.size() - 1;
+		m_currentHoveredGraphOption = newSelectedOption % (int)m_allSelectableOptions.size();
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
-		m_selectedGraphOption = (m_selectedGraphOption + 1) % m_totalSelectableGraphOptions;
+		m_currentHoveredGraphOption = (m_currentHoveredGraphOption + 1) % (int)m_allSelectableOptions.size();
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ENTER))
 	{
-		ToggleOptionToGraph(m_selectedGraphOption);
+		ToggleOptionToGraph(m_currentHoveredGraphOption);
 	}
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ESCAPE))
@@ -123,10 +110,10 @@ void AnalysisState::TransitionOut(float secondsTransitioning)
 //  =========================================================================================
 void AnalysisState::ResetState()
 {
-	std::map<std::string, SimulationContents*>::iterator mapIterator = m_definitionsForExecutionMap.begin();
+	std::map<std::string, SimulationDefinitionContents*>::iterator mapIterator = m_definitionsForExecutionMap.begin();
 	for (mapIterator = m_definitionsForExecutionMap.begin(); mapIterator != m_definitionsForExecutionMap.end(); ++mapIterator);
 	{
-		SimulationContents* simContent = mapIterator->second;
+		SimulationDefinitionContents* simContent = mapIterator->second;
 		delete(simContent);
 		simContent = nullptr;
 	}
@@ -159,21 +146,30 @@ void AnalysisState::InitializeSimulationAnalysisData()
 
 		//add structure to map
 		std::string definitionName = GetDefinitionNameFromPath(simulationDefinitionPaths[definitionIndex]);
-		SimulationContents* dataContents = new SimulationContents();
-		m_definitionsForExecutionMap.insert(std::pair<std::string, SimulationContents*>(definitionName, dataContents));
+		SimulationDefinitionContents* dataContents = new SimulationDefinitionContents();
+		m_definitionsForExecutionMap.insert(std::pair<std::string, SimulationDefinitionContents*>(definitionName, dataContents));
 
 		//populate the data contents with each profiled simulation data set
 		for (int fileIndex = 0; fileIndex < (int)containedFilePaths.size(); ++fileIndex)
 		{
 			selectableForGraphCount++;
 
-			ImportedProfiledSimulationData* profiledData = GenerateProfiledSimulationDataFromFile(containedFilePaths[fileIndex]);
-			dataContents->importedStatisticData.push_back(profiledData);
+			//generate sim data
+			ImportedProfiledSimulationData* profiledData = GenerateProfiledSimulationDataFromFile(definitionName, containedFilePaths[fileIndex]);
+
+			//add option to list of selectable sims
+			int optionIndex = (int)m_allSelectableOptions.size();
+			SelectableProfiledSimDataOption option = SelectableProfiledSimDataOption(optionIndex, profiledData, false);
+			dataContents->m_simSelectableOptionIndexes.push_back(optionIndex);
+			m_allSelectableOptions.push_back(option);			
 		}
 	}
+}
 
-	//set total count for selectable options
-	m_totalSelectableGraphOptions = selectableForGraphCount;
+//  =========================================================================================
+void AnalysisState::SetSimulationDataFilePath(const std::string& rootFilePath)
+{
+	m_simulationDataFilePath = rootFilePath;
 }
 
 //  =========================================================================================
@@ -183,6 +179,11 @@ void AnalysisState::RenderGraph()
 	Window* theWindow = Window::GetInstance();
 
 	static AABB2 graphBox = AABB2(Vector2(theWindow->m_clientWidth * 0.4, theWindow->m_clientHeight * 0.05), Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.95));
+
+	//reset texture
+	theRenderer->SetTexture(*m_backGroundTexture);
+	theRenderer->SetShader(theRenderer->m_defaultShader);
+	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	//draw the graph
 	theRenderer->DrawAABB(graphBox, Rgba(0.8f, 0.8f, 0.8f, 0.8f));
@@ -201,6 +202,11 @@ void AnalysisState::RenderLoadedDefinitionOptions()
 
 	static AABB2 exportedDataOptionsBox = AABB2(Vector2(theWindow->m_clientWidth * 0.025, theWindow->m_clientHeight * 0.05), Vector2(theWindow->m_clientWidth * 0.35, theWindow->m_clientHeight * 0.95));
 
+	//reset texture
+	theRenderer->SetTexture(*m_backGroundTexture);
+	theRenderer->SetShader(theRenderer->m_defaultShader);
+	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
+
 	//draw options
 	theRenderer->DrawAABB(exportedDataOptionsBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
 
@@ -208,13 +214,12 @@ void AnalysisState::RenderLoadedDefinitionOptions()
 	Vector2 exportedDataOptionsBoxStart = exportedDataOptionsBox.GetTopLeftPosition();
 	Vector2 exportDataOptionsBoxDimensions = exportedDataOptionsBox.GetDimensions();
 
-	int selectableOptionCount = 0;
 	int optionDisplacementCount = 0;
 	int simCount = 0;
 
 	float startHeight = 0.9f;
 	float heightDecrementAmount = 0.02f;	
-	std::map<std::string, SimulationContents*>::iterator contentsIterator;
+	std::map<std::string, SimulationDefinitionContents*>::iterator contentsIterator;
 
 	for (contentsIterator = m_definitionsForExecutionMap.begin(); contentsIterator != m_definitionsForExecutionMap.end(); ++contentsIterator)
 	{
@@ -232,27 +237,29 @@ void AnalysisState::RenderLoadedDefinitionOptions()
 			1.f,
 			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
-		SimulationContents* simContents = contentsIterator->second;
+		SimulationDefinitionContents* simContents = contentsIterator->second;
 		++optionDisplacementCount;
 
-		for (int analyzedFunctionIndex = 0; analyzedFunctionIndex < (int)simContents->importedStatisticData.size(); ++analyzedFunctionIndex)
+		for (int simContentsOptionIndex = 0; simContentsOptionIndex < (int)simContents->m_simSelectableOptionIndexes.size(); ++simContentsOptionIndex)
 		{
-			if (IsOptionSelectedForGraph(selectableOptionCount))
-				m_selectedGraphOption == selectableOptionCount ? textColor = hoveredColor : textColor = colorInSelectedList;
+			int optionIndex = simContents->m_simSelectableOptionIndexes[simContentsOptionIndex];
+			SelectableProfiledSimDataOption& currentOption = m_allSelectableOptions[optionIndex];
+
+			if (IsOptionSelectedForGraph(optionIndex))
+				m_currentHoveredGraphOption == optionIndex ? textColor = hoveredColor : textColor = colorInSelectedList;
 			else
-				m_selectedGraphOption == selectableOptionCount ? textColor = hoveredColor : textColor = nonHoveredColor;
+				m_currentHoveredGraphOption == optionIndex ? textColor = hoveredColor : textColor = nonHoveredColor;
 
 			//draw simulation paths
 			Vector2 textPosition = Vector2(exportedDataOptionsBoxStart.x + (exportDataOptionsBoxDimensions.x * 0.05f), ((exportedDataOptionsBoxStart.y * 0.95) - (exportDataOptionsBoxDimensions.y * float(optionDisplacementCount) * heightDecrementAmount)));
 			theRenderer->DrawText2D(textPosition,
-				Stringf("	- %s", simContents->importedStatisticData[analyzedFunctionIndex]->m_profiledName.c_str()).c_str(),
+				Stringf("	- %s", currentOption.m_data->m_profiledName.c_str()).c_str(),
 				theWindow->m_clientHeight * 0.015f,
 				textColor,
 				1.f,
 				Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
 			++optionDisplacementCount;
-			++selectableOptionCount;
 		}				
 	}
 }
@@ -260,6 +267,27 @@ void AnalysisState::RenderLoadedDefinitionOptions()
 //  =========================================================================================
 void AnalysisState::RenderLoadedDataContent()
 {
+	Renderer* theRenderer = Renderer::GetInstance();
+	Window* theWindow = Window::GetInstance();
+
+	static Rgba detailTextColor = Rgba::WHITE;
+
+	static AABB2 simDetailBox = AABB2(Vector2(theWindow->m_clientWidth * 0.375, theWindow->m_clientHeight * 0.55), Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.95));
+	static AABB2 profiledSimulationDataBox = AABB2(Vector2(theWindow->m_clientWidth * 0.375, theWindow->m_clientHeight * 0.05), Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.525));
+
+	//set render settings back to default
+	theRenderer->SetTexture(*m_backGroundTexture);
+	theRenderer->SetShader(theRenderer->m_defaultShader);
+	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);	
+
+	//render boxes
+	theRenderer->DrawAABB(simDetailBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
+	theRenderer->DrawAABB(profiledSimulationDataBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
+
+	//get sim definition data
+	TODO("GET SIM DEFINITION DATA FROM GENERAL INFO LOADED LIST");
+
+	//get hovered profiled content
 
 }
 
@@ -270,34 +298,58 @@ void AnalysisState::RenderSelectedLoadedDataContentDetails()
 }
 
 //  =========================================================================================
+void AnalysisState::RenderInfoAndInstructions()
+{
+	Renderer* theRenderer = Renderer::GetInstance();
+	Window* theWindow = Window::GetInstance();
+
+	//draw simulation paths
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.975f),
+		Stringf("Analyzing Simulation: %s", m_simulationDataFilePath.c_str()),
+		theWindow->m_clientHeight * 0.01f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * 0.015f),
+		"Press 'ENTER' to Add Data to Graph - Press 'SPACE' to Generate Graph - Press 'ESCAPE' to Return to Analysis Select",
+		theWindow->m_clientHeight * 0.01f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+}
+
+//  =========================================================================================
 bool AnalysisState::IsOptionSelectedForGraph(int optionIndex)
 {
-	for (int selectedIndex = 0; selectedIndex < (int)m_optionsSelectedForAnalysis.size(); ++selectedIndex)
-	{
-		if (optionIndex == m_optionsSelectedForAnalysis[selectedIndex])
-			return true;
-	}
+	return m_allSelectableOptions[optionIndex].m_isSelectedForGraph;
+}
 
-	return false;
+//  =========================================================================================
+void AnalysisState::SelectOptionForGraph(int optionIndex)
+{
+	m_allSelectableOptions[optionIndex].m_isSelectedForGraph = true;
 }
 
 //  =========================================================================================
 void AnalysisState::DeselectOptionForGraph(int optionIndex)
 {
-	for (int selectedIndex = 0; selectedIndex < m_optionsSelectedForAnalysis.size(); ++selectedIndex)
-	{
-		if (optionIndex == m_optionsSelectedForAnalysis[selectedIndex])
-			m_optionsSelectedForAnalysis.erase(m_optionsSelectedForAnalysis.begin() + selectedIndex);
-	}
+	m_allSelectableOptions[optionIndex].m_isSelectedForGraph = false;
 }
 
 //  =========================================================================================
 void AnalysisState::ToggleOptionToGraph(int optionIndex)
 {
 	if (!IsOptionSelectedForGraph(optionIndex))
-		m_optionsSelectedForAnalysis.push_back(optionIndex);
+		SelectOptionForGraph(optionIndex);
 	else
 		DeselectOptionForGraph(optionIndex);
+}
+
+//  =========================================================================================
+ImportedProfiledSimulationData * AnalysisState::GetImportedProfiledSimulationDataForOptionIndex(int optionIndex)
+{
+	
 }
 
 //  =========================================================================================
@@ -326,10 +378,10 @@ std::string AnalysisState::GetProfiledNameFromFileName(const std::string& filePa
 }
 
 //  =========================================================================================
-ImportedProfiledSimulationData* AnalysisState::GenerateProfiledSimulationDataFromFile(const std::string& filePath)
+ImportedProfiledSimulationData* AnalysisState::GenerateProfiledSimulationDataFromFile(const std::string& definitionName, const std::string& filePath)
 {
 	//perform calculation
-	ImportedProfiledSimulationData* simData = new ImportedProfiledSimulationData(filePath);
+	ImportedProfiledSimulationData* simData = new ImportedProfiledSimulationData(definitionName, filePath);
 
 	CSVEditor editor;
 	if (!editor.ReadFromFile(filePath))

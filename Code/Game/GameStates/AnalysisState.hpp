@@ -4,11 +4,13 @@
 #include "Engine\Core\Rgba.hpp"
 #include <map>
 
+
 //  ----------------------------------------------
 struct ImportedProfiledSimulationData
 {
-	ImportedProfiledSimulationData(const std::string& path)
+	ImportedProfiledSimulationData(const std::string& simDefinitionNameKey, const std::string& path)
 	{
+		m_simulationDefinitionContentsNameKey = simDefinitionNameKey;
 		m_path = path;
 	}
 
@@ -17,6 +19,7 @@ struct ImportedProfiledSimulationData
 		return m_entries == -1;
 	}
 
+	std::string m_simulationDefinitionContentsNameKey;
 	std::string m_profiledName;
 	std::string m_path;
 
@@ -32,15 +35,39 @@ struct ImportedProfiledSimulationData
 };
 
 //  ----------------------------------------------
-struct SimulationContents
+struct SelectableProfiledSimDataOption
 {
-	SimulationContents() {};
-	~SimulationContents()
+
+	SelectableProfiledSimDataOption(int optionIndex, ImportedProfiledSimulationData* data, bool isSelected = false)
 	{
-		importedStatisticData.clear();
+		m_optionIndex = optionIndex;
+		m_data = data;
+		m_isSelectedForGraph = isSelected;
 	}
 
-	std::vector<ImportedProfiledSimulationData*> importedStatisticData;
+	~SelectableProfiledSimDataOption()
+	{
+		m_data = nullptr;
+	}
+
+	int m_optionIndex = -1;
+	ImportedProfiledSimulationData* m_data = nullptr;
+	bool m_isSelectedForGraph = false;
+};
+
+
+//  ----------------------------------------------
+struct SimulationDefinitionContents
+{
+	std::vector<int> m_simSelectableOptionIndexes;
+};
+
+//  ----------------------------------------------
+enum AnalysisStateRenderState
+{
+	ANALYSIS_STATE_INFO_RENDER_STATE,
+	ANALYSIS_STATE_GRAPH_RENDER_STATE,
+	NUM_ANALYSIS_STATE_RENDER_STATES
 };
 
 //  ----------------------------------------------
@@ -70,12 +97,16 @@ public:
 
 	void InitializeSimulationAnalysisData();
 
+	void SetSimulationDataFilePath(const std::string& rootFilePath);
+
+private:
+
 	//string helper functions
 	std::string GetDefinitionNameFromPath(const std::string& path);
 	std::string GetProfiledNameFromFileName(const std::string& filePath);
 
 	//profile generation
-	ImportedProfiledSimulationData* GenerateProfiledSimulationDataFromFile(const std::string& filePath);
+	ImportedProfiledSimulationData* GenerateProfiledSimulationDataFromFile(const std::string& definitionName, const std::string& filePath);
 
 	//computations
 	void FillSimData(ImportedProfiledSimulationData* simData, const std::vector<float>& data);
@@ -89,23 +120,26 @@ public:
 	void RenderLoadedDefinitionOptions();
 	void RenderLoadedDataContent();
 	void RenderSelectedLoadedDataContentDetails();
+	void RenderInfoAndInstructions();
 
 	//graph helpers
 	bool IsOptionSelectedForGraph(int optionIndex);
+	void SelectOptionForGraph(int optionIndex);
 	void DeselectOptionForGraph(int optionIndex);
 	void ToggleOptionToGraph(int optionIndex);
+	ImportedProfiledSimulationData* GetImportedProfiledSimulationDataForOptionIndex(int optionIndex);
 
-public:
+private:
 	Texture* m_backGroundTexture = nullptr;
 	AnalysisGraph* m_analysisGraph = nullptr;
 	bool m_isGraphRendering = false;
 
 	std::string m_simulationDataFilePath = "";
-	int m_selectedGraphOption = 0;
-	int m_totalSelectableGraphOptions = 0;
+	int m_currentHoveredGraphOption = 0;
+
+	AnalysisStateRenderState m_currentRenderState = ANALYSIS_STATE_INFO_RENDER_STATE;
 
 	//matched using ID
-	std::map<std::string, SimulationContents*> m_definitionsForExecutionMap;	
-
-	std::vector<int> m_optionsSelectedForAnalysis;
+	std::map<std::string, SimulationDefinitionContents*> m_definitionsForExecutionMap;	
+	std::vector<SelectableProfiledSimDataOption> m_allSelectableOptions;
 };
