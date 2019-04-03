@@ -76,14 +76,31 @@ void AnalysisGraph::Render()
 
 	//draw horizontal graph lines (always 10 for now)
 	int simDataContentCount = (int)m_simuldationDataContents.size();
-	float percentageSpacingBetweenHorizontalLines = 0.1f;
+	float percentageSpacingBetweenHorizontalLines = 1.f/9.f;
+	float confidencePercentage = (m_maxConfidenceValue - m_minConfidenceValue) * percentageSpacingBetweenHorizontalLines;
 
-	for (int dataContentIndex = 0; dataContentIndex < 10; ++dataContentIndex)
+	//bottom -> top
+	for (int dataContentIndex = 0; dataContentIndex < 9; ++dataContentIndex)
 	{
 		float yPosition = graphBox.mins.y + (graphBoxDimensions.y * percentageSpacingBetweenHorizontalLines * (float)dataContentIndex);
 		Vector2 lineStart = Vector2(graphBox.mins.x, yPosition);
 		Vector2 lineEnd = Vector2(graphBox.maxs.x, yPosition);
 		theRenderer->DrawLineWithColor(lineStart, lineEnd, Rgba(0.2f, 0.2f, 0.2f, 0.5f));
+	}
+
+	//bottom -> top
+	for (int dataContentIndex = 0; dataContentIndex < 10; ++dataContentIndex)
+	{	
+		float yPosition = graphBox.mins.y + (graphBoxDimensions.y * percentageSpacingBetweenHorizontalLines * (float)dataContentIndex);
+
+		//draw horizontal legend text
+		Vector2 drawPosition = Vector2(boundsBox.mins.x + (boundsBoxDimensions.x * 0.01f), yPosition - ((theWindow->m_clientHeight * 0.015f * 0.5f)));
+		theRenderer->DrawText2D(drawPosition,
+			Stringf("%f", m_minConfidenceValue + (confidencePercentage * (float)dataContentIndex)).c_str(),
+			theWindow->m_clientHeight * 0.015f,
+			Rgba::BLACK,
+			1.f,
+			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	}
 	
 
