@@ -392,6 +392,9 @@ float AnalysisState::UpdateInputGraphState(float deltaSeconds)
 
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ESCAPE))
 	{
+		delete(m_analysisGraph);
+		m_analysisGraph = nullptr;
+
 		m_currentRenderState = ANALYSIS_STATE_INFO_RENDER_STATE;
 	}
 

@@ -9,9 +9,9 @@ Rgba g_graphColorList[8] = { Rgba::RED, Rgba::GREEN, Rgba::BLUE, Rgba::YELLOW, R
 //  =========================================================================================
 AnalysisGraph::AnalysisGraph()
 {
-	for (int dataIndex = 0; dataIndex < (int)m_simuldationDataContents.size(); ++dataIndex)
+	for (int dataIndex = 0; dataIndex < (int)m_simulationDataContents.size(); ++dataIndex)
 	{
-		m_simuldationDataContents[dataIndex] = nullptr;
+		m_simulationDataContents[dataIndex] = nullptr;
 	}
 }
 
@@ -23,14 +23,20 @@ AnalysisGraph::~AnalysisGraph()
 //  =========================================================================================
 void AnalysisGraph::GenerateGraph()
 {
-	//get min and max values from data
-	for (int simDataIndex = 0; simDataIndex < (int)m_simuldationDataContents.size(); ++simDataIndex)
-	{
-		if (m_simuldationDataContents[simDataIndex]->m_confidenceIntervalRangeLow < m_minConfidenceValue)
-			m_minConfidenceValue = m_simuldationDataContents[simDataIndex]->m_confidenceIntervalRangeLow;
+	if (m_simulationDataContents.size() == 0)
+		return;
 
-		if (m_simuldationDataContents[simDataIndex]->m_confidenceIntervalRangeHigh > m_maxConfidenceValue)
-			m_maxConfidenceValue = m_simuldationDataContents[simDataIndex]->m_confidenceIntervalRangeHigh;
+	m_minConfidenceValue = m_simulationDataContents[0]->m_confidenceIntervalRangeLow;
+	m_maxConfidenceValue = m_simulationDataContents[0]->m_confidenceIntervalRangeHigh;
+
+	//get min and max values from data
+	for (int simDataIndex = 0; simDataIndex < (int)m_simulationDataContents.size(); ++simDataIndex)
+	{
+		if (m_simulationDataContents[simDataIndex]->m_confidenceIntervalRangeLow < m_minConfidenceValue)
+			m_minConfidenceValue = m_simulationDataContents[simDataIndex]->m_confidenceIntervalRangeLow;
+
+		if (m_simulationDataContents[simDataIndex]->m_confidenceIntervalRangeHigh > m_maxConfidenceValue)
+			m_maxConfidenceValue = m_simulationDataContents[simDataIndex]->m_confidenceIntervalRangeHigh;
 	}
 
 	//anything else goes here
@@ -63,6 +69,7 @@ void AnalysisGraph::Render()
 	theRenderer->SetShader(theRenderer->m_defaultShader);
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
+	//  ----------------------------------------------
 	//draw graph space
 	theRenderer->DrawAABB(boundsBox, Rgba(1.f, 1.f, 1.f, 1.f));
 	//theRenderer->DrawAABB(titleBox, Rgba(1.f, 0.f, 0.f, 1.f));
@@ -74,8 +81,8 @@ void AnalysisGraph::Render()
 	theRenderer->DrawLineWithColor(bottomLeftGraphPosition, topLeftGraphPosition, Rgba::BLACK);
 	theRenderer->DrawLineWithColor(bottomRightGraphPosition, topRightGraphPosition, Rgba::BLACK);
 
+	//  ----------------------------------------------
 	//draw horizontal graph lines (always 10 for now)
-	int simDataContentCount = (int)m_simuldationDataContents.size();
 	float percentageSpacingBetweenHorizontalLines = 1.f/9.f;
 	float confidencePercentage = (m_maxConfidenceValue - m_minConfidenceValue) * percentageSpacingBetweenHorizontalLines;
 
@@ -87,6 +94,15 @@ void AnalysisGraph::Render()
 		Vector2 lineEnd = Vector2(graphBox.maxs.x, yPosition);
 		theRenderer->DrawLineWithColor(lineStart, lineEnd, Rgba(0.2f, 0.2f, 0.2f, 0.5f));
 	}
+
+	//draw vertical legend header text
+	Vector2 verticalLegendHeaderTextDrawPosition = Vector2(boundsBox.mins.x + (boundsBoxDimensions.x * 0.01f), graphBox.maxs.y + ((theWindow->m_clientHeight * 0.015f * 0.5f) * 2.f));
+	theRenderer->DrawText2D(verticalLegendHeaderTextDrawPosition,
+		Stringf("Seconds").c_str(),
+		theWindow->m_clientHeight * 0.015f,
+		Rgba::BLACK,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
 	//bottom -> top
 	for (int dataContentIndex = 0; dataContentIndex < 10; ++dataContentIndex)
@@ -103,18 +119,23 @@ void AnalysisGraph::Render()
 			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	}
 	
+	//  ----------------------------------------------
+	//reset texture
+	theRenderer->SetTexture(*theRenderer->CreateOrGetTexture("default"));
+	theRenderer->SetShader(theRenderer->m_defaultShader);
+	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	//draw data points for confidence intervals vertically
-	/*int simDataContentCount = (int)m_simuldationDataContents.size();
+	int simDataContentCount = (int)m_simulationDataContents.size();
 	float percentageSpacingBetweenVerticalLines = 1.f / ((float)simDataContentCount + 1.f);
 
 	for (int dataContentIndex = 0; dataContentIndex < simDataContentCount; ++dataContentIndex)
 	{
-		float xPosition = graphBoxDimensions.x * percentageSpacingBetweenVerticalLines;
+		float xPosition = graphBox.mins.x + (graphBoxDimensions.x * percentageSpacingBetweenVerticalLines * ((float)dataContentIndex + 1.f));
 		Vector2 lineStart = Vector2(xPosition, graphBox.mins.y);
 		Vector2 lineEnd = Vector2(xPosition, graphBox.maxs.y);
-		theRenderer->DrawLine(lineStart, lineEnd);
-	}*/
+		theRenderer->DrawLineWithColor(lineStart, lineEnd, Rgba::BLACK);
+	}
 
 	//draw title
 	theRenderer->DrawText2DCentered(titleBox.GetCenter(),
@@ -123,17 +144,10 @@ void AnalysisGraph::Render()
 		Rgba::BLACK,
 		1.f,
 		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-
-	//draw vertical legend text
-
-	//draw horizontal legend text
-
-	
-
 }
 
 //  =========================================================================================
 void AnalysisGraph::AddDataToGraph(ImportedProfiledSimulationData* data)
 {
-	m_simuldationDataContents.push_back(data);
+	m_simulationDataContents.push_back(data);
 }

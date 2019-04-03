@@ -18,11 +18,11 @@ public:
 	void Render();
 	void AddDataToGraph(ImportedProfiledSimulationData* data);
 
-	inline int GetDataCount() { return (int)m_simuldationDataContents.size(); }
+	inline int GetDataCount() { return (int)m_simulationDataContents.size(); }
 
 private:
 	float m_minConfidenceValue = 0.f;
 	float m_maxConfidenceValue = 0.f;
 
-	std::vector<ImportedProfiledSimulationData*> m_simuldationDataContents;
+	std::vector<ImportedProfiledSimulationData*> m_simulationDataContents;
 };
