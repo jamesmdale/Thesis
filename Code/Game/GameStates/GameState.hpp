@@ -71,10 +71,10 @@ protected:
 	static bool s_isFinishedTransitioningOut;
 	static bool s_isFinishedTransitioningIn;
 	static std::vector<GameState*> s_gameStates;
+	bool m_isInitialized = false;
 
 private:
 	static void FinishTransition();
-	bool m_isInitialized = false;
 };
 
 //static variables

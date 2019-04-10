@@ -94,6 +94,8 @@ void SimSelectState::Initialize()
 
 		m_executionSimulationDefinitions.push_back(option);
 	}
+
+	m_isInitialized = true;
 }
 
 //  =========================================================================================
@@ -318,9 +320,9 @@ void SimSelectState::RenderSelectableBox()
 		Vector2(theWindow->m_clientWidth * 0.45f, theWindow->m_clientHeight * 0.90f));*/
 
 	AABB2 selectableContentsBox;
-	Vector2 selectableContentsBoxCenter = Vector2(theWindow->m_clientWidth * 0.2f, theWindow->m_clientHeight * 0.55f);
+	Vector2 selectableContentsBoxCenter = Vector2(theWindow->m_clientWidth * 0.25, theWindow->m_clientHeight * 0.55f);
 	selectableContentsBox.SetCenter(selectableContentsBoxCenter);
-	selectableContentsBox.SetDimensions(theWindow->m_clientWidth * 0.125f, theWindow->m_clientHeight * 0.33f);
+	selectableContentsBox.SetDimensions(theWindow->m_clientWidth * 0.2f, theWindow->m_clientHeight * 0.33f);
 
 	// reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);
@@ -397,9 +399,9 @@ void SimSelectState::RenderSelectedBox()
 		Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.90f));*/
 
 	AABB2 selectedContentsBox;
-	Vector2 selectedContentsBoxCenter = Vector2(theWindow->m_clientWidth * 0.8f, theWindow->m_clientHeight * 0.55f);
+	Vector2 selectedContentsBoxCenter = Vector2(theWindow->m_clientWidth * 0.75f, theWindow->m_clientHeight * 0.55f);
 	selectedContentsBox.SetCenter(selectedContentsBoxCenter);
-	selectedContentsBox.SetDimensions(theWindow->m_clientWidth * 0.125f, theWindow->m_clientHeight * 0.33f);
+	selectedContentsBox.SetDimensions(theWindow->m_clientWidth * 0.2f, theWindow->m_clientHeight * 0.33f);
 
 	// reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);
