@@ -180,6 +180,12 @@ void Game::InitializeAgentDefinitions()
 void Game::InitializeSimulationDefinitions()
 {
 	SimulationDefinition::Initialize("Data/Simulations/Simulations.xml");
+
+	//add all simulations to the current list
+	for (int simulationIndex = 0; simulationIndex < SimulationDefinition::s_simulationDefinitions.size(); ++simulationIndex)
+	{
+		m_selectedDefinitions.push_back(SimulationDefinition::s_simulationDefinitions[simulationIndex]);
+	}
 }
 
 // pause command =============================================================================

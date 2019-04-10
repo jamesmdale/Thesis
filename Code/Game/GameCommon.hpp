@@ -59,8 +59,6 @@ extern uint g_numCopyPathCalls;
 extern uint g_numQueueActionPathCalls;
 extern uint g_numCollisionCalls;
 
-extern int g_currentSimDefinitionIndex;
-
 //camera data
 const Vector2 g_bottomLeftOrtho = Vector2( -1.f, -1.f);
 const Vector2 g_topRightOrtho = Vector2(1.f, 1.f);

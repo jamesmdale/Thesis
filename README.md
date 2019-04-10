@@ -8,8 +8,9 @@ Controls:
 - T                         = Show Tile Data
 - I                         = Show Agent Id
 - CTRL + F                  = Show Debug Data
-- CTRL + P		    = Pause Sim
+- CTRL + P		   			= Pause Sim
 - CTRL+ UP or DOWN (While debug data shown) = Cycle through agent details
+- F1						= Reload Simulation Definitions
 
 
 Optimizations:

@@ -186,7 +186,7 @@ void AnalysisState::RenderLoadedDefinitionOptions()
 	static Rgba nonHoveredColor = Rgba::GRAY;
 	static Rgba colorInSelectedList = Rgba::GREEN;
 
-	static AABB2 exportedDataOptionsBox = AABB2(Vector2(theWindow->m_clientWidth * 0.025, theWindow->m_clientHeight * 0.05), Vector2(theWindow->m_clientWidth * 0.35, theWindow->m_clientHeight * 0.95));
+	static AABB2 exportedDataOptionsBox = AABB2(Vector2(theWindow->m_clientWidth * 0.025f, theWindow->m_clientHeight * 0.05f), Vector2(theWindow->m_clientWidth * 0.35f, theWindow->m_clientHeight * 0.95f));
 
 	//reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);

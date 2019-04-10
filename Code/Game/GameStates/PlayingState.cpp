@@ -56,6 +56,7 @@ void PlayingState::Initialize()
 {
 	Window* theWindow = Window::GetInstance();
 	Renderer* theRenderer = Renderer::GetInstance();
+	Game* theGame = Game::GetInstance();
 
 	//setup cameras
 	m_uiCamera = new Camera();
@@ -82,7 +83,7 @@ void PlayingState::Initialize()
 
 	//simulation setup
 	GenerateOutputDirectory();
-	g_currentSimulationDefinition = SimulationDefinition::s_simulationDefinitions[g_currentSimDefinitionIndex];
+	g_currentSimulationDefinition = theGame->m_selectedDefinitions[theGame->m_currentSimDefinitionIndex];
 
 	CreateMapForSimulation(g_currentSimulationDefinition);
 	InitializeSimulation(g_currentSimulationDefinition);
@@ -305,7 +306,8 @@ void PlayingState::TransitionOut(float secondsTransitioning)
 //  =========================================================================================
 void PlayingState::ResetState()
 {
-	g_currentSimDefinitionIndex = 0;
+	Game* theGame = Game::GetInstance();
+	theGame->m_currentSimDefinitionIndex = 0;
 }
 
 //  =========================================================================================
@@ -537,16 +539,17 @@ void PlayingState::DeleteMap()
 //  =========================================================================================
 void PlayingState::LoadNextSim()
 {
+	Game* theGame = Game::GetInstance();
 	ExportSimulationData();
 	ResetCurrentSimulationData();
 
-	g_currentSimDefinitionIndex++;
+	theGame->m_currentSimDefinitionIndex++;
 	isResetingSimulation = false;
 	m_disectedAgent = nullptr;
 
-	if (g_currentSimDefinitionIndex < SimulationDefinition::s_simulationDefinitions.size())
+	if (theGame->m_currentSimDefinitionIndex < theGame->m_selectedDefinitions.size())
 	{
-		SimulationDefinition* definition = SimulationDefinition::s_simulationDefinitions[g_currentSimDefinitionIndex];	
+		SimulationDefinition* definition = theGame->m_selectedDefinitions[theGame->m_currentSimDefinitionIndex];
 
 		//if we are on the same map, leave the spawn points the same.
 	/*	if(definition->m_mapDefinition == g_currentSimulationDefinition->m_mapDefinition)

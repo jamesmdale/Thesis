@@ -26,6 +26,12 @@ SimulationDefinition::SimulationDefinition( const tinyxml2::XMLElement& element 
 	m_mapDefinition = MapDefinition::GetMapDefinitionByName(m_mapName);
 }
 
+//  =========================================================================================
+SimulationDefinition::~SimulationDefinition()
+{
+	m_mapDefinition = nullptr;
+}
+
 //  =============================================================================
 void SimulationDefinition::Initialize(const std::string& filePath)
 {

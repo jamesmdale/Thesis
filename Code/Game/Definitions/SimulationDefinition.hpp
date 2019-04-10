@@ -10,6 +10,7 @@ class SimulationDefinition
 {
 public:
 	explicit SimulationDefinition( const tinyxml2::XMLElement& element );
+	~SimulationDefinition();
 	static void Initialize(const std::string& filePath);
 	static SimulationDefinition* GetSimulationByName(const std::string& definitionName);
 

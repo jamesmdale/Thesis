@@ -2,17 +2,35 @@
 #include "Game\GameStates\GameState.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
 
-enum eSelectSimStateOptions
+
+enum eCurrentSelectedInput
 {
-	RUN_ALL_SELECT_SIM_OPTION,
-	RUN_FROM_LIST_SELECT_SIM_OPTION,
-	NUM_SELECT_SIM_OPTIONS
+	SELECTABLE_SIMS_BOX,
+	SELECTED_SIMS_BOX,
+	RELOAD_OPTION_BOX,
+	EXECUTE_OPTION_BOX,
+	CLEAR_OPTION_BOX,
+	NUM_OPTIONS
 };
 
-struct SimulationUIOptions
+struct SimulationUIOption
 {
-	uint id = 0;
-	bool isSelected = 0;
+	SimulationUIOption(uint id, SimulationDefinition* definition)
+	{
+		m_id = id;
+		m_definition = definition;
+		bool m_isSelected = false;
+	}
+	~SimulationUIOption()
+	{
+		m_definition = nullptr;
+	}
+
+	void ToggleSelected() { m_isSelected = !m_isSelected; }
+
+	int m_id = 0;
+	SimulationDefinition* m_definition = nullptr;
+	bool m_isSelected = false;
 };
 
 class SimSelectState : public GameState
@@ -32,10 +50,40 @@ public:
 	virtual void PostRender() override;
 	virtual float UpdateFromInput(float deltaSeconds) override;
 
-	virtual void ResetState() override;
+	virtual void Initialize();
+
+	virtual void TransitionIn(float secondsTransitioning) override;
+	virtual void TransitionOut(float secondsTransitioning) override;
+
+	void UpdateInputSelectableBox();
+	void UpdateInputSelectedBox();
+	void UpdateInputExecuteBox();
+	void UpdateInputClearBox();
+	void UpdateInputReloadBox();
+
+	void RenderInstructions();
+	void RenderSelectableBox();
+	void RenderSelectedBox();
+	void RenderReloadBox();
+	void RenderClearBox();
+	void RenderExecuteBox();
+
+	void ReloadSimulationDefinitions();
+	void AddSimulationToSelectedList(int id);
+	void RemoveSimulationFromSelectedList(int id);
+	void Execute();
+	void RemoveAllFromList();
+	void ReturnToMainMenu();
 
 public:
-	Texture * m_backGroundTexture;
-	eSelectSimStateOptions m_selectedSimMenuOption = RUN_ALL_SELECT_SIM_OPTION;
+	Texture* m_backGroundTexture;
+
+	int m_selectedOptionIndex = 0;
+	eCurrentSelectedInput m_selectedBox = SELECTABLE_SIMS_BOX;
+
+	std::vector<SimulationUIOption> m_selectableSimulationDefinitions;
+	std::vector<SimulationUIOption> m_selectedSimulationDefinitions;
+
+
 };
 

@@ -26,8 +26,6 @@ uint g_numCopyPathCalls = 0;
 uint g_numQueueActionPathCalls = 0;
 uint g_numCollisionCalls = 0;
 
-int g_currentSimDefinitionIndex = 0;
-
 //debug globals
 bool g_isDebug = false;
 bool g_isQuitting = false;

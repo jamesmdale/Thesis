@@ -40,7 +40,8 @@ public:
 
 	//rendering members
 	ForwardRenderingPath2D* m_forwardRenderingPath2D = nullptr;
-	SimulationDefinition* m_selectedSimulationDefinitions = nullptr;
+	std::vector<SimulationDefinition*> m_selectedDefinitions;
+	int m_currentSimDefinitionIndex = 0;
 };
 
 Clock* GetGameClock();
