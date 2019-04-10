@@ -25,16 +25,12 @@ void MainMenuState::Render()
 	Renderer* theRenderer = Renderer::GetInstance();
 	Window* theWindow = Window::GetInstance();
 
-	Rgba playColor = Rgba::GRAY;
 	Rgba simSelectColor = Rgba::GRAY;
 	Rgba analysisColor = Rgba::GRAY;
 	Rgba quitColor = Rgba::GRAY;
 
 	switch (m_selectedMenuOption)
 	{
-	case PLAY:
-		playColor = Rgba::WHITE;
-		break;
 	case SIM_SELECT:
 		simSelectColor = Rgba::WHITE;
 		break;
@@ -58,7 +54,6 @@ void MainMenuState::Render()
 
 	theRenderer->DrawAABB(theWindow->GetClientWindow(), Rgba(0.f, 0.f, 0.f, 1.f));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .66666f), "Thesis", theWindow->m_clientHeight * .1f, Rgba::YELLOW, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
-	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .45), "Play", theWindow->m_clientHeight * .075f, playColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .35f), "Sim Select", theWindow->m_clientHeight * .075f, simSelectColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .25f), "Analysis", theWindow->m_clientHeight * .075f, analysisColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 	theRenderer->DrawText2DCentered(Vector2(theWindow->m_clientWidth * .5f, theWindow->m_clientHeight * .15f), "Quit", theWindow->m_clientHeight * .075f, quitColor, 1.f, Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
@@ -106,10 +101,6 @@ float MainMenuState::UpdateFromInput(float deltaSeconds)
 	{
 		switch (m_selectedMenuOption)
 		{
-		case(PLAY):
-			ResetState();
-			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
-			break;
 		case(SIM_SELECT):
 			ResetState();
 			GameState::TransitionGameStates(GetGameStateFromGlobalListByType(SIM_SELECT_GAME_STATE));
@@ -144,7 +135,7 @@ void MainMenuState::TransitionIn(float secondsTransitioning)
 //  =========================================================================================
 void MainMenuState::ResetState()
 {
-	m_selectedMenuOption = PLAY;
+	m_selectedMenuOption = SIM_SELECT;
 }
 
 //  =========================================================================================

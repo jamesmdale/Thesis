@@ -292,6 +292,12 @@ float PlayingState::UpdateFromInput(float deltaSeconds)
 //  =========================================================================================
 void PlayingState::TransitionIn(float secondsTransitioning)
 {
+	Game* theGame = Game::GetInstance();
+	g_currentSimulationDefinition = theGame->m_selectedDefinitions[theGame->m_currentSimDefinitionIndex];
+
+	CreateMapForSimulation(g_currentSimulationDefinition);
+	InitializeSimulation(g_currentSimulationDefinition);
+
 	s_isFinishedTransitioningIn = true;
 }
 
@@ -579,9 +585,30 @@ void PlayingState::LoadNextSim()
 //  =============================================================================
 void PlayingState::ExportSimulationData()
 {
-	std::string newFolder = Stringf("%s%s%s", simDataOutputDirectory.c_str(), "Simulation_Definition_", g_currentSimulationDefinition->m_name.c_str());
-	CreateFolder(newFolder.c_str());
+	std::string newFolder = "";
+	bool isFolderValid = false;
+	int iterationCount = 0;
 
+	newFolder = Stringf("%s%s%s", simDataOutputDirectory.c_str(), "Simulation_Definition_", g_currentSimulationDefinition->m_name.c_str());
+	while (!isFolderValid)
+	{
+		if (DoesFileExist(newFolder))
+		{
+			if (iterationCount > 0)
+				newFolder.erase(newFolder.end() - 2, newFolder.end());
+
+			++iterationCount;
+			
+			newFolder.append(Stringf("_%i", iterationCount).c_str());
+		}
+		else
+		{
+			isFolderValid = true;
+		}
+			
+	}
+
+	CreateFolder(newFolder.c_str());
 	std::string finalFilePath = Stringf("%s%s", newFolder.c_str(), "\\");
 
 	//general data

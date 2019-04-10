@@ -3,7 +3,6 @@
 
 enum eMainMenuOptions
 {
-	PLAY,
 	SIM_SELECT,
 	ANALYSIS,
 	EXIT,
@@ -33,6 +32,6 @@ public:
 
 public:
 	Texture* m_backGroundTexture;
-	eMainMenuOptions m_selectedMenuOption = PLAY;
+	eMainMenuOptions m_selectedMenuOption = SIM_SELECT;
 };
 

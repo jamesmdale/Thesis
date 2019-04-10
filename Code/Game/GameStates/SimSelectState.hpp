@@ -72,7 +72,7 @@ public:
 	void AddSimulationToSelectedList(int id);
 	void RemoveSimulationFromSelectedList(int id);
 	void Execute();
-	void RemoveAllFromList();
+	void RemoveAllFromSelectedList();
 	void ReturnToMainMenu();
 
 public:
@@ -82,7 +82,7 @@ public:
 	eCurrentSelectedInput m_selectedBox = SELECTABLE_SIMS_BOX;
 
 	std::vector<SimulationUIOption> m_selectableSimulationDefinitions;
-	std::vector<SimulationUIOption> m_selectedSimulationDefinitions;
+	std::vector<SimulationUIOption> m_executionSimulationDefinitions;
 
 
 };

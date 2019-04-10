@@ -89,8 +89,10 @@ void SimSelectState::Initialize()
 {
 	for (uint definitionIndex = 0; definitionIndex < (uint)SimulationDefinition::s_simulationDefinitions.size(); ++definitionIndex)
 	{
-		SimulationUIOption option = SimulationUIOption(definitionIndex, SimulationDefinition::s_simulationDefinitions[0]);
+		SimulationUIOption option = SimulationUIOption(definitionIndex, SimulationDefinition::s_simulationDefinitions[definitionIndex]);
 		m_selectableSimulationDefinitions.push_back(option);
+
+		m_executionSimulationDefinitions.push_back(option);
 	}
 }
 
@@ -127,7 +129,7 @@ void SimSelectState::UpdateInputSelectableBox()
 	//if they press the down key, navigate one down in the selectable list
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
-		if (m_selectedOptionIndex < (int)m_selectableSimulationDefinitions.size())
+		if (m_selectedOptionIndex < (int)m_selectableSimulationDefinitions.size() - 1)
 			m_selectedOptionIndex += 1;
 		else
 		{
@@ -140,16 +142,9 @@ void SimSelectState::UpdateInputSelectableBox()
 	//if they press the right key, put them in the selected box
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_D) || theInput->WasKeyJustPressed(theInput->KEYBOARD_RIGHT_ARROW))
 	{
-		if (m_selectedOptionIndex < (int)m_selectableSimulationDefinitions.size())
-			m_selectedOptionIndex += 1;
-		else
-		{
-			if (m_selectedOptionIndex >= (int)m_selectedSimulationDefinitions.size())
-				m_selectedOptionIndex = (int)m_selectedSimulationDefinitions.size() - 1;
-
-			m_selectedBox = SELECTED_SIMS_BOX;
-			return;
-		}
+		m_selectedOptionIndex = 0;
+		m_selectedBox = SELECTED_SIMS_BOX;
+		return;
 	}
 
 	//if they press the enter key, add the option to the selected list
@@ -173,7 +168,7 @@ void SimSelectState::UpdateInputSelectedBox()
 	//if they press the down key, navigate one down in the selected list
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_S) || theInput->WasKeyJustPressed(theInput->KEYBOARD_DOWN_ARROW))
 	{
-		if (m_selectedOptionIndex < (int)m_selectedSimulationDefinitions.size())
+		if (m_selectedOptionIndex < (int)m_executionSimulationDefinitions.size() - 1)
 			m_selectedOptionIndex += 1;
 		else
 		{
@@ -184,18 +179,11 @@ void SimSelectState::UpdateInputSelectedBox()
 	}
 
 	//if they press the left key, put them in the selectable box
-	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_D) || theInput->WasKeyJustPressed(theInput->KEYBOARD_RIGHT_ARROW))
+	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_A) || theInput->WasKeyJustPressed(theInput->KEYBOARD_LEFT_ARROW))
 	{
-		if (m_selectedOptionIndex < (int)m_selectedSimulationDefinitions.size())
-			m_selectedOptionIndex += 1;
-		else
-		{
-			if (m_selectedOptionIndex >= (int)m_selectableSimulationDefinitions.size())
-				m_selectedOptionIndex = (int)m_selectableSimulationDefinitions.size() - 1;
-
-			m_selectedBox = SELECTABLE_SIMS_BOX;
-			return;
-		}
+		m_selectedOptionIndex = 0;
+		m_selectedBox = SELECTABLE_SIMS_BOX;
+		return;
 	}
 
 	//if they press the enter key, remove the selected option
@@ -213,7 +201,7 @@ void SimSelectState::UpdateInputExecuteBox()
 	//if they press the up key, put them at the bottom of the selected list
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
 	{
-		m_selectedOptionIndex = (int)m_selectedSimulationDefinitions.size() - 1;
+		m_selectedOptionIndex = (int)m_executionSimulationDefinitions.size() - 1;
 		m_selectedBox = SELECTED_SIMS_BOX;
 	}
 
@@ -227,11 +215,11 @@ void SimSelectState::UpdateInputExecuteBox()
 	//if they press the enter key, excute the current list we have
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ENTER))
 	{
-		if (m_selectedSimulationDefinitions.size() > 0)
+		if (m_executionSimulationDefinitions.size() > 0)
 		{
-			//transition to playing with the current list
-		}
-		//else show popup or something telling them they must have some in the list		
+			//else show popup or something telling them they must have some in the list		
+			Execute();
+		}		
 	}
 }
 
@@ -243,7 +231,7 @@ void SimSelectState::UpdateInputClearBox()
 	//if they press the up key, put them at the bottom of the selected list
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_W) || theInput->WasKeyJustPressed(theInput->KEYBOARD_UP_ARROW))
 	{
-		m_selectedOptionIndex = (int)m_selectedSimulationDefinitions.size() - 1;
+		m_selectedOptionIndex = (int)m_executionSimulationDefinitions.size() - 1;
 		m_selectedBox = SELECTED_SIMS_BOX;
 	}
 
@@ -257,14 +245,14 @@ void SimSelectState::UpdateInputClearBox()
 	//if they press the left key, put them in the execute option box box
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_D) || theInput->WasKeyJustPressed(theInput->KEYBOARD_RIGHT_ARROW))
 	{
-		m_selectedBox = RELOAD_OPTION_BOX;
+		m_selectedBox = EXECUTE_OPTION_BOX;
 		return;
 	}
 
 	//if they press the enter key, excute the current list we have
 	if (theInput->WasKeyJustPressed(theInput->KEYBOARD_ENTER))
 	{
-		RemoveAllFromList();
+		RemoveAllFromSelectedList();
 	}
 }
 
@@ -326,16 +314,41 @@ void SimSelectState::RenderSelectableBox()
 	static Rgba simHeaderColor = Rgba::YELLOW;
 	static Rgba nonHoveredColor = Rgba::GRAY;
 
-	static AABB2 selectableContentsBox = AABB2(Vector2(theWindow->m_clientWidth * 0.025f, theWindow->m_clientHeight * 0.15f),
-		Vector2(theWindow->m_clientWidth * 0.45f, theWindow->m_clientHeight * 0.90f));
+	/*static AABB2 selectableContentsBox = AABB2(Vector2(theWindow->m_clientWidth * 0.025f, theWindow->m_clientHeight * 0.15f),
+		Vector2(theWindow->m_clientWidth * 0.45f, theWindow->m_clientHeight * 0.90f));*/
+
+	AABB2 selectableContentsBox;
+	Vector2 selectableContentsBoxCenter = Vector2(theWindow->m_clientWidth * 0.2f, theWindow->m_clientHeight * 0.55f);
+	selectableContentsBox.SetCenter(selectableContentsBoxCenter);
+	selectableContentsBox.SetDimensions(theWindow->m_clientWidth * 0.125f, theWindow->m_clientHeight * 0.33f);
 
 	// reset texture
-		theRenderer->SetTexture(*m_backGroundTexture);
+	theRenderer->SetTexture(*m_backGroundTexture);
 	theRenderer->SetShader(theRenderer->m_defaultShader);
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	//draw options
+	if (m_selectedBox == SELECTABLE_SIMS_BOX)
+		theRenderer->DrawAABB(selectableContentsBox * 0.015f, Rgba::YELLOW);
+
 	theRenderer->DrawAABB(selectableContentsBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
+	
+	Vector2 selectableTitleCenter = Vector2(selectableContentsBoxCenter.x, selectableContentsBoxCenter.y + (theWindow->m_clientHeight * 0.33f) + (theWindow->m_clientHeight * 0.025f));
+	theRenderer->DrawText2DCentered(selectableTitleCenter,
+		Stringf("Selectable List").c_str(),
+		theWindow->m_clientHeight * 0.025f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	Vector2 selectableInstructionsCenter = Vector2(selectableContentsBoxCenter.x, selectableContentsBoxCenter.y - (theWindow->m_clientHeight * 0.33f) + (theWindow->m_clientHeight * 0.025f));
+	theRenderer->DrawText2DCentered(selectableInstructionsCenter,
+		Stringf("'ENTER' to ADD to the execution list").c_str(),
+		theWindow->m_clientHeight * 0.01f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
 
 	//draw each type of reset
 	Vector2 optionsBoxStart = selectableContentsBox.GetTopLeftPosition();
@@ -345,7 +358,7 @@ void SimSelectState::RenderSelectableBox()
 	int simCount = 0;
 
 	float startHeight = 0.9f;
-	float heightDecrementAmount = 0.02f;
+	float heightDecrementAmount = 0.04;
 
 	for (int selectableIndex = 0; selectableIndex < (int)m_selectableSimulationDefinitions.size(); ++selectableIndex)
 	{
@@ -358,7 +371,7 @@ void SimSelectState::RenderSelectableBox()
 		std::string simName = m_selectableSimulationDefinitions[selectableIndex].m_definition->m_name;
 
 		//draw simulation paths
-		Vector2 textPosition = Vector2(optionsBoxStart.x + (optionsBoxDimensions.x * 0.05f), ((optionsBoxStart.y * 0.95) - (optionsBoxDimensions.y * float(optionDisplacementCount) * heightDecrementAmount)));
+		Vector2 textPosition = Vector2(optionsBoxStart.x + (optionsBoxDimensions.x * 0.05f), ((optionsBoxStart.y * 0.95f) - (optionsBoxDimensions.y * float(optionDisplacementCount) * heightDecrementAmount)));
 		theRenderer->DrawText2D(textPosition,
 			Stringf("%i) %s", simCount, simName.c_str()).c_str(),
 			theWindow->m_clientHeight * 0.015f,
@@ -380,8 +393,13 @@ void SimSelectState::RenderSelectedBox()
 	static Rgba simHeaderColor = Rgba::YELLOW;
 	static Rgba nonHoveredColor = Rgba::GRAY;
 
-	static AABB2 selectedContentsBox = AABB2(Vector2(theWindow->m_clientWidth * 0.525, theWindow->m_clientHeight * 0.15f),
-		Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.90f));
+	/*static AABB2 selectedContentsBox = AABB2(Vector2(theWindow->m_clientWidth * 0.525, theWindow->m_clientHeight * 0.15f),
+		Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.90f));*/
+
+	AABB2 selectedContentsBox;
+	Vector2 selectedContentsBoxCenter = Vector2(theWindow->m_clientWidth * 0.8f, theWindow->m_clientHeight * 0.55f);
+	selectedContentsBox.SetCenter(selectedContentsBoxCenter);
+	selectedContentsBox.SetDimensions(theWindow->m_clientWidth * 0.125f, theWindow->m_clientHeight * 0.33f);
 
 	// reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);
@@ -389,7 +407,27 @@ void SimSelectState::RenderSelectedBox()
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	//draw options
-	theRenderer->DrawAABB(selectedContentsBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
+	if (m_selectedBox == SELECTED_SIMS_BOX)
+		theRenderer->DrawAABB(selectedContentsBox * 0.015f, Rgba::YELLOW);
+
+	theRenderer->DrawAABB(selectedContentsBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));	
+
+	//draw instrcutions
+	Vector2 executionTitleCenter = Vector2(selectedContentsBoxCenter.x, selectedContentsBoxCenter.y + (theWindow->m_clientHeight * 0.33f) + (theWindow->m_clientHeight * 0.025f));
+	theRenderer->DrawText2DCentered(executionTitleCenter,
+		Stringf("Execution List").c_str(),
+		theWindow->m_clientHeight * 0.025f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	Vector2 executionInstructionsCenter= Vector2(selectedContentsBoxCenter.x, selectedContentsBoxCenter.y - (theWindow->m_clientHeight * 0.33f) + (theWindow->m_clientHeight * 0.025f));
+	theRenderer->DrawText2DCentered(executionInstructionsCenter,
+		Stringf("'ENTER' to REMOVE from execution list").c_str(),
+		theWindow->m_clientHeight * 0.01f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 
 	//draw each type of reset
 	Vector2 optionsBoxStart = selectedContentsBox.GetTopLeftPosition();
@@ -399,9 +437,9 @@ void SimSelectState::RenderSelectedBox()
 	int simCount = 0;
 
 	float startHeight = 0.9f;
-	float heightDecrementAmount = 0.02f;
+	float heightDecrementAmount = 0.04;
 
-	for (int selectableIndex = 0; selectableIndex < (int)m_selectedSimulationDefinitions.size(); ++selectableIndex)
+	for (int selectableIndex = 0; selectableIndex < (int)m_executionSimulationDefinitions.size(); ++selectableIndex)
 	{
 		Rgba textColor = nonHoveredColor;
 		if (m_selectedBox == SELECTED_SIMS_BOX && m_selectedOptionIndex == selectableIndex)
@@ -409,10 +447,10 @@ void SimSelectState::RenderSelectedBox()
 
 		++simCount;
 
-		std::string simName = m_selectedSimulationDefinitions[selectableIndex].m_definition->m_name;
+		std::string simName = m_executionSimulationDefinitions[selectableIndex].m_definition->m_name;
 
 		//draw simulation paths
-		Vector2 textPosition = Vector2(optionsBoxStart.x + (optionsBoxDimensions.x * 0.05f), ((optionsBoxStart.y * 0.95) - (optionsBoxDimensions.y * float(optionDisplacementCount) * heightDecrementAmount)));
+		Vector2 textPosition = Vector2(optionsBoxStart.x + (optionsBoxDimensions.x * 0.05f), ((optionsBoxStart.y * 0.95f) - (optionsBoxDimensions.y * float(optionDisplacementCount) * heightDecrementAmount)));
 		theRenderer->DrawText2D(textPosition,
 			Stringf("%i) %s", simCount, simName.c_str()).c_str(),
 			theWindow->m_clientHeight * 0.015f,
@@ -435,8 +473,13 @@ void SimSelectState::RenderReloadBox()
 	static Rgba simHeaderColor = Rgba::YELLOW;
 	static Rgba nonHoveredColor = Rgba::GRAY;
 
-	static AABB2 reloadBox = AABB2(Vector2(theWindow->m_clientWidth * 0.25f, theWindow->m_clientHeight * 0.075f),
-		theWindow->m_clientWidth * 0.05f, theWindow->m_clientHeight * 0.05f);
+	AABB2 reloadBox;
+	reloadBox.SetCenter(Vector2(theWindow->m_clientWidth * 0.25f, theWindow->m_clientHeight * 0.125f));
+	reloadBox.SetDimensions(theWindow->m_clientWidth * 0.1f, theWindow->m_clientHeight * 0.05f);
+
+	Rgba textColor = nonHoveredColor;
+	if (m_selectedBox == RELOAD_OPTION_BOX)
+		textColor = hoveredColor;
 
 	// reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);
@@ -444,7 +487,17 @@ void SimSelectState::RenderReloadBox()
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	//draw options
-	theRenderer->DrawAABB(reloadBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
+	if (m_selectedBox == RELOAD_OPTION_BOX)
+		theRenderer->DrawAABB(reloadBox * 0.015, Rgba::YELLOW);
+
+	theRenderer->DrawAABB(reloadBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));	
+
+	theRenderer->DrawText2DCentered(reloadBox.GetCenter(),
+		Stringf("Reload Defs").c_str(),
+		theWindow->m_clientHeight * 0.025f,
+		textColor,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 }
 
 //  =========================================================================================
@@ -457,8 +510,16 @@ void SimSelectState::RenderClearBox()
 	static Rgba simHeaderColor = Rgba::YELLOW;
 	static Rgba nonHoveredColor = Rgba::GRAY;
 
-	static AABB2 clearBox = AABB2(Vector2(theWindow->m_clientWidth * 0.5f, theWindow->m_clientHeight * 0.075f),
-		theWindow->m_clientWidth * 0.05f, theWindow->m_clientHeight * 0.05f);
+	Rgba textColor = nonHoveredColor;
+	if (m_selectedBox == CLEAR_OPTION_BOX)
+		textColor = hoveredColor;
+
+	/*static AABB2 clearBox = AABB2(Vector2(theWindow->m_clientWidth * 0.5f, theWindow->m_clientHeight * 0.075f),
+		theWindow->m_clientWidth * 0.05f, theWindow->m_clientHeight * 0.05f);*/
+
+	AABB2 clearBox;
+	clearBox.SetCenter(Vector2(theWindow->m_clientWidth * 0.5f, theWindow->m_clientHeight * 0.125f));
+	clearBox.SetDimensions(theWindow->m_clientWidth * 0.1f, theWindow->m_clientHeight * 0.05f);
 
 	// reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);
@@ -466,7 +527,17 @@ void SimSelectState::RenderClearBox()
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	//draw options
+	if (m_selectedBox == CLEAR_OPTION_BOX)
+		theRenderer->DrawAABB(clearBox * 0.015, Rgba::YELLOW);
+
 	theRenderer->DrawAABB(clearBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
+
+	theRenderer->DrawText2DCentered(clearBox.GetCenter(),
+		Stringf("Clear Selected").c_str(),
+		theWindow->m_clientHeight * 0.025f,
+		textColor,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 }
 
 //  =========================================================================================
@@ -479,8 +550,13 @@ void SimSelectState::RenderExecuteBox()
 	static Rgba simHeaderColor = Rgba::YELLOW;
 	static Rgba nonHoveredColor = Rgba::GRAY;
 
-	static AABB2 executeBox = AABB2(Vector2(theWindow->m_clientWidth * 0.75f, theWindow->m_clientHeight * 0.075f),
-		theWindow->m_clientWidth * 0.05f, theWindow->m_clientHeight * 0.05f);
+	Rgba textColor = nonHoveredColor;
+	if (m_selectedBox == EXECUTE_OPTION_BOX)
+		textColor = hoveredColor;
+
+	AABB2 executeBox;
+	executeBox.SetCenter(Vector2(theWindow->m_clientWidth * 0.75f, theWindow->m_clientHeight * 0.125f));
+	executeBox.SetDimensions(theWindow->m_clientWidth * 0.1f, theWindow->m_clientHeight * 0.05f);
 
 	// reset texture
 	theRenderer->SetTexture(*m_backGroundTexture);
@@ -488,7 +564,17 @@ void SimSelectState::RenderExecuteBox()
 	theRenderer->m_defaultShader->EnableColorBlending(BLEND_OP_ADD, BLEND_SOURCE_ALPHA, BLEND_ONE_MINUS_SOURCE_ALPHA);
 
 	//draw options
+	if (m_selectedBox == EXECUTE_OPTION_BOX)
+		theRenderer->DrawAABB(executeBox * 0.015, Rgba::YELLOW);
+
 	theRenderer->DrawAABB(executeBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
+
+	theRenderer->DrawText2DCentered(executeBox.GetCenter(),
+		Stringf("Execute").c_str(),
+		theWindow->m_clientHeight * 0.025f,
+		textColor,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
 }
 
 //  =========================================================================================
@@ -500,41 +586,63 @@ void SimSelectState::ReloadSimulationDefinitions()
 	SimulationDefinition::s_simulationDefinitions.clear();
 	theGame->InitializeSimulationDefinitions();
 
-	RemoveAllFromList();
+	m_selectableSimulationDefinitions.clear();
+	
+	RemoveAllFromSelectedList();
 	Initialize();	
 }
 
 //  =========================================================================================
 void SimSelectState::AddSimulationToSelectedList(int id)
 {
-	SimulationUIOption optionCopy = m_selectableSimulationDefinitions[id];
-	optionCopy.m_id = (int)m_selectedSimulationDefinitions.size();
+	if (m_executionSimulationDefinitions.size() >= 8)
+		return;
 
-	m_selectedSimulationDefinitions.push_back(optionCopy);
+	SimulationUIOption optionCopy = m_selectableSimulationDefinitions[id];
+	optionCopy.m_id = (int)m_executionSimulationDefinitions.size();
+
+	m_executionSimulationDefinitions.push_back(optionCopy);
 }
 
 //  =========================================================================================
 void SimSelectState::RemoveSimulationFromSelectedList(int id)
 {
-	m_selectedSimulationDefinitions.erase(m_selectedSimulationDefinitions.begin() + id);
+	if (m_executionSimulationDefinitions.size() == 0)
+		return;
+
+	m_executionSimulationDefinitions.erase(m_executionSimulationDefinitions.begin() + id);
 	m_selectedOptionIndex--;
+
+	if (m_selectedOptionIndex < 0)
+		m_selectedOptionIndex = 0;
+
+	m_selectedOptionIndex % m_executionSimulationDefinitions.size();
 }
 
 //  =========================================================================================
 void SimSelectState::Execute()
 {
+	//copy selected list into our game list
+	Game* theGame = Game::GetInstance();
+	theGame->m_selectedDefinitions.clear();
 
+	for (int definitionIndex = 0; definitionIndex < (int)m_executionSimulationDefinitions.size(); ++definitionIndex)
+	{
+		theGame->m_selectedDefinitions.push_back(m_executionSimulationDefinitions[definitionIndex].m_definition);
+	}
+
+	GameState::TransitionGameStates(GetGameStateFromGlobalListByType(PLAYING_GAME_STATE));
 }
 
 //  =========================================================================================
-void SimSelectState::RemoveAllFromList()
+void SimSelectState::RemoveAllFromSelectedList()
 {
-	m_selectedSimulationDefinitions.clear();
+	m_executionSimulationDefinitions.clear();
 	m_selectedOptionIndex = 0;
 }
 
 //  =========================================================================================
 void SimSelectState::ReturnToMainMenu()
 {
-	GameState::TransitionGameStates(GetGameStateFromGlobalListByType(ANALYSIS_SELECT_GAME_STATE));
+	GameState::TransitionGameStates(GetGameStateFromGlobalListByType(MAIN_MENU_GAME_STATE));
 }
