@@ -10,6 +10,7 @@
 #include "Engine\Time\Stopwatch.hpp"
 #include "Engine\Profiler\Profiler.hpp"
 #include "Engine\Core\EngineCommon.hpp"
+#include "Engine\Profiler\ProfilerConsole.hpp"
 
 UtilityStorage* Planner::m_distanceUtilityStorage = nullptr;
 UtilityStorage* Planner::m_buildingHealthUtilityStorage = nullptr;
@@ -90,7 +91,7 @@ void Planner::ProcessActionStack(float deltaSeconds)
 #endif
 
 	//if we don't have a plan, we need an immediate update, or our timer for checking our plan has elapsed
-	if (m_actionStack.size() == 0 || m_isCurrentPlanDirty)
+	if (m_actionStack.size() == 0)
 	{
 		//force a new plan update
 		ResetCurrentPlanData();
@@ -165,6 +166,8 @@ void Planner::ClearActionStack()
 //  =========================================================================================
 void Planner::UpdatePlan()
 {
+	PROFILER_PUSH();
+
 #ifdef UpdatePlanAnalysis
 	// profiling ----------------------------------------------
 	++g_numUpdatePlanCalls;
@@ -176,8 +179,6 @@ void Planner::UpdatePlan()
 	++iterations;
 	//  ----------------------------------------------
 #endif
-
-	PROFILER_PUSH();
 
 	//set preset to 
 	ePlanTypes chosenOutcome = NONE_PLAN_TYPE;
@@ -325,7 +326,6 @@ void Planner::UpdatePlan()
 		
 	//reset necessary flags
 	ResetAgentUpdatePlanTimer();
-	m_isCurrentPlanDirty = false;
 
 #ifdef UpdatePlanAnalysis
 	// profiling ----------------------------------------------
@@ -379,6 +379,8 @@ bool Planner::IsPlanSameAsCurrent(const UtilityInfo& newPlan)
 //  =========================================================================================
 void Planner::QueueActionsFromCurrentPlan(const UtilityInfo& info)
 {
+	//PROFILER_PUSH();
+
 	++g_numQueueActionPathCalls;
 
 #ifdef QueueActionPathingDataAnalysis
@@ -431,18 +433,23 @@ void Planner::QueueActionsFromCurrentPlan(const UtilityInfo& info)
 
 		m_agent->m_planner->AddActionToStack(data);
 
+		{
+			PROFILER_SCOPE_PUSH("Pathing");
 
-		//figure out if we can skip doing an A* by borrowing someone else's path
-		if (GetIsOptimized())
-		{
-			PROFILER_PUSH();
-			bool success = FindAgentAndCopyPath(info.endPosition);
+			//figure out if we can skip doing an A* by borrowing someone else's path
+			if (GetIsOptimized())
+			{
+				//PROFILER_PUSH();
+				bool success = FindAgentAndCopyPath(info.endPosition);
+			}
+			else
+			{
+				//PROFILER_PUSH();
+				m_agent->GetPathToDestination(info.endPosition);
+			}
 		}
-		else
-		{
-			PROFILER_PUSH();
-			m_agent->GetPathToDestination(info.endPosition);
-		}		
+
+		
 
 #ifdef QueueActionPathingDataAnalysis
 		// profiling ----------------------------------------------
@@ -1419,6 +1426,8 @@ void Planner::ResetAgentUpdatePlanTimer()
 //  =========================================================================================
 bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 {
+	PROFILER_PUSH();
+
 	++g_numCopyPathCalls;
 
 	static Disc2 compareDisc = Disc2(0.f, 0.f, g_agentCopyDestinationPositionRadius);

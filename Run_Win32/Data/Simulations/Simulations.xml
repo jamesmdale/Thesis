@@ -32,11 +32,10 @@
   isBudgeted="false"
   />
 
-
-  <SimulationDefinition
-  name="100_optimized"
+     <SimulationDefinition
+  name="1000_optimized_sm"
   mapName="20x20"
-  numAgents="100"
+  numAgents="1000"
   numArmories="2"
   numLumberyards="2"
   numMedStations="2"
@@ -49,8 +48,41 @@
   isBudgeted="true"
   />
 
+      <SimulationDefinition
+  name="1000_unoptimized_sm"
+  mapName="20x20"
+  numAgents="1000"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="2"
+  numWells="2"
+  bombardmentRatePerSecond="2.0"
+  threatRatePerSecond = "5.0"
+  startingThreat="400"
+  processTimerInSeconds="180"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
+
+  <SimulationDefinition
+  name="100_optimized_180"
+  mapName="20x20"
+  numAgents="100"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="2"
+  numWells="2"
+  bombardmentRatePerSecond="2.0"
+  threatRatePerSecond = "5.0"
+  startingThreat="400"
+  processTimerInSeconds="180"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
 <SimulationDefinition
-  name="100_unoptomized"
+  name="100_unoptomized_180"
   mapName="20x20"
   numAgents="100"
   numArmories="2"
@@ -63,6 +95,56 @@
   processTimerInSeconds="60"
   isOptimized="false" 
   isBudgeted="false"
+  />
+
+
+
+<SimulationDefinition
+  name="1000_unoptomized"
+  mapName="20x20"
+  numAgents="100"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="2"
+  numWells="2"
+  bombardmentRatePerSecond="2.0"
+  threatRatePerSecond = "5.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
+        <SimulationDefinition
+  name="3000_unbudgeted"
+  mapName="50x50"
+  numAgents="3000"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="8.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
+     <SimulationDefinition
+  name="3000_budgeted"
+  mapName="50x50"
+  numAgents="3000"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="8.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="true"
   />
 
 </SimulationDefinitions>
@@ -149,3 +231,4 @@
   />
    <!-->
 
+</SimulationDefinitions>

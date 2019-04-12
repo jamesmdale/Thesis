@@ -21,7 +21,7 @@ UtilityStorage::UtilityStorage(const float min, const float max, uint divisions)
 //  =============================================================================
 int UtilityStorage::CalculateIndexForInput(const float input)
 {
-	float mappedValue = RangeMapFloat(input, m_min, m_max, 0, m_divisions - 1);
+	float mappedValue = RangeMapFloat(input, m_min, m_max, 0.f, (float)(m_divisions - 1.f));
 
 	//same as a floor
 	return (int)mappedValue;

@@ -106,7 +106,6 @@ void Agent::Update(float deltaSeconds)
 	UpdateSpriteRenderDirection();
 	m_animationSet->Update(deltaSeconds);
 
-
 #ifdef AgentUpdateAnalysis
 	// profiling ----------------------------------------------
 	uint64_t endHPC = GetPerformanceCounter();
@@ -175,6 +174,8 @@ void Agent::Render()
 //  =========================================================================================
 bool Agent::GetPathToDestination(const Vector2& goalDestination)
 {
+	PROFILER_PUSH();
+
 	++g_numGetPathCalls;
 
 #ifdef PathingDataAnalysis
@@ -188,7 +189,7 @@ bool Agent::GetPathToDestination(const Vector2& goalDestination)
 	//  ----------------------------------------------
 #endif
 
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 	m_currentPath = std::vector<Vector2>(); //clear vector
 
 	IntVector2 startCoord = m_planner->m_map->GetTileCoordinateOfPosition(m_position);
@@ -266,6 +267,8 @@ void Agent::UpdatePhysicsData()
 //  =========================================================================================
 bool Agent::IsHazardAhead()
 {
+	//PROFILER_PUSH();
+
 	Map* map = m_planner->m_map;
 
 	Vector2 positionAhead = m_position + m_forward;

@@ -15,6 +15,7 @@
 #include "Engine\Window\Window.hpp"
 #include "Engine\Core\EngineCommon.hpp"
 #include "Engine\File\FIleHelpers.hpp"
+#include "Engine\Profiler\Profiler.hpp"
 #include <vector>
 #include <string>
 
@@ -124,6 +125,8 @@ void Game::Initialize()
 //  =========================================================================================
 void Game::Update()
 {
+	PROFILER_PUSH();
+
 	float deltaSeconds = GetGameClock()->GetDeltaSeconds();
 
 	// update global menu data (handles transitions and timers) =============================================================================

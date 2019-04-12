@@ -25,7 +25,7 @@ Bombardment::~Bombardment()
 //  =========================================================================================
 void Bombardment::Update(float deltaSeconds)
 {
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 
 	float percentComplete = m_timer->GetNormalizedElapsedTimeInSeconds();
 
@@ -35,7 +35,7 @@ void Bombardment::Update(float deltaSeconds)
 //  =========================================================================================
 void Bombardment::Render()
 {
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 
 	Renderer* theRenderer = Renderer::GetInstance();
 

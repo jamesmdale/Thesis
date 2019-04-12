@@ -1,5 +1,9 @@
-#include <map>
-#include <string>
+#include "Game\GameStates\PlayingState.hpp"
+#include "Game\Entities\PointOfInterest.hpp"
+#include "Game\Agents\Agent.hpp"
+#include "Game\Definitions\SimulationDefinition.hpp"
+#include "Game\SimulationData.hpp"
+#include "Game\UI\DebugInputBox.hpp"
 #include "Engine\Window\Window.hpp"
 #include "Engine\Debug\DebugRender.hpp"
 #include "Engine\Core\LightObject.hpp"
@@ -12,12 +16,11 @@
 #include "Engine\Renderer\Mesh.hpp"
 #include "Engine\Math\AABB2.hpp"
 #include "Engine\Time\SimpleTimer.hpp"
-#include "Game\GameStates\PlayingState.hpp"
-#include "Game\Entities\PointOfInterest.hpp"
-#include "Game\Agents\Agent.hpp"
-#include "Game\Definitions\SimulationDefinition.hpp"
-#include "Game\SimulationData.hpp"
-#include "Game\UI\DebugInputBox.hpp"
+#include "Engine\Profiler\Profiler.hpp"
+#include <map>
+#include <string>
+
+
 
 float ORTHO_MAX = 0.f;
 float ORTHO_MIN = 0.f;
@@ -54,6 +57,8 @@ PlayingState::~PlayingState()
 //  =============================================================================
 void PlayingState::Initialize()
 {
+	//PROFILER_PUSH();
+
 	Window* theWindow = Window::GetInstance();
 	Renderer* theRenderer = Renderer::GetInstance();
 	Game* theGame = Game::GetInstance();
@@ -111,6 +116,8 @@ void PlayingState::Initialize()
 //  =============================================================================
 void PlayingState::Update(float deltaSeconds)
 { 
+	PROFILER_PUSH();
+
 	if (!GetGameClock()->IsPaused())
 	{
 		m_map->Update(deltaSeconds);
@@ -127,6 +134,8 @@ void PlayingState::Update(float deltaSeconds)
 //  =============================================================================
 void PlayingState::PreRender()
 {
+	PROFILER_PUSH();
+
 	if (m_isCameraLockedToAgent)
 	{
 		//have the camera follow the agent
@@ -137,6 +146,8 @@ void PlayingState::PreRender()
 //  =============================================================================
 void PlayingState::Render()
 {
+	PROFILER_PUSH();
+
 	//this timer determines how much time we have for all of our agent update.
 	SimpleTimer timer;
 	timer.Start();
@@ -158,6 +169,8 @@ void PlayingState::Render()
 //  =============================================================================
 void PlayingState::PostRender()
 {
+	PROFILER_PUSH();
+
 	if (g_isQuitting)
 		return;
 
@@ -327,13 +340,14 @@ void PlayingState::UpdateFPSCounters()
 	if (g_minFPSResetStopwatch->ResetAndDecrementIfElapsed())
 	{
 		g_minFPS = g_currentFps;
-	}
-	
+	}	
 }
 
 //  =========================================================================================
 void PlayingState::RenderGame()
 {
+	PROFILER_PUSH();
+
 	Renderer* theRenderer = Renderer::GetInstance();
 	theRenderer->SetCamera(m_camera);
 	m_map->Render();

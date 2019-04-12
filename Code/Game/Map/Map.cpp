@@ -320,6 +320,7 @@ void Map::Update(float deltaSeconds)
 void Map::UpdateAgents(float deltaSeconds)
 {
 	//update agents
+	PROFILER_PUSH();
 
 	if (!GetIsAgentUpdateBudgeted())
 	{
@@ -349,6 +350,8 @@ void Map::UpdateAgents(float deltaSeconds)
 //  =============================================================================
 void Map::UpdateAgentsBudgeted(float deltaSeconds)
 {
+	PROFILER_PUSH();
+
 	int64_t remainingAgentUpdateBudget = int64_t(g_perFrameHPCBudget - g_previousFrameNonAgentUpdateTime - g_previousFrameRenderTime);
 	g_agentsUpdatedThisFrame = 0;
 
@@ -573,6 +576,8 @@ void Map::Reload(SimulationDefinition* definition)
 //  =========================================================================================
 void Map::CreateMapMesh()
 {
+	PROFILER_PUSH();
+
 	MeshBuilder builder;
 	
 	//create mesh for static tiles and buildings
@@ -589,6 +594,8 @@ void Map::CreateMapMesh()
 //  =========================================================================================
 void Map::CreateDebugMapMesh()
 {
+	PROFILER_PUSH();
+
 	if (m_debugMapMesh != nullptr)
 	{
 		delete(m_debugMapMesh);
@@ -612,6 +619,8 @@ void Map::CreateDebugMapMesh()
 //  =========================================================================================
 Mesh* Map::CreateDynamicAgentMesh()
 {
+	PROFILER_PUSH();
+
 	MeshBuilder builder = MeshBuilder();
 
 	//create mesh for static tiles and buildings
@@ -672,6 +681,8 @@ Mesh* Map::CreateDynamicAgentMesh()
 //  =============================================================================
 Mesh* Map::CreateTextMesh()
 {
+	PROFILER_PUSH();
+
 	MeshBuilder builder = MeshBuilder();
 	Mesh* textMesh = nullptr;
 
@@ -699,6 +710,8 @@ Mesh* Map::CreateTextMesh()
 //  =========================================================================================
 Mesh* Map::CreateDynamicBombardmentMesh()
 {
+	PROFILER_PUSH();
+
 	MeshBuilder builder;
 
 	for (int bombardmentIndex = 0; bombardmentIndex < (int)m_activeBombardments.size(); ++bombardmentIndex)
@@ -715,6 +728,8 @@ Mesh* Map::CreateDynamicBombardmentMesh()
 //  =========================================================================================
 Mesh* Map::CreateDynamicFireMesh()
 {
+	PROFILER_PUSH();
+
 	MeshBuilder builder;;
 
 	for (int fireIndex = 0; fireIndex < (int)m_fires.size(); ++fireIndex)
@@ -733,6 +748,8 @@ Mesh* Map::CreateDynamicFireMesh()
 //  =========================================================================================
 void Map::DeleteDeadEntities()
 {
+	PROFILER_PUSH();
+
 	DeleteDeadFires();
 	DeleteDeadBombardmentsAndRandomlyStartFire();
 }
@@ -789,7 +806,7 @@ void Map::DeleteDeadBombardmentsAndRandomlyStartFire()
 // Bubble sort. Once sorted, will rarely require more than one pass =========================================================================================
 void Map::SortAgentsByX()
 {
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 
 	int i = 0;
 	int j = 0;
@@ -816,7 +833,7 @@ void Map::SortAgentsByX()
 // Bubble sort. Once sorted, will rarely require more than one pass =========================================================================================
 void Map::SortAgentsByY()
 {
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 
 	int i = 0;
 	int j = 0;
@@ -945,6 +962,8 @@ void Map::InitializeMapGrid()
 //  =========================================================================================
 void Map::UpdateMapGrid()
 {
+	PROFILER_PUSH();
+
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); tileIndex++)
 	{
 		int value = m_tiles[tileIndex]->m_tileDefinition->m_allowsWalking ? 0 : 1;

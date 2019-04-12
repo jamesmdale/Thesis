@@ -112,7 +112,7 @@ void GameState::Initialize()
 //static methods ========================================================================================
 void GameState::UpdateGlobalGameState(float deltaSeconds)
 {	
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 
 	s_secondsInState += deltaSeconds;
 

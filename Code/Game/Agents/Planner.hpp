@@ -123,7 +123,6 @@ public:
 	UtilityInfo m_currentPlan;
 
 	Stopwatch* m_updatePlanTimer = nullptr;
-	bool m_isCurrentPlanDirty = false;
 
 	UtilityHistory m_utilityHistory;
 

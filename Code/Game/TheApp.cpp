@@ -1,6 +1,11 @@
 #include "Game\TheApp.hpp"
 #include "Game\Game.hpp"
 #include "Game\GameCommon.hpp"
+#include "Game\SimulationData.hpp"
+#include "Game\Definitions\SpriteDefinitions\SpriteDefinition.hpp"
+#include "Game\Definitions\SpriteDefinitions\IsoSpriteDefinition.hpp"
+#include "Game\Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp"
+#include "Game\Definitions\SpriteDefinitions\IsoSpriteAnimSetDefinition.hpp"
 #include "Engine\Renderer\Renderer.hpp"
 #include "Engine\Input\InputSystem.hpp"
 #include "Engine\Time\Time.hpp"
@@ -20,11 +25,6 @@
 #include "Engine\File\CSVEditor.hpp"
 #include <thread>
 #include <fstream>
-#include "Game\SimulationData.hpp"
-#include "Game\Definitions\SpriteDefinitions\SpriteDefinition.hpp"
-#include "Game\Definitions\SpriteDefinitions\IsoSpriteDefinition.hpp"
-#include "Game\Definitions\SpriteDefinitions\IsoSpriteAnimDefinition.hpp"
-#include "Game\Definitions\SpriteDefinitions\IsoSpriteAnimSetDefinition.hpp"
 
 TheApp* g_theApp = nullptr;
 bool g_isAppPaused = false;
@@ -133,7 +133,7 @@ void TheApp::Update()
 //  =============================================================================
 void TheApp::PreRender()
 {
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 
 	Game::GetInstance()->PreRender();
 
@@ -175,7 +175,8 @@ void TheApp::PostRender()
 //  =============================================================================
 float TheApp::UpdateInput(float deltaSeconds)
 {
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
+
 	if(InputSystem::GetInstance()->WasKeyJustPressed((InputSystem::GetInstance()->KEYBOARD_TILDE)))
 	{
 		if(!DevConsole::GetInstance()->IsOpen())

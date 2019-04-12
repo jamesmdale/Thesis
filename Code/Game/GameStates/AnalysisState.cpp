@@ -103,6 +103,7 @@ void AnalysisState::ResetState()
 		simContent = nullptr;
 	}
 
+	m_allSelectableOptions.clear();
 	m_definitionsForExecutionMap.clear();
 
 	delete(m_analysisGraph);

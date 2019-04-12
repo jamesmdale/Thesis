@@ -26,7 +26,7 @@ IsoSpriteAnim::IsoSpriteAnim( IsoSpriteAnimDefinition* animDef, float totalAnima
 //  =============================================================================
 void IsoSpriteAnim::Update( float deltaSeconds )
 {
-	PROFILER_PUSH();
+	//PROFILER_PUSH();
 
 	m_elapsedSeconds += deltaSeconds;
 	float fractionelapsed = GetFractionElapsed();

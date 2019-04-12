@@ -7,7 +7,7 @@
 #include "Engine\Core\Rgba.hpp"
 #include <vector>
 
-#define ActionStackAnalysis
+/*#define ActionStackAnalysis
 #define UpdatePlanAnalysis
 #define AgentUpdateAnalysis
 #define PathingDataAnalysis
@@ -15,10 +15,7 @@
 #define QueueActionPathingDataAnalysis
 #define DistanceMemoizationDataAnalysis
 #define CollisionDataAnalysis
-
-//data organization switches
-#define ArrayOfStructs
-#define StructOfArrays
+*/
 
 class SimulationData;
 class SimulationDefinition;
