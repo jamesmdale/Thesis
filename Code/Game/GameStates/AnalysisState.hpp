@@ -41,6 +41,22 @@ struct ImportedProfiledSimulationData
 		return m_entries == -1;
 	}
 
+	void GetContentAsStrings(std::vector<std::string>& outContent)
+	{
+		std::string dataContent = "";
+
+		outContent.push_back(Stringf("Name: %s", m_profiledName.c_str()));
+		outContent.push_back(Stringf("Entries: %i", m_entries));
+		outContent.push_back(Stringf("Average: %f", m_average));
+		outContent.push_back(Stringf("Median: %f", m_median));
+		outContent.push_back(Stringf("Max Value: %f", m_maxValue));
+		outContent.push_back(Stringf("Min Value: %f", m_minValue));
+		outContent.push_back(Stringf("Std. Dev.: %f", m_standardDeviation));
+		outContent.push_back(Stringf("Interval 95: %f", m_confidenceInterval95));
+		outContent.push_back(Stringf("Interval Low: %f", m_confidenceIntervalRangeLow));
+		outContent.push_back(Stringf("Interval High: %f", m_confidenceIntervalRangeHigh));
+	}
+
 	std::string m_simulationDefinitionContentsNameKey;
 	std::string m_profiledName;
 	std::string m_path;
@@ -153,6 +169,7 @@ private:
 
 	//ui helpers
 	bool IsOptionSelectedForGraph(int optionIndex);
+	SimulationDefinitionContents* GetDefinitionContentsForHoveredOption(int optionIndex);
 	void SelectOptionForGraph(int optionIndex);
 	void DeselectOptionForGraph(int optionIndex);
 	void ToggleOptionToGraph(int optionIndex);

@@ -244,7 +244,7 @@ void AnalysisState::RenderLoadedDefinitionOptions()
 				m_currentHoveredGraphOption == optionIndex ? textColor = hoveredColor : textColor = nonHoveredColor;
 
 			//draw simulation paths
-			Vector2 textPosition = Vector2(exportedDataOptionsBoxStart.x + (exportDataOptionsBoxDimensions.x * 0.05f), ((exportedDataOptionsBoxStart.y * 0.95) - (exportDataOptionsBoxDimensions.y * float(optionDisplacementCount) * heightDecrementAmount)));
+			Vector2 textPosition = Vector2(exportedDataOptionsBoxStart.x + (exportDataOptionsBoxDimensions.x * 0.05f), ((exportedDataOptionsBoxStart.y * 0.95f) - (exportDataOptionsBoxDimensions.y * float(optionDisplacementCount) * heightDecrementAmount)));
 			theRenderer->DrawText2D(textPosition,
 				Stringf("	- %s", currentOption.m_data->m_profiledName.c_str()).c_str(),
 				theWindow->m_clientHeight * 0.015f,
@@ -265,8 +265,14 @@ void AnalysisState::RenderLoadedDataContent()
 
 	static Rgba detailTextColor = Rgba::WHITE;
 
-	static AABB2 simDetailBox = AABB2(Vector2(theWindow->m_clientWidth * 0.375, theWindow->m_clientHeight * 0.55), Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.95));
-	static AABB2 profiledSimulationDataBox = AABB2(Vector2(theWindow->m_clientWidth * 0.375, theWindow->m_clientHeight * 0.05), Vector2(theWindow->m_clientWidth * 0.95, theWindow->m_clientHeight * 0.525));
+	static AABB2 simDetailBox = AABB2(Vector2(theWindow->m_clientWidth * 0.375f, theWindow->m_clientHeight * 0.55f), Vector2(theWindow->m_clientWidth * 0.95f, theWindow->m_clientHeight * 0.95f));
+	static AABB2 profiledSimulationDataBox = AABB2(Vector2(theWindow->m_clientWidth * 0.375f, theWindow->m_clientHeight * 0.05f), Vector2(theWindow->m_clientWidth * 0.95f, theWindow->m_clientHeight * 0.525f));
+
+	static Vector2 simDetailBoxStart = simDetailBox.GetTopLeftPosition();
+	static Vector2 simDetailBoxDimensions = simDetailBox.GetDimensions();
+
+	static Vector2 profiledSimulationDataBoxStart = profiledSimulationDataBox.GetTopLeftPosition();
+	static Vector2 profiledSimulationDataBoxDimensions = profiledSimulationDataBox.GetDimensions();
 
 	//set render settings back to default
 	theRenderer->SetTexture(*m_backGroundTexture);
@@ -277,11 +283,61 @@ void AnalysisState::RenderLoadedDataContent()
 	theRenderer->DrawAABB(simDetailBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
 	theRenderer->DrawAABB(profiledSimulationDataBox, Rgba(0.2f, 0.2f, 0.2f, 1.f));
 
-	//get sim definition data
-	TODO("GET SIM DEFINITION DATA FROM GENERAL INFO LOADED LIST");
+	//render simulation definitions
+	SimulationDefinitionContents* dataContents = GetDefinitionContentsForHoveredOption(m_currentHoveredGraphOption);
 
-	//get hovered profiled content
+	if (dataContents == nullptr)
+		return;
 
+	float heightDecrementAmount = 0.0375f;
+
+	//draw sim details
+	Vector2 textPosition = Vector2(simDetailBoxStart.x + (simDetailBoxDimensions.x * 0.05f), ((simDetailBoxStart.y * 0.95f)));
+	theRenderer->DrawText2D(textPosition,
+		"Simulation Details",
+		theWindow->m_clientHeight * 0.015f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	for (int contentIndex = 0; contentIndex < (int)dataContents->m_generalInfo.size(); ++contentIndex)
+	{
+		std::string contentText = dataContents->m_generalInfo[contentIndex];
+
+		//draw simulation paths
+		Vector2 textPosition = Vector2(simDetailBoxStart.x + (simDetailBoxDimensions.x * 0.05f), ((simDetailBoxStart.y * 0.95f) - (simDetailBoxDimensions.y * ((float)contentIndex + 2) * heightDecrementAmount)));
+		theRenderer->DrawText2D(textPosition,
+			contentText.c_str(),
+			theWindow->m_clientHeight * 0.0135f,
+			Rgba::WHITE,
+			1.f,
+			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	}
+
+	//draw profiled simulation data
+	textPosition = Vector2(profiledSimulationDataBoxStart.x + (profiledSimulationDataBoxDimensions.x * 0.05f), ((profiledSimulationDataBoxStart.y * 0.95f)));
+	theRenderer->DrawText2D(textPosition,
+		"Profiled Function Details",
+		theWindow->m_clientHeight * 0.015f,
+		Rgba::YELLOW,
+		1.f,
+		Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+
+	SelectableProfiledSimDataOption& currentOption = m_allSelectableOptions[m_currentHoveredGraphOption];
+	std::vector<std::string> optionContent;
+	currentOption.m_data->GetContentAsStrings(optionContent);
+
+	for (int optionIndex = 0; optionIndex < (int)optionContent.size(); ++optionIndex)
+	{
+		//draw simulation paths
+		Vector2 textPosition = Vector2(profiledSimulationDataBoxStart.x + (profiledSimulationDataBoxDimensions.x * 0.05f), ((profiledSimulationDataBoxStart.y * 0.95f) - (profiledSimulationDataBoxDimensions.y * ((float)optionIndex + 2) * heightDecrementAmount)));
+		theRenderer->DrawText2D(textPosition,
+			optionContent[optionIndex].c_str(),
+			theWindow->m_clientHeight * 0.0135f,
+			Rgba::WHITE,
+			1.f,
+			Renderer::GetInstance()->CreateOrGetBitmapFont("SquirrelFixedFont"));
+	}	
 }
 
 //  =========================================================================================
@@ -316,6 +372,18 @@ void AnalysisState::RenderInfoAndInstructions()
 bool AnalysisState::IsOptionSelectedForGraph(int optionIndex)
 {
 	return m_allSelectableOptions[optionIndex].m_isSelectedForGraph;
+}
+
+//  =========================================================================================
+SimulationDefinitionContents* AnalysisState::GetDefinitionContentsForHoveredOption(int optionIndex)
+{
+	std::string definitionName = m_allSelectableOptions[optionIndex].m_data->m_simulationDefinitionContentsNameKey;
+	std::map<std::string, SimulationDefinitionContents*>::iterator definition = m_definitionsForExecutionMap.find(definitionName);
+
+	if (definition != m_definitionsForExecutionMap.end())
+		return definition->second;	
+
+	return nullptr;
 }
 
 //  =========================================================================================
