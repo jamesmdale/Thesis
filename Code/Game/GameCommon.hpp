@@ -7,15 +7,16 @@
 #include "Engine\Core\Rgba.hpp"
 #include <vector>
 
-/*#define ActionStackAnalysis
+#define ActionStackAnalysis
 #define UpdatePlanAnalysis
 #define AgentUpdateAnalysis
 #define PathingDataAnalysis
 #define CopyPathAnalysis
 #define QueueActionPathingDataAnalysis
+#define MemoizationDataAnalysis
 #define DistanceMemoizationDataAnalysis
 #define CollisionDataAnalysis
-*/
+
 
 class SimulationData;
 class SimulationDefinition;
@@ -112,7 +113,10 @@ extern int g_bombardmentDamage;
 extern float g_sortTimerInSeconds;
 extern float g_agentCopyDestinationPositionRadius;
 
-//  threat globals
+extern int g_numMemoizationStorageAccesses;
+extern int g_numMemoizationUtilityCalls;
+
+//threat globals
 extern float g_maxThreat;
 
 //convenience directions
@@ -146,3 +150,27 @@ extern Rgba SHOOT_TINT;
 extern Rgba REPAIR_TINT;
 extern Rgba HEAL_TINT;
 extern Rgba PUT_OUT_FIRE_TINT;
+
+//simulation data output
+constexpr char* SIM_NAME_OUTPUT_TEXT = "SimulationName";
+constexpr char* NUM_AGENTS_OUTPUT_TEXT = "NumAgents";
+constexpr char* NUM_ARMORIES_OUTPUT_TEXT = "NumArmories";
+constexpr char* NUM_LUMBERYARDS_OUTPUT_TEXT = "NumLumberyards";
+constexpr char* NUM_MED_STATIONS_OUTPUT_TEXT = "NumMedStations";
+constexpr char* NUM_WELLS_OUTPUT_TEXT = "NumWells";
+constexpr char* BOMBARDMENT_RATE_OUTPUT_TEXT = "BombardmentRate";
+constexpr char* THREAT_RATE_OUTPUT_TEXT = "ThreatRate";
+constexpr char* STARTING_THREAT_OUTPUT_TEXT = "StartingThreat";
+constexpr char* MAP_DIMENSIONS_OUTPUT_TEXT = "MapDimensions";
+constexpr char* MAP_NAME_OUTPUT_TEXT = "MapName";
+constexpr char* STARTING_TIME_OUTPUT_TEXT = "StartingTime";
+constexpr char* OPTIMIZED_OUTPUT_TEXT = "IsOptimized";
+constexpr char* BUDGETED_OUTPUT_TEXT = "IsBudgeted";
+constexpr char* NUM_UPDATE_PLAN_CALLS_OUTPUT_TEXT = "Num Update Plan Calls";
+constexpr char* NUM_PROCESS_ACTION_STACK_CALLS_OUTPUT_TEXT = "Num Process Action Stack Calls";
+constexpr char* NUM_AGENT_UPDATE_CALLS_OUTPUT_TEXT = "Num Agent Update Calls";
+constexpr char* NUM_GET_PATH_CALLS_OUTPUT_TEXT = "Num Get Path Calls";
+constexpr char* NUM_COPY_PATH_CALLS_OUTPUT_TEXT = "Num Copy Path Calls";
+constexpr char* NUM_QUEUE_ACTION_PATH_CALLS_OUTPUT_TEXT = "Num Queue Action Path Calls";
+constexpr char* NUM_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT = "Num Memoization Standard Calls";
+constexpr char* NUM_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT = "Num Memoization Optimized Accesses";

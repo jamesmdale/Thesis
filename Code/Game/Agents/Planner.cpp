@@ -1037,6 +1037,7 @@ void Planner::SkewUtilityForBias(UtilityInfo& outInfo, float biasValue)
 //  =========================================================================================
 float Planner::CalculateDistanceUtility(float normalizedDistance)
 {
+
 #ifdef DistanceMemoizationDataAnalysis
 	// profiling ----------------------------------------------
 	static int iterations = 0;
@@ -1054,8 +1055,23 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 		float outValue;
 		if (m_distanceUtilityStorage->DoesValueExistForInput(normalizedDistance, outValue, outIndex))
 		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationStorageAccesses;
+#endif
 			return outValue;
-		}			
+		}
+		else
+		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationUtilityCalls;
+#endif
+		}
+	}
+	else
+	{
+#ifdef	MemoizationDataAnalysis
+		++g_numMemoizationUtilityCalls;
+#endif
 	}
 	//  ----------------------------------------------
 	
@@ -1105,6 +1121,10 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 //  =========================================================================================
 float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 {
+#ifdef	MemoizationDataAnalysis
+	++g_numMemoizationUtilityCalls;
+#endif
+
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
 	if (GetIsOptimized())
@@ -1112,8 +1132,23 @@ float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 		float outValue;
 		if (m_buildingHealthUtilityStorage->DoesValueExistForInput(normalizedBuildingHealth, outValue, outIndex))
 		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationStorageAccesses;
+#endif
 			return outValue;
-		}			
+		}
+		else
+		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationUtilityCalls;
+#endif
+		}
+	}
+	else
+	{
+#ifdef	MemoizationDataAnalysis
+		++g_numMemoizationUtilityCalls;
+#endif
 	}
 	//  ----------------------------------------------
 
@@ -1135,6 +1170,10 @@ float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 //  =============================================================================
 float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 {
+#ifdef	MemoizationDataAnalysis
+	++g_numMemoizationUtilityCalls;
+#endif
+
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
 	if (GetIsOptimized())
@@ -1142,8 +1181,11 @@ float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 		float outValue;
 		if (m_agentHealthUitilityStorage->DoesValueExistForInput(normalizedAgentHealth, outValue, outIndex))
 		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationStorageAccesses;
+#endif
 			return outValue;
-		}			
+		}
 	}
 	//  ----------------------------------------------
 
@@ -1166,6 +1208,10 @@ float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 //  =============================================================================
 float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 {
+#ifdef	MemoizationDataAnalysis
+	++g_numMemoizationUtilityCalls;
+#endif
+
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
 	if (GetIsOptimized())
@@ -1173,8 +1219,23 @@ float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 		float outValue;
 		if (m_agentGatherUtilityStorage->DoesValueExistForInput(normalizedResourceCarryAmount, outValue, outIndex))
 		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationStorageAccesses;
+#endif
 			return outValue;
-		}			
+		}
+		else
+		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationUtilityCalls;
+#endif
+		}
+	}
+	else
+	{
+#ifdef	MemoizationDataAnalysis
+		++g_numMemoizationUtilityCalls;
+#endif
 	}
 	//  ----------------------------------------------
 
@@ -1197,6 +1258,10 @@ float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 //  =============================================================================
 float Planner::CalculateShootUtility(float normalizedThreatUtility)
 {
+#ifdef	MemoizationDataAnalysis
+	++g_numMemoizationUtilityCalls;
+#endif
+
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
 	if (GetIsOptimized())
@@ -1204,8 +1269,23 @@ float Planner::CalculateShootUtility(float normalizedThreatUtility)
 		float outValue;
 		if (m_shootUtilityStorageUtility->DoesValueExistForInput(normalizedThreatUtility, outValue, outIndex))
 		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationStorageAccesses;
+#endif
 			return outValue;
 		}			
+		else
+		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationUtilityCalls;
+#endif
+		}
+	}
+	else
+	{
+#ifdef	MemoizationDataAnalysis
+		++g_numMemoizationUtilityCalls;
+#endif
 	}
 	//  ----------------------------------------------
 

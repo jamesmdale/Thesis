@@ -19,7 +19,7 @@ public:
 
 	void Initialize(SimulationDefinition* simulationDefinition);
 
-	void CreateComprehensiveDataSet();
+	void WriteGeneralData();
 
 	void WriteEntryWithTimeStamp(const std::string& entry);
 	bool ExportCSV(const std::string& filePath, const std::string& fileName);

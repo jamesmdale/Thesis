@@ -2,8 +2,30 @@
 #include "Game\GameStates\GameState.hpp"
 #include "Game\Helpers\AnalysisGraph.hpp"
 #include "Engine\Core\Rgba.hpp"
+#include "Engine\Math\IntRange.hpp"
+#include "Engine\Core\StringUtils.hpp"
 #include <map>
 
+//  ----------------------------------------------
+struct ImportedSimulationGeneralInfo
+{
+	ImportedSimulationGeneralInfo() {}
+
+	ImportedSimulationGeneralInfo(const std::string& key, const std::string& value)
+	{
+		m_key = key;
+		m_value = value;
+	}
+
+	//general info
+	std::string m_key = "";
+	std::string m_value = "";
+
+	std::string GetEntry()
+	{
+		return Stringf("%s: %s", m_key.c_str(), m_value.c_str());
+	}
+};
 
 //  ----------------------------------------------
 struct ImportedProfiledSimulationData
@@ -23,6 +45,7 @@ struct ImportedProfiledSimulationData
 	std::string m_profiledName;
 	std::string m_path;
 
+	//calculated statistics
 	int m_entries = -1;
 	float m_average = 0.f;
 	float m_median = 0.f;
@@ -59,6 +82,7 @@ struct SelectableProfiledSimDataOption
 //  ----------------------------------------------
 struct SimulationDefinitionContents
 {
+	std::vector<std::string> m_generalInfo;
 	std::vector<int> m_simSelectableOptionIndexes;
 };
 
@@ -111,6 +135,7 @@ private:
 
 	//profile generation
 	ImportedProfiledSimulationData* GenerateProfiledSimulationDataFromFile(const std::string& definitionName, const std::string& filePath);
+	void GenerateSimulationGeneralInfoFromFile(SimulationDefinitionContents* outContents, const std::string& definitionName, const std::string& rootPath);
 
 	//computations
 	void FillSimData(ImportedProfiledSimulationData* simData, const std::vector<float>& data);

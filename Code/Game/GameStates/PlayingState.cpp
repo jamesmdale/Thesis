@@ -547,6 +547,9 @@ void PlayingState::ResetCurrentSimulationData()
 	g_numCopyPathCalls = 0;
 	g_numQueueActionPathCalls = 0;
 	g_numCollisionCalls = 0;
+	g_numMemoizationStorageAccesses = 0;
+	g_numMemoizationUtilityCalls = 0;
+	g_numQueueActionPathCalls = 0;
 }
 
 //  =============================================================================
@@ -706,48 +709,50 @@ void PlayingState::GenerateOutputDirectory()
 void PlayingState::FinalizeGeneralSimulationData()
 {
 	std::string optimizationString = "";
-	g_generalSimulationData->CreateComprehensiveDataSet();
-
-	GetIsOptimized() ? optimizationString = "true" : optimizationString = "false";
-	g_generalSimulationData->AddCell("Is Optimized?", false);
-	g_generalSimulationData->AddCell(Stringf("%s", optimizationString.c_str()));
-	g_generalSimulationData->AddNewLine();
+	g_generalSimulationData->WriteGeneralData();
 
 #ifdef UpdatePlanAnalysis
-	g_generalSimulationData->AddCell("Num update plan calls:", false);
-	g_generalSimulationData->AddCell(Stringf(" %i", g_numUpdatePlanCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_UPDATE_PLAN_CALLS_OUTPUT_TEXT, g_numUpdatePlanCalls));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef ActionStackAnalysis
-	g_generalSimulationData->AddCell("Num Process Action Stack calls:");
-	g_generalSimulationData->AddCell(Stringf(" %i", g_numActionStackProcessCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_PROCESS_ACTION_STACK_CALLS_OUTPUT_TEXT, g_numActionStackProcessCalls));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef AgentUpdateAnalysis
-	g_generalSimulationData->AddCell("Num Agent Update calls:");
-	g_generalSimulationData->AddCell(Stringf(" %i", g_numAgentUpdateCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_AGENT_UPDATE_CALLS_OUTPUT_TEXT, g_numAgentUpdateCalls));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef PathingDataAnalysis
-	g_generalSimulationData->AddCell("Num Get Path calls:");
-	g_generalSimulationData->AddCell(Stringf(" %i", g_numGetPathCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_GET_PATH_CALLS_OUTPUT_TEXT, g_numGetPathCalls));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef CopyPathAnalysis
-	g_generalSimulationData->AddCell("Num Copy Path calls:");
-	g_generalSimulationData->AddCell(Stringf(" %i", g_numCopyPathCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_COPY_PATH_CALLS_OUTPUT_TEXT, g_numCopyPathCalls));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef QueueActionPathingDataAnalysis
-	g_generalSimulationData->AddCell("Num Queue Action Path calls:");
-	g_generalSimulationData->AddCell(Stringf(" %i", g_numQueueActionPathCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_QUEUE_ACTION_PATH_CALLS_OUTPUT_TEXT, g_numQueueActionPathCalls));
 	g_generalSimulationData->AddNewLine();
 #endif
+
+#ifdef MemoizationDataAnalysis
+	//write counts for memoization
+	if (g_generalSimulationData->m_simulationDefinitionReference->m_isOptimized)
+	{
+		g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT, g_numMemoizationUtilityCalls));
+		g_generalSimulationData->AddNewLine();
+
+		g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT, g_numMemoizationStorageAccesses));
+		g_generalSimulationData->AddNewLine();
+	}
+#endif
+
 	
 }
 

@@ -73,6 +73,8 @@ int g_bombardmentDamage = 10.f;
 //optimization globals
 float g_sortTimerInSeconds = 0.5f;
 float g_agentCopyDestinationPositionRadius = 0.5f;
+int g_numMemoizationStorageAccesses = 0;
+int g_numMemoizationUtilityCalls = 0;
 
 //threat globals
 float g_maxThreat = 500.f;

@@ -59,14 +59,14 @@
   bombardmentRatePerSecond="2.0"
   threatRatePerSecond = "5.0"
   startingThreat="400"
-  processTimerInSeconds="180"
+  processTimerInSeconds="60"
   isOptimized="false" 
   isBudgeted="false"
   />
 
 
   <SimulationDefinition
-  name="100_optimized_180"
+  name="100_optimized"
   mapName="20x20"
   numAgents="100"
   numArmories="2"
@@ -76,13 +76,13 @@
   bombardmentRatePerSecond="2.0"
   threatRatePerSecond = "5.0"
   startingThreat="400"
-  processTimerInSeconds="180"
+  processTimerInSeconds="60"
   isOptimized="true" 
   isBudgeted="true"
   />
 
 <SimulationDefinition
-  name="100_unoptomized_180"
+  name="100_unoptomized"
   mapName="20x20"
   numAgents="100"
   numArmories="2"

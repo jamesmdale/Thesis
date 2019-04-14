@@ -126,6 +126,9 @@ void AnalysisState::InitializeSimulationAnalysisData()
 		std::vector<std::string> containedFilePaths;
 		ReadContainedFilePathsForPath(simulationDefinitionPaths[definitionIndex], containedFilePaths);
 
+		//std::string infoFilePath;
+		//ReadContainedFilePathsForPath()
+
 		//if there aren't any files in side this folder, return
 		if (containedFilePaths.size() == 0)
 			return;
@@ -134,6 +137,9 @@ void AnalysisState::InitializeSimulationAnalysisData()
 		std::string definitionName = GetDefinitionNameFromPath(simulationDefinitionPaths[definitionIndex]);
 		SimulationDefinitionContents* dataContents = new SimulationDefinitionContents();
 		m_definitionsForExecutionMap.insert(std::pair<std::string, SimulationDefinitionContents*>(definitionName, dataContents));
+
+		//populate data contents with general info
+		GenerateSimulationGeneralInfoFromFile(dataContents, definitionName, simulationDefinitionPaths[definitionIndex]);
 
 		//populate the data contents with each profiled simulation data set
 		for (int fileIndex = 0; fileIndex < (int)containedFilePaths.size(); ++fileIndex)
@@ -449,6 +455,27 @@ ImportedProfiledSimulationData* AnalysisState::GenerateProfiledSimulationDataFro
 	FillSimData(simData, contentAsFloats);
 
 	return simData;
+}
+
+//  =========================================================================================
+void AnalysisState::GenerateSimulationGeneralInfoFromFile(SimulationDefinitionContents* outContents, const std::string& definitionName, const std::string& rootPath)
+{
+	std::string path = Stringf("%s%s%s%s", rootPath.c_str(), "\\GeneralInfo\\GeneralInfo_", definitionName.c_str(), ".csv");
+
+	CSVEditor editor;
+	if (!editor.ReadFromFile(path))
+		return;
+
+	std::vector<std::string> outStrings;
+	ImportedSimulationGeneralInfo info;
+
+	for (int entryIndex = 0; entryIndex < (int)editor.m_content.size(); ++entryIndex)
+	{
+		outContents->m_generalInfo.push_back(editor.m_content[entryIndex]);
+		//SplitStringOnCharacter(editor.m_content[entryIndex], ',', outStrings);
+		//info = ImportedSimulationGeneralInfo(outStrings[1], outStrings[2]);
+		//outStrings.clear();
+	}
 }
 
 //  =========================================================================================
