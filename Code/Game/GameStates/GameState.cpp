@@ -176,6 +176,12 @@ void GameState::TransitionGameStatesImmediate( GameState* toState)
 }
 
 //  =========================================================================================
+bool GameState::IsTransitioning()
+{
+	return g_transitionState != nullptr;
+}
+
+//  =========================================================================================
 GameState* GameState::GetCurrentGameState()
 {
 	return g_currentState;

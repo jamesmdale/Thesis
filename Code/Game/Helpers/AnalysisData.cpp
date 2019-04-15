@@ -6,7 +6,7 @@
 
 
 //  =========================================================================================
-AnalysisData::AnalysisData(SimulationData* exportDataReferene, uint iterationsBeforeLog)
+AnalysisData::AnalysisData(SimulationData* exportDataReferene, int iterationsBeforeLog)
 {
 	m_data = exportDataReferene;
 	m_iterationsBeforeLog = iterationsBeforeLog;
@@ -40,20 +40,11 @@ void AnalysisData::Start()
 void AnalysisData::End()
 {
 	uint64_t totalHPC = GetPerformanceCounter() - m_startHPC;
-
 	m_timeAverage = ((m_timeAverage * (m_currentIterationCount - 1)) + totalHPC) / m_currentIterationCount;
 	if (m_currentIterationCount == m_iterationsBeforeLog)
 	{
-		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - m_iterationStartHPC);
-		float iterationsPerSecond = totalSeconds / 100.f;
-
 		float secondsAverage = (float)PerformanceCounterToSeconds(m_timeAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (UpdatePlan) %f", secondsAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (UpdatePlan) (total time %f)", iterationsPerSecond, totalSeconds);
-
 		m_data->AddCell(Stringf("%f", secondsAverage), true);
-
-		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (UpdatePlan) (total time between: %f)", iterationsPerSecond, totalSeconds));
 
 		//reset data
 		Reset();

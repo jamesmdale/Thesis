@@ -25,6 +25,9 @@ void AnalysisState::PreRender()
 //  =========================================================================================
 void AnalysisState::Render()
 {
+	if (GameState::IsTransitioning())
+		return;
+
 	Renderer* theRenderer = Renderer::GetInstance();
 	Window* theWindow = Window::GetInstance();
 

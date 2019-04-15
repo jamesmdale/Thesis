@@ -7,6 +7,7 @@
 #include "Game\GameCommon.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Game\Game.hpp"
+#include "Game\Helpers\AnalysisData.hpp"
 #include "Engine\Time\Stopwatch.hpp"
 #include "Engine\Profiler\Profiler.hpp"
 #include "Engine\Core\EngineCommon.hpp"
@@ -1508,21 +1509,22 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 {
 	PROFILER_PUSH();
 
-	++g_numCopyPathCalls;
-
-	static Disc2 compareDisc = Disc2(0.f, 0.f, g_agentCopyDestinationPositionRadius);
-
-	bool didSuccessfullyCopyMatchingAgent = false;
-
 #ifdef CopyPathAnalysis
-	// profiling ----------------------------------------------
-	static int iterations = 0;
-	static uint64_t timeAverage = 0.f;
-	static uint64_t iterationStartHPC = GetPerformanceCounter();
-	uint64_t startHPC = GetPerformanceCounter();
-	++iterations;
-	//  ----------------------------------------------
+	static AnalysisData copyPathAnalysis = AnalysisData(g_copyPathData, 1);
+	copyPathAnalysis.Start();
+	//// profiling ----------------------------------------------
+	//static int iterations = 0;
+	//static uint64_t timeAverage = 0.f;
+	//static uint64_t iterationStartHPC = GetPerformanceCounter();
+	//uint64_t startHPC = GetPerformanceCounter();
+	//++iterations;
+	////  ----------------------------------------------
 #endif
+
+	//start of function updates
+	++g_numCopyPathCalls;
+	static Disc2 compareDisc = Disc2(0.f, 0.f, g_agentCopyDestinationPositionRadius);
+	bool didSuccessfullyCopyMatchingAgent = false;
 
 	Vector2 goalPosition = Vector2::ZERO;
 	if (GetDoesHaveTopActionGoalPosition(goalPosition))
@@ -1616,31 +1618,29 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 	}
 
 #ifdef CopyPathAnalysis
-	// profiling ----------------------------------------------
-	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
 
-	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-	if (iterations == 1)
-	{
-		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
-		float iterationsPerSecond = totalSeconds / 100.f;
-		iterationStartHPC = GetPerformanceCounter();
+	copyPathAnalysis.End();
+	//// profiling ----------------------------------------------
+	//uint64_t totalHPC = GetPerformanceCounter() - startHPC;
 
-		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
+	//timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
+	//if (iterations == 1)
+	//{
+	//	iterationStartHPC = GetPerformanceCounter();
 
-		if(g_copyPathData != nullptr)
-			g_copyPathData->AddCell(Stringf("%f", secondsAverage), true);
+	//	float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
+	//	//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
+	//	//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
 
-		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Copy Path) (total time between: %f)", iterationsPerSecond, totalSeconds));
-		
-		//reset data
-		iterationStartHPC = GetPerformanceCounter();
-		iterations = 0;
-		timeAverage = 0.0;
-	}
-	//  ---------------------------------------------
+	//	if(g_copyPathData != nullptr)
+	//		g_copyPathData->AddCell(Stringf("%f", secondsAverage), true);
+	//	
+	//	//reset data
+	//	iterationStartHPC = GetPerformanceCounter();
+	//	iterations = 0;
+	//	timeAverage = 0.0;
+	//}
+	////  ---------------------------------------------
 #endif
 
 	return didSuccessfullyCopyMatchingAgent;

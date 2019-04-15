@@ -48,6 +48,8 @@ public:
 	static void TransitionGameStates(GameState* toState);
 	static void TransitionGameStatesImmediate(GameState* toState);
 
+	static bool IsTransitioning();
+
 	static GameState* GetCurrentGameState();
 	static GameState* GetTransitionGameState();
 
