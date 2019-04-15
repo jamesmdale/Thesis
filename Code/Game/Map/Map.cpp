@@ -13,6 +13,7 @@
 #include "Game\Entities\Fire.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Game\SimulationData.hpp"
+#include "Game\Helpers\AnalysisData.hpp"
 #include "Engine\Window\Window.hpp"
 #include "Engine\Time\Stopwatch.hpp"
 #include "Engine\Math\MathUtils.hpp"
@@ -1108,15 +1109,11 @@ void Map::SpawnFire(Tile* spawnTile)
 //  =========================================================================================
 void Map::DetectAgentToTileCollision(Agent* agent)
 {
-	++g_numCollisionCalls;
+	
 
 #ifdef CollisionDataAnalysis
 	// profiling ----------------------------------------------
-	static int iterations = 0;
-	static uint64_t timeAverage = 0.f;
-	static uint64_t iterationStartHPC = GetPerformanceCounter();
-	uint64_t startHPC = GetPerformanceCounter();
-	++iterations;
+	g_collisionAnalysisData->Start();
 	//  ----------------------------------------------
 #endif
 
@@ -1194,24 +1191,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 
 #ifdef CollisionDataAnalysis
 	// profiling ----------------------------------------------
-	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
-
-	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-	if (iterations == 1)
-	{
-		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
-		float iterationsPerSecond = totalSeconds/100.f;
-
-		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-
-		if(g_collisionData != nullptr)
-			g_collisionData->AddCell(Stringf("%f", secondsAverage), true);
-
-		//reset data
-		iterationStartHPC = GetPerformanceCounter();
-		iterations = 0;
-		timeAverage = 0.0;
-	}
+	g_collisionAnalysisData->End();
 	//  ----------------------------------------------
 #endif
 }

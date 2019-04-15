@@ -4,6 +4,8 @@
 #include "Game\Definitions\SimulationDefinition.hpp"
 #include "Game\SimulationData.hpp"
 #include "Game\UI\DebugInputBox.hpp"
+#include "Game\Helpers\AnalysisData.hpp"
+#include "Game\Helpers\AnalysisData.hpp"
 #include "Engine\Window\Window.hpp"
 #include "Engine\Debug\DebugRender.hpp"
 #include "Engine\Core\LightObject.hpp"
@@ -118,6 +120,9 @@ void PlayingState::Update(float deltaSeconds)
 { 
 	PROFILER_PUSH();
 
+	if (GameState::IsTransitioning())
+		return;
+
 	if (!GetGameClock()->IsPaused())
 	{
 		m_map->Update(deltaSeconds);
@@ -147,6 +152,8 @@ void PlayingState::PreRender()
 void PlayingState::Render()
 {
 	PROFILER_PUSH();
+	if (GameState::IsTransitioning())
+		return;
 
 	//this timer determines how much time we have for all of our agent update.
 	SimpleTimer timer;
@@ -171,7 +178,7 @@ void PlayingState::PostRender()
 {
 	PROFILER_PUSH();
 
-	if (g_isQuitting)
+	if (g_isQuitting || GameState::IsTransitioning())
 		return;
 
 	m_map->DeleteDeadEntities();
@@ -186,6 +193,10 @@ void PlayingState::PostRender()
 //  =============================================================================
 float PlayingState::UpdateFromInput(float deltaSeconds)
 {
+
+	if (GameState::IsTransitioning())
+		return deltaSeconds;
+
 	InputSystem* theInput = InputSystem::GetInstance();
 
 	//movement should run on the master deltaseconds so we can move the camera even if the game is paused
@@ -449,48 +460,64 @@ void PlayingState::InitializeSimulationData()
 	//action stack data
 	g_processActionStackData = new SimulationData();
 	g_processActionStackData->Initialize(g_currentSimulationDefinition);
+	g_processActionStackAnalysisData->m_data = g_processActionStackData;
+	g_processActionStackAnalysisData->FullReset();
 #endif // ActionStackAnalysis
 
 #ifdef UpdatePlanAnalysis
 	//update plan data
 	g_updatePlanData = new SimulationData();
 	g_updatePlanData->Initialize(g_currentSimulationDefinition);
+	g_updatePlanAnalysisData->m_data = g_updatePlanData;
+	g_updatePlanAnalysisData->FullReset();
 #endif // UpdatePlanAnalysis
 
 #ifdef AgentUpdateAnalysis
 	//agent update data
 	g_agentUpdateData = new SimulationData();
 	g_agentUpdateData->Initialize(g_currentSimulationDefinition);
+	g_agentUpdateAnalysisData->m_data = g_agentUpdateData;
+	g_agentUpdateAnalysisData->FullReset();
 #endif // AgentUpdateAnalysis
 
 #ifdef PathingDataAnalysis
 	//pathing data
 	g_pathingData = new SimulationData();
 	g_pathingData->Initialize(g_currentSimulationDefinition);
+	g_pathingAnalysisData->m_data = g_pathingData;
+	g_pathingAnalysisData->FullReset();
 #endif // PathingDataAnalysis
 
 #ifdef CopyPathAnalysis
 	//copy path data
 	g_copyPathData = new SimulationData();
 	g_copyPathData->Initialize(g_currentSimulationDefinition);
+	g_copyPathAnalysisData->m_data = g_copyPathData;
+	g_copyPathAnalysisData->FullReset();
 #endif // CopyPathAnalysis
 
 #ifdef QueueActionPathingDataAnalysis
 	//queue path data
 	g_queueActionPathingData = new SimulationData();
 	g_queueActionPathingData->Initialize(g_currentSimulationDefinition);
+	g_queueActionPathingAnalysisData->m_data = g_queueActionPathingData;
+	g_queueActionPathingAnalysisData->FullReset();
 #endif // QueueActionPathingDataAnalysis
 
 #ifdef DistanceMemoizationDataAnalysis
 	//queue path data
 	g_distanceMemoizationData = new SimulationData();
 	g_distanceMemoizationData->Initialize(g_currentSimulationDefinition);
+	g_distanceMemoizationAnalysisData->m_data = g_distanceMemoizationData;
+	g_distanceMemoizationAnalysisData->FullReset();
 #endif // DistanceMemoizationDataAnalysis
 
 #ifdef CollisionDataAnalysis
 	//queue path data
 	g_collisionData = new SimulationData();
 	g_collisionData->Initialize(g_currentSimulationDefinition);
+	g_collisionAnalysisData->m_data = g_collisionData;
+	g_collisionAnalysisData->FullReset();
 #endif // CollisionDataAnalysis
 }
 
@@ -503,53 +530,50 @@ void PlayingState::ResetCurrentSimulationData()
 #ifdef ActionStackAnalysis
 	delete(g_processActionStackData);
 	g_processActionStackData = nullptr;
+	g_processActionStackAnalysisData->m_data = nullptr;
 #endif
 
 #ifdef UpdatePlanAnalysis
 	delete(g_updatePlanData);
 	g_updatePlanData = nullptr;
+	g_updatePlanAnalysisData->m_data = nullptr;
 #endif
 
 #ifdef AgentUpdateAnalysis
 	delete(g_agentUpdateData);
 	g_agentUpdateData = nullptr;
+	g_agentUpdateAnalysisData->m_data = nullptr;
 #endif
 
 #ifdef PathingDataAnalysis
 	delete(g_pathingData);
 	g_pathingData = nullptr;
+	g_pathingAnalysisData->m_data = nullptr;
 #endif
 
 #ifdef CopyPathAnalysis
 	delete(g_copyPathData);
 	g_copyPathData = nullptr;
+	g_copyPathAnalysisData->m_data = nullptr;
 #endif
 
 #ifdef QueueActionPathingDataAnalysis
 	delete(g_queueActionPathingData);
 	g_queueActionPathingData = nullptr;
+	g_queueActionPathingAnalysisData->m_data = nullptr;
 #endif
 
 #ifdef DistanceMemoizationDataAnalysis
 	delete(g_distanceMemoizationData);
 	g_distanceMemoizationData = nullptr;
+	g_distanceMemoizationAnalysisData->m_data = nullptr;
 #endif
 
 #ifdef CollisionDataAnalysis
 	delete(g_collisionData);
 	g_collisionData = nullptr;
+	g_collisionAnalysisData->m_data = nullptr;
 #endif
-
-	g_numUpdatePlanCalls = 0;
-	g_numActionStackProcessCalls = 0;
-	g_numAgentUpdateCalls = 0;
-	g_numGetPathCalls = 0;
-	g_numCopyPathCalls = 0;
-	g_numQueueActionPathCalls = 0;
-	g_numCollisionCalls = 0;
-	g_numMemoizationStorageAccesses = 0;
-	g_numMemoizationUtilityCalls = 0;
-	g_numQueueActionPathCalls = 0;
 }
 
 //  =============================================================================
@@ -712,32 +736,32 @@ void PlayingState::FinalizeGeneralSimulationData()
 	g_generalSimulationData->WriteGeneralData();
 
 #ifdef UpdatePlanAnalysis
-	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_UPDATE_PLAN_CALLS_OUTPUT_TEXT, g_numUpdatePlanCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_UPDATE_PLAN_CALLS_OUTPUT_TEXT, g_updatePlanData->m_count));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef ActionStackAnalysis
-	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_PROCESS_ACTION_STACK_CALLS_OUTPUT_TEXT, g_numActionStackProcessCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_PROCESS_ACTION_STACK_CALLS_OUTPUT_TEXT, g_processActionStackData->m_count));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef AgentUpdateAnalysis
-	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_AGENT_UPDATE_CALLS_OUTPUT_TEXT, g_numAgentUpdateCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_AGENT_UPDATE_CALLS_OUTPUT_TEXT, g_agentUpdateData->m_count));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef PathingDataAnalysis
-	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_GET_PATH_CALLS_OUTPUT_TEXT, g_numGetPathCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_GET_PATH_CALLS_OUTPUT_TEXT, g_pathingData->m_count));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef CopyPathAnalysis
-	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_COPY_PATH_CALLS_OUTPUT_TEXT, g_numCopyPathCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_COPY_PATH_CALLS_OUTPUT_TEXT, g_copyPathData->m_count));
 	g_generalSimulationData->AddNewLine();
 #endif
 
 #ifdef QueueActionPathingDataAnalysis
-	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_QUEUE_ACTION_PATH_CALLS_OUTPUT_TEXT, g_numQueueActionPathCalls));
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_QUEUE_ACTION_PATH_CALLS_OUTPUT_TEXT, g_queueActionPathingData->m_count));
 	g_generalSimulationData->AddNewLine();
 #endif
 

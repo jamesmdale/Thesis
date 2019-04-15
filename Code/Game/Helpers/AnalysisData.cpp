@@ -24,7 +24,6 @@ void AnalysisData::Reset()
 	m_iterationStartHPC = GetPerformanceCounter();
 	m_currentIterationCount = 0;
 	m_timeAverage = 0.0;
-	m_currentIterationCount = 0;
 }
 
 //  =========================================================================================
@@ -39,14 +38,34 @@ void AnalysisData::Start()
 //  =========================================================================================
 void AnalysisData::End()
 {
-	uint64_t totalHPC = GetPerformanceCounter() - m_startHPC;
-	m_timeAverage = ((m_timeAverage * (m_currentIterationCount - 1)) + totalHPC) / m_currentIterationCount;
-	if (m_currentIterationCount == m_iterationsBeforeLog)
+	//we can skip cumulative average if iterations before log is only 1
+	if (m_iterationsBeforeLog == 1)
 	{
-		float secondsAverage = (float)PerformanceCounterToSeconds(m_timeAverage);
-		m_data->AddCell(Stringf("%f", secondsAverage), true);
-
-		//reset data
-		Reset();
+		uint64_t endHPC = GetPerformanceCounter();
+		m_data->AddCell(Stringf("%f", (float)PerformanceCounterToSeconds(endHPC - m_startHPC)), true);
 	}
+	else
+	{
+		uint64_t totalHPC = GetPerformanceCounter() - m_startHPC;
+		m_timeAverage = ((m_timeAverage * (m_currentIterationCount - 1)) + totalHPC) / m_currentIterationCount;
+		if (m_currentIterationCount == m_iterationsBeforeLog)
+		{
+			float secondsAverage = (float)PerformanceCounterToSeconds(m_timeAverage);
+			m_data->AddCell(Stringf("%f", secondsAverage), true);
+		}
+	}
+
+	//reset data
+	++m_data->m_count;
+	Reset();
+}
+
+//  =========================================================================================
+void AnalysisData::FullReset()
+{
+	m_currentIterationCount = 0;
+	m_timeAverage = 0.0;
+	m_startHPC = 0.0;
+	m_iterationStartHPC = 0.0;
+	m_totalNumCalls = 0;
 }

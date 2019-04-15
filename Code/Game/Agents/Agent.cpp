@@ -7,6 +7,7 @@
 #include "Game\Entities\PointOfInterest.hpp"
 #include "Game\GameStates\PlayingState.hpp"
 #include "Game\Entities\Fire.hpp"
+#include "Game\Helpers\AnalysisData.hpp"
 #include "Engine\Core\Transform2D.hpp"
 #include "Engine\Math\MathUtils.hpp"
 #include "Engine\Window\Window.hpp"
@@ -96,8 +97,7 @@ void Agent::Update(float deltaSeconds)
 
 #ifdef AgentUpdateAnalysis
 	// profiling ----------------------------------------------
-	uint64_t startHPC = GetPerformanceCounter();
-	++g_numAgentUpdateCalls;
+	g_agentUpdateAnalysisData->Start();
 	//  ----------------------------------------------
 #endif
 
@@ -108,9 +108,7 @@ void Agent::Update(float deltaSeconds)
 
 #ifdef AgentUpdateAnalysis
 	// profiling ----------------------------------------------
-	uint64_t endHPC = GetPerformanceCounter();
-	if(g_agentUpdateData != nullptr )
-		g_agentUpdateData->AddCell(Stringf("%f", (float)PerformanceCounterToSeconds(endHPC - startHPC)), true);
+	g_agentUpdateAnalysisData->End();
 	//  ----------------------------------------------
 #endif	
 }
@@ -176,16 +174,9 @@ bool Agent::GetPathToDestination(const Vector2& goalDestination)
 {
 	PROFILER_PUSH();
 
-	++g_numGetPathCalls;
-
 #ifdef PathingDataAnalysis
 	// profiling ----------------------------------------------
-	static int iterations = 0;
-	static uint64_t timeAverage = 0.f;
-	static uint64_t iterationStartHPC = GetPerformanceCounter();
-	uint64_t startHPC = GetPerformanceCounter();
-
-	++iterations;
+	g_pathingAnalysisData->Start();
 	//  ----------------------------------------------
 #endif
 
@@ -213,30 +204,7 @@ bool Agent::GetPathToDestination(const Vector2& goalDestination)
 
 #ifdef PathingDataAnalysis
 	// profiling ----------------------------------------------
-	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
-
-	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-	if (iterations == 1)
-	{
-		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
-		float iterationsPerSecond = totalSeconds/100.f;
-		
-
-		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-		//DevConsolePrintf(Rgba::LIGHT_BLUE, "Average Time After 100 iterations (Pathing) %f", secondsAverage);
-		//DevConsolePrintf(Rgba::LIGHT_BLUE, "Iterations per second %f (Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds);
-
-		if(g_pathingData != nullptr)
-			g_pathingData->AddCell(Stringf("%f", secondsAverage), true);
-
-		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds));
-
-
-		//reset data
-		iterationStartHPC = GetPerformanceCounter();
-		iterations = 0;
-		timeAverage = 0.0;
-	}
+	g_pathingAnalysisData->End();
 	//  ----------------------------------------------
 #endif
 

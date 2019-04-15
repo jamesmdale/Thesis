@@ -28,5 +28,6 @@ public:
 public:
 	std::vector<SimulationDataEntry> m_entries;
 	SimulationDefinition* m_simulationDefinitionReference = nullptr;
+	uint64_t m_count = 0;
 };
 

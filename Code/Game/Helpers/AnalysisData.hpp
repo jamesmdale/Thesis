@@ -13,9 +13,11 @@ public:
 	void Start();
 	void End();
 
+	void FullReset();
+
 public:
 	int m_currentIterationCount = 0;
-	int m_iterationsBeforeLog = 0;
+	int m_iterationsBeforeLog = 1;
 	uint64_t m_timeAverage = 0.0;
 	uint64_t m_startHPC = 0.0;
 	uint64_t m_iterationStartHPC = 0.0;	
@@ -23,4 +25,5 @@ public:
 	int m_totalNumCalls = 0;
 	SimulationData* m_data = nullptr;
 };
+
 

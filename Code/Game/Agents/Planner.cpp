@@ -81,13 +81,7 @@ void Planner::ProcessActionStack(float deltaSeconds)
 	
 #ifdef ActionStackAnalysis
 	// profiling ----------------------------------------------
-	++g_numActionStackProcessCalls;
-
-	static int iterations = 0;
-	static uint64_t timeAverage = 0.f;
-	static uint64_t iterationStartHPC = GetPerformanceCounter();
-	uint64_t startHPC = GetPerformanceCounter();
-	++iterations;
+	g_processActionStackAnalysisData->Start();
 	//  ----------------------------------------------
 #endif
 
@@ -120,29 +114,7 @@ void Planner::ProcessActionStack(float deltaSeconds)
 
 #ifdef ActionStackAnalysis
 	// profiling ----------------------------------------------
-	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
-
-	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-	if (iterations == 1)
-	{
-		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
-		float iterationsPerSecond = totalSeconds / iterations;
-		iterationStartHPC = GetPerformanceCounter();
-
-		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Average Time After 10000 iterations (Process Action Stack) %f", secondsAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Process Action Stack) (total time %f)", iterationsPerSecond, totalSeconds);
-
-		if (g_processActionStackData != nullptr)
-			g_processActionStackData->AddCell(Stringf("%f", secondsAverage), true);
-		
-		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Process Action Stack) (total time between: %f)", iterationsPerSecond, totalSeconds));
-
-		//reset data
-		iterationStartHPC = GetPerformanceCounter();
-		iterations = 0;
-		timeAverage = 0.0;
-	}
+	g_processActionStackAnalysisData->End();
 	//  ---------------------------------------------
 #endif
 }
@@ -171,13 +143,7 @@ void Planner::UpdatePlan()
 
 #ifdef UpdatePlanAnalysis
 	// profiling ----------------------------------------------
-	++g_numUpdatePlanCalls;
-
-	static int iterations = 0;
-	static uint64_t timeAverage = 0.f;
-	static uint64_t iterationStartHPC = GetPerformanceCounter();
-	uint64_t startHPC = GetPerformanceCounter();
-	++iterations;
+	g_updatePlanAnalysisData->Start();
 	//  ----------------------------------------------
 #endif
 
@@ -330,29 +296,7 @@ void Planner::UpdatePlan()
 
 #ifdef UpdatePlanAnalysis
 	// profiling ----------------------------------------------
-	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
-
-	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-	if (iterations == 1)
-	{
-		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
-		float iterationsPerSecond = totalSeconds / 100.f;
-		iterationStartHPC = GetPerformanceCounter();
-
-		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (UpdatePlan) %f", secondsAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (UpdatePlan) (total time %f)", iterationsPerSecond, totalSeconds);
-
-		if(g_updatePlanData != nullptr)
-			g_updatePlanData->AddCell(Stringf("%f", secondsAverage), true);
-
-		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (UpdatePlan) (total time between: %f)", iterationsPerSecond, totalSeconds));
-
-		//reset data
-		iterationStartHPC = GetPerformanceCounter();
-		iterations = 0;
-		timeAverage = 0.0;
-	}
+	g_updatePlanAnalysisData->End();
 	//  ---------------------------------------------
 #endif
 }
@@ -382,15 +326,11 @@ void Planner::QueueActionsFromCurrentPlan(const UtilityInfo& info)
 {
 	//PROFILER_PUSH();
 
-	++g_numQueueActionPathCalls;
+
 
 #ifdef QueueActionPathingDataAnalysis
 	// profiling ----------------------------------------------
-	static int iterations = 0;
-	static uint64_t timeAverage = 0.f;
-	static uint64_t iterationStartHPC = GetPerformanceCounter();
-	uint64_t startHPC = GetPerformanceCounter();
-	++iterations;
+	g_queueActionPathingAnalysisData->Start();
 	//  ----------------------------------------------
 #endif
 
@@ -450,35 +390,12 @@ void Planner::QueueActionsFromCurrentPlan(const UtilityInfo& info)
 			}
 		}
 
-		
-
 #ifdef QueueActionPathingDataAnalysis
 		// profiling ----------------------------------------------
-		uint64_t totalHPC = GetPerformanceCounter() - startHPC;
-
-		timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-		if (iterations == 1)
-		{
-			float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
-			float iterationsPerSecond = totalSeconds / 100.f;
-			iterationStartHPC = GetPerformanceCounter();
-
-			float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-			//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
-			//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
-
-			if(g_queueActionPathingData != nullptr)
-				g_queueActionPathingData->AddCell(Stringf("%f", secondsAverage), true);
-
-			//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Queue Action Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds));
-
-			//reset data
-			iterationStartHPC = GetPerformanceCounter();
-			iterations = 0;
-			timeAverage = 0.0;
-		}
+		g_queueActionPathingAnalysisData->End();
 		//  ---------------------------------------------
 #endif
+
 	}
 }
 
@@ -1041,11 +958,7 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 
 #ifdef DistanceMemoizationDataAnalysis
 	// profiling ----------------------------------------------
-	static int iterations = 0;
-	static uint64_t timeAverage = 0.f;
-	static uint64_t iterationStartHPC = GetPerformanceCounter();
-	uint64_t startHPC = GetPerformanceCounter();
-	++iterations;
+	g_distanceMemoizationAnalysisData->Start();	
 	//  ----------------------------------------------
 #endif
 
@@ -1090,29 +1003,7 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 
 #ifdef DistanceMemoizationDataAnalysis
 	// profiling ----------------------------------------------
-	uint64_t totalHPC = GetPerformanceCounter() - startHPC;
-
-	timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-	if (iterations == 1)
-	{
-		float totalSeconds = (float)PerformanceCounterToSeconds(GetPerformanceCounter() - iterationStartHPC);
-		float iterationsPerSecond = totalSeconds / 100.f;
-		iterationStartHPC = GetPerformanceCounter();
-
-		float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
-		//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
-
-		if(g_distanceMemoizationData != nullptr)
-			g_distanceMemoizationData->AddCell(Stringf("%f", secondsAverage), true);
-
-		//g_generalSimulationData->WriteEntryWithTimeStamp(Stringf("Iterations per second %f (Distance Utility Pathing) (total time between: %f)", iterationsPerSecond, totalSeconds));
-
-		//reset data
-		iterationStartHPC = GetPerformanceCounter();
-		iterations = 0;
-		timeAverage = 0.0;
-	}
+	g_distanceMemoizationAnalysisData->End();
 	//  ---------------------------------------------
 #endif
 
@@ -1509,20 +1400,13 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 {
 	PROFILER_PUSH();
 
-#ifdef CopyPathAnalysis
-	static AnalysisData copyPathAnalysis = AnalysisData(g_copyPathData, 1);
-	copyPathAnalysis.Start();
-	//// profiling ----------------------------------------------
-	//static int iterations = 0;
-	//static uint64_t timeAverage = 0.f;
-	//static uint64_t iterationStartHPC = GetPerformanceCounter();
-	//uint64_t startHPC = GetPerformanceCounter();
-	//++iterations;
-	////  ----------------------------------------------
+#ifdef CopyPathAnalysis	
+	// profiling ----------------------------------------------
+	g_copyPathAnalysisData->Start();
+	//  ----------------------------------------------
 #endif
 
 	//start of function updates
-	++g_numCopyPathCalls;
 	static Disc2 compareDisc = Disc2(0.f, 0.f, g_agentCopyDestinationPositionRadius);
 	bool didSuccessfullyCopyMatchingAgent = false;
 
@@ -1618,29 +1502,9 @@ bool Planner::FindAgentAndCopyPath(const Vector2& endPosition)
 	}
 
 #ifdef CopyPathAnalysis
-
-	copyPathAnalysis.End();
-	//// profiling ----------------------------------------------
-	//uint64_t totalHPC = GetPerformanceCounter() - startHPC;
-
-	//timeAverage = ((timeAverage * (iterations - 1)) + totalHPC) / iterations;
-	//if (iterations == 1)
-	//{
-	//	iterationStartHPC = GetPerformanceCounter();
-
-	//	float secondsAverage = (float)PerformanceCounterToSeconds(timeAverage);
-	//	//DevConsolePrintf(Rgba::GREEN, "Average Time After 100 iterations (Copy path) %f", secondsAverage);
-	//	//DevConsolePrintf(Rgba::GREEN, "Iterations per second %f (Copy Path) (total time %f)", iterationsPerSecond, totalSeconds);
-
-	//	if(g_copyPathData != nullptr)
-	//		g_copyPathData->AddCell(Stringf("%f", secondsAverage), true);
-	//	
-	//	//reset data
-	//	iterationStartHPC = GetPerformanceCounter();
-	//	iterations = 0;
-	//	timeAverage = 0.0;
-	//}
-	////  ---------------------------------------------
+	// profiling ----------------------------------------------
+	g_copyPathAnalysisData->End();
+	//  ---------------------------------------------
 #endif
 
 	return didSuccessfullyCopyMatchingAgent;
