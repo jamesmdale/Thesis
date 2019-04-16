@@ -22,7 +22,6 @@ public:
 	uint64_t m_startHPC = 0.0;
 	uint64_t m_iterationStartHPC = 0.0;	
 
-	int m_totalNumCalls = 0;
 	SimulationData* m_data = nullptr;
 };
 

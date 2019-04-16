@@ -87,8 +87,6 @@ void TheApp::Initialize()
 	Game::GetInstance()->Initialize();
 
 	InitializeGameResources();
-
-	WriteTestCSV();
 }
 
 //  =============================================================================

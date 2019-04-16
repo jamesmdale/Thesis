@@ -5,12 +5,6 @@
 #include "Game\Definitions\SimulationDefinition.hpp"
 
 
-struct SimulationDataEntry
-{
-	std::string m_value = "";
-	std::string m_timeStamp = "";	
-};
-
 class SimulationData : public CSVEditor
 {
 public:
@@ -21,12 +15,10 @@ public:
 
 	void WriteGeneralData();
 
-	void WriteEntryWithTimeStamp(const std::string& entry);
 	bool ExportCSV(const std::string& filePath, const std::string& fileName);
 	void ResetData();
 
 public:
-	std::vector<SimulationDataEntry> m_entries;
 	SimulationDefinition* m_simulationDefinitionReference = nullptr;
 	uint64_t m_count = 0;
 };

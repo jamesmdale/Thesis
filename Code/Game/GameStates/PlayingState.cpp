@@ -23,7 +23,6 @@
 #include <string>
 
 
-
 float ORTHO_MAX = 0.f;
 float ORTHO_MIN = 0.f;
 float g_orthoZoom = 0.f;
@@ -661,7 +660,7 @@ void PlayingState::ExportSimulationData()
 
 	std::string fileName = Stringf("GeneralInfo_%s.csv", g_currentSimulationDefinition->m_name.c_str());
 	bool success = g_generalSimulationData->ExportCSV(generalInfoFilePath, fileName.c_str());
-	ASSERT_OR_DIE(success, "Action data broken");
+	ASSERT_OR_DIE(success, "General Info data broken");
 
 #ifdef ActionStackAnalysis
 	//export action stack data

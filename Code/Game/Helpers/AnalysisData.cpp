@@ -29,7 +29,6 @@ void AnalysisData::Reset()
 //  =========================================================================================
 void AnalysisData::Start()
 {
-	++m_totalNumCalls;
 	++m_currentIterationCount;
 
 	m_startHPC = GetPerformanceCounter();
@@ -38,6 +37,13 @@ void AnalysisData::Start()
 //  =========================================================================================
 void AnalysisData::End()
 {
+	//update count
+	++m_data->m_count;
+
+	//check to see if we are at capacity. If so we can skip adding cells
+	if (m_data->IsAtCapacity())
+		return;
+
 	//we can skip cumulative average if iterations before log is only 1
 	if (m_iterationsBeforeLog == 1)
 	{
@@ -56,7 +62,6 @@ void AnalysisData::End()
 	}
 
 	//reset data
-	++m_data->m_count;
 	Reset();
 }
 
@@ -67,5 +72,4 @@ void AnalysisData::FullReset()
 	m_timeAverage = 0.0;
 	m_startHPC = 0.0;
 	m_iterationStartHPC = 0.0;
-	m_totalNumCalls = 0;
 }
