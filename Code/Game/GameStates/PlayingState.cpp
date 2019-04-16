@@ -880,20 +880,23 @@ Mesh* PlayingState::CreateDisectedAgentPathMesh()
 	//get current index
 	uint8_t pathIndex = m_disectedAgent->m_currentPathIndex;
 	if(pathIndex == UINT8_MAX)
-		pathIndex = m_disectedAgent->m_currentPath.size() -1 ;
+		pathIndex = 0;
 
 	//build player to next position in path index
 	Vector2 nextTileCenter = m_disectedAgent->m_currentPath[pathIndex];
 	builder.CreateLine2D(agentPosition, nextTileCenter, Rgba::PINK);
 
-	if (m_disectedAgent->m_currentPath.size() != 1)
+	if (pathIndex != 0)
 	{
-		//we know the agent is set so we don't have to check for nullptr case
-		for (int pathIndex = 1; pathIndex < m_disectedAgent->m_currentPath.size() - 1; ++pathIndex)
+		if (m_disectedAgent->m_currentPath.size() != 1)
 		{
-			builder.CreateLine2D(m_disectedAgent->m_currentPath[pathIndex], m_disectedAgent->m_currentPath[pathIndex + 1], Rgba::PINK);
+			//we know the agent is set so we don't have to check for nullptr case
+			for (int pathIndex = 1; pathIndex < m_disectedAgent->m_currentPath.size() - 1; ++pathIndex)
+			{
+				builder.CreateLine2D(m_disectedAgent->m_currentPath[pathIndex], m_disectedAgent->m_currentPath[pathIndex + 1], Rgba::PINK);
+			}
 		}
-	}	
+	}
 
 	pathMesh = builder.CreateMesh<VertexPCU>();	
 

@@ -2,6 +2,7 @@
 #include "Game\SimulationData.hpp"
 #include "Game\Game.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
+#include "Game\Helpers\AnalysisData.hpp"
 #include "Engine\Window\Window.hpp"
 
 IntVector2 BUILDING_DIMENSIONS = IntVector2(2, 2);
@@ -18,13 +19,14 @@ SimulationData* g_queueActionPathingData = nullptr;
 SimulationData* g_distanceMemoizationData = nullptr;
 SimulationData* g_collisionData = nullptr;
 
-uint g_numUpdatePlanCalls = 0;
-uint g_numActionStackProcessCalls = 0;
-uint g_numAgentUpdateCalls = 0;
-uint g_numGetPathCalls = 0;
-uint g_numCopyPathCalls = 0;
-uint g_numQueueActionPathCalls = 0;
-uint g_numCollisionCalls = 0;
+AnalysisData* g_processActionStackAnalysisData = nullptr;
+AnalysisData* g_updatePlanAnalysisData = nullptr;
+AnalysisData* g_agentUpdateAnalysisData = nullptr;
+AnalysisData* g_pathingAnalysisData = nullptr;
+AnalysisData* g_copyPathAnalysisData = nullptr;
+AnalysisData* g_queueActionPathingAnalysisData = nullptr;
+AnalysisData* g_distanceMemoizationAnalysisData = nullptr;
+AnalysisData* g_collisionAnalysisData = nullptr;
 
 //debug globals
 bool g_isDebug = false;

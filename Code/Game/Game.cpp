@@ -10,6 +10,7 @@
 #include "Game\GameStates\AnalysisSelectState.hpp"
 #include "Game\GameStates\AnalysisState.hpp"
 #include "Game\Definitions\SimulationDefinition.hpp"
+#include "Game\Helpers\AnalysisData.hpp"
 #include "Engine\Renderer\Renderer.hpp"
 #include "Engine\Core\EngineCommon.hpp"
 #include "Engine\Window\Window.hpp"
@@ -116,6 +117,7 @@ void Game::Initialize()
 	InitializeMapDefinitions();
 	InitializeAgentDefinitions();
 	InitializeSimulationDefinitions();
+	InitializeAnalysisData();
 
 	// cleanup
 	theRenderer = nullptr;
@@ -190,6 +192,28 @@ void Game::InitializeSimulationDefinitions()
 		m_selectedDefinitions.push_back(SimulationDefinition::s_simulationDefinitions[simulationIndex]);
 	}
 }
+
+//  =========================================================================================
+void Game::InitializeAnalysisData()
+{
+	if (g_processActionStackAnalysisData == nullptr)
+		g_processActionStackAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_updatePlanAnalysisData == nullptr)
+		g_updatePlanAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_agentUpdateAnalysisData == nullptr)
+		g_agentUpdateAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_pathingAnalysisData == nullptr)
+		g_pathingAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_copyPathAnalysisData == nullptr)
+		g_copyPathAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_queueActionPathingAnalysisData == nullptr)
+		g_queueActionPathingAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_distanceMemoizationAnalysisData == nullptr)
+		g_distanceMemoizationAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_collisionAnalysisData == nullptr)
+		g_collisionAnalysisData = new AnalysisData(nullptr, 1);
+}
+
 
 // pause command =============================================================================
 void ToggleGamePaused(Command& cmd)

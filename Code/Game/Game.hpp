@@ -31,6 +31,7 @@ public:
 	void InitializeMapDefinitions();
 	void InitializeAgentDefinitions();
 	void InitializeSimulationDefinitions();
+	void InitializeAnalysisData();
 
 public:  
 
