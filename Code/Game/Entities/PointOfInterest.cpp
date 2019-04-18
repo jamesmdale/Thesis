@@ -39,7 +39,8 @@ void PointOfInterest::Update(float deltaSeconds)
 //  =========================================================================================
 void PointOfInterest::Render()
 {
-	Renderer* theRenderer = Renderer::GetInstance();
+	//unused;
+	/*Renderer* theRenderer = Renderer::GetInstance();
 
 	Rgba tint = Rgba::WHITE;
 	switch (m_type)
@@ -53,6 +54,9 @@ void PointOfInterest::Render()
 	case MED_STATION_POI_TYPE:
 		tint = MED_TINT;
 		break;
+	case WELL_POI_TYPE:
+		tint = WELL_TINT;
+		break;
 	}
 
 	AABB2 bounds;
@@ -63,7 +67,7 @@ void PointOfInterest::Render()
 	theRenderer->DrawAABB(bounds, tint);
 	theRenderer->SetShader(theRenderer->CreateOrGetShader("default"));
 
-	theRenderer = nullptr;	
+	theRenderer = nullptr;	*/
 }
 
 //  =========================================================================================

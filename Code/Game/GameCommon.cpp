@@ -98,10 +98,10 @@ IntVector2 UI_RIGHT = IntVector2(-1, 0);
 IntVector2 UI_LEFT = IntVector2(1, 0);
 
 //TINTS
-Rgba ARMORY_TINT = Rgba(255, 0, 0, 150);
-Rgba LUMBER_TINT = Rgba(255, 255, 0, 75);
-Rgba MED_TINT = Rgba(0, 255, 0, 75);
-Rgba WELL_TINT = Rgba(0, 0, 255, 75);
+Rgba ARMORY_TINT = Rgba(248, 124, 124, 200);
+Rgba LUMBERYARD_TINT = Rgba(255, 255, 0, 255);
+Rgba MED_STATION_TINT = Rgba(124, 248, 124, 200);
+Rgba WELL_TINT = Rgba(124, 124, 248, 200);
 
 Rgba GATHER_ARROWS_TINT = Rgba(255, 160, 160, 255); //red
 Rgba GATHER_LUMBER_TINT= Rgba(255, 226, 170, 255); //yellow

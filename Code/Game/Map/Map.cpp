@@ -1353,15 +1353,15 @@ PointOfInterest* Map::GeneratePointOfInterest(int poiType)
 		spriteName = "Armory";
 		break;
 	case LUMBERYARD_POI_TYPE:
-		buildingColor = Rgba::LIGHT_YELLOW_TRANSPARENT;
+		buildingColor = LUMBERYARD_TINT;
 		spriteName = "Lumberyard";
 		break;
 	case MED_STATION_POI_TYPE:
-		buildingColor = Rgba::LIGHT_GREEN_TRANSPARENT;
+		buildingColor = MED_STATION_TINT;
 		spriteName = "MedStation";
 		break;
 	case WELL_POI_TYPE:
-		buildingColor = Rgba::LIGHT_BLUE_TRANSPARENT;
+		buildingColor = WELL_TINT;
 		spriteName = "Well";
 		break;
 	}

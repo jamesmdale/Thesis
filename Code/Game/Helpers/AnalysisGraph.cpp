@@ -96,6 +96,9 @@ void AnalysisGraph::Render()
 	}
 
 	//draw vertical legend header text
+	/*std::string timeText = "";
+	if()*/
+
 	Vector2 verticalLegendHeaderTextDrawPosition = Vector2(boundsBox.mins.x + (boundsBoxDimensions.x * 0.01f), graphBox.maxs.y + ((theWindow->m_clientHeight * 0.015f * 0.5f) * 2.f));
 	theRenderer->DrawText2D(verticalLegendHeaderTextDrawPosition,
 		Stringf("Seconds").c_str(),

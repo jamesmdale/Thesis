@@ -64,6 +64,22 @@
   isBudgeted="false"
   />
 
+   <SimulationDefinition
+  name="100_optimized_lng"
+  mapName="15x15"
+  numAgents="100"
+  numArmories="1"
+  numLumberyards="1"
+  numMedStations="1"
+  numWells="1"
+  bombardmentRatePerSecond="2.0"
+  threatRatePerSecond = "5.0"
+  startingThreat="400"
+  processTimerInSeconds="200"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
 
   <SimulationDefinition
   name="100_optimized"
@@ -76,7 +92,7 @@
   bombardmentRatePerSecond="2.0"
   threatRatePerSecond = "5.0"
   startingThreat="400"
-  processTimerInSeconds="60"
+  processTimerInSeconds="200"
   isOptimized="true" 
   isBudgeted="true"
   />

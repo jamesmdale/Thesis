@@ -136,12 +136,12 @@ extern IntVector2 UI_DOWN;
 extern IntVector2 UI_RIGHT;
 extern IntVector2 UI_LEFT;
 
-//tints
+// tints
 extern Rgba ARMORY_TINT;
-extern Rgba LUMBER_TINT;
-extern Rgba MED_TINT;
+extern Rgba LUMBERYARD_TINT;
+extern Rgba MED_STATION_TINT;
+extern Rgba WELL_TINT;
 
-//agent tints
 extern Rgba GATHER_ARROWS_TINT;
 extern Rgba GATHER_LUMBER_TINT;
 extern Rgba GATHER_BANDAGES_TINT;

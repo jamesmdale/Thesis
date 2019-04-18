@@ -17,5 +17,11 @@
     </GenerationSteps>
 	</MapDefinition>
 
+	<MapDefinition name="15x15" defaultTile="Ground" width="15" height="15">
+		<GenerationSteps iterations="1" chanceToRun="1.0">
+			<FillAndEdge fillTile="Ground" edgeTile="Wall"></FillAndEdge>
+    </GenerationSteps>
+	</MapDefinition>
+
 </MapDefinitions>
 
