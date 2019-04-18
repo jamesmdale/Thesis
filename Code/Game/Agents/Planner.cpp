@@ -154,6 +154,9 @@ void Planner::UpdatePlan()
 
 	//utility for gathering arrows ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherArrowsUtility();
+	if (compareUtilityInfo.utility != 0.f)
+		SkewUtilityForBias(compareUtilityInfo, m_agent->m_combatBias);
+
 	if (m_currentPlan.m_chosenPlanType == GATHER_ARROWS_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -167,6 +170,10 @@ void Planner::UpdatePlan()
 		
 	//utility for gathering lumber ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherLumberUtility();
+
+	if (compareUtilityInfo.utility != 0.f)
+		SkewUtilityForBias(compareUtilityInfo, m_agent->m_repairBias);
+
 	if (m_currentPlan.m_chosenPlanType == GATHER_LUMBER_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -180,6 +187,9 @@ void Planner::UpdatePlan()
 
 	// utility for gathering bandages ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherBandagesUtility();
+	if (compareUtilityInfo.utility != 0.f)
+		SkewUtilityForBias(compareUtilityInfo, m_agent->m_healBias);
+
 	if (m_currentPlan.m_chosenPlanType == GATHER_BANDAGES_PLAN_TYPE && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -193,6 +203,9 @@ void Planner::UpdatePlan()
 
 	//utility for gathering water ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherWaterUtility();
+	if (compareUtilityInfo.utility != 0.f)
+		SkewUtilityForBias(compareUtilityInfo, m_agent->m_fireFightingBias);
+
 	if (m_currentPlan.m_chosenPlanType == GATHER_WATER_PLAN_TYPE  && compareUtilityInfo.utility != 0.f)
 	{
 		SkewCurrentPlanUtilityValue(compareUtilityInfo);
@@ -1013,9 +1026,9 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 //  =========================================================================================
 float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 {
-#ifdef	MemoizationDataAnalysis
-	++g_numMemoizationUtilityCalls;
-#endif
+//#ifdef	MemoizationDataAnalysis
+//	++g_numMemoizationUtilityCalls;
+//#endif
 
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
@@ -1062,9 +1075,9 @@ float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 //  =============================================================================
 float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 {
-#ifdef	MemoizationDataAnalysis
-	++g_numMemoizationUtilityCalls;
-#endif
+//#ifdef	MemoizationDataAnalysis
+//	++g_numMemoizationUtilityCalls;
+//#endif
 
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
@@ -1078,6 +1091,18 @@ float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 #endif
 			return outValue;
 		}
+		else
+		{
+#ifdef	MemoizationDataAnalysis
+			++g_numMemoizationUtilityCalls;
+#endif
+		}
+	}
+	else
+	{
+#ifdef	MemoizationDataAnalysis
+		++g_numMemoizationUtilityCalls;
+#endif
 	}
 	//  ----------------------------------------------
 
@@ -1100,10 +1125,10 @@ float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 //  =============================================================================
 float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 {
-#ifdef	MemoizationDataAnalysis
-	++g_numMemoizationUtilityCalls;
-#endif
-
+//#ifdef	MemoizationDataAnalysis
+//	++g_numMemoizationUtilityCalls;
+//#endif
+//
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
 	if (GetIsOptimized())
@@ -1150,9 +1175,9 @@ float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 //  =============================================================================
 float Planner::CalculateShootUtility(float normalizedThreatUtility)
 {
-#ifdef	MemoizationDataAnalysis
-	++g_numMemoizationUtilityCalls;
-#endif
+//#ifdef	MemoizationDataAnalysis
+//	++g_numMemoizationUtilityCalls;
+//#endif
 
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;

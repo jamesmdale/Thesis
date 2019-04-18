@@ -573,6 +573,10 @@ void PlayingState::ResetCurrentSimulationData()
 	g_collisionData = nullptr;
 	g_collisionAnalysisData->m_data = nullptr;
 #endif
+
+	//reset memoization variables
+	g_numMemoizationUtilityCalls = 0;
+	g_numMemoizationStorageAccesses = 0;
 }
 
 //  =============================================================================
@@ -766,14 +770,12 @@ void PlayingState::FinalizeGeneralSimulationData()
 
 #ifdef MemoizationDataAnalysis
 	//write counts for memoization
-	if (g_generalSimulationData->m_simulationDefinitionReference->m_isOptimized)
-	{
-		g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT, g_numMemoizationUtilityCalls));
-		g_generalSimulationData->AddNewLine();
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT, g_numMemoizationUtilityCalls));
+	g_generalSimulationData->AddNewLine();
 
-		g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT, g_numMemoizationStorageAccesses));
-		g_generalSimulationData->AddNewLine();
-	}
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT, g_numMemoizationStorageAccesses));
+	g_generalSimulationData->AddNewLine();
+	
 #endif
 
 	

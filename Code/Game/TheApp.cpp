@@ -197,6 +197,12 @@ float TheApp::UpdateInput(float deltaSeconds)
 		deltaSeconds = Game::GetInstance()->UpdateInput(deltaSeconds);
 	}
 
+	if (InputSystem::GetInstance()->WasKeyJustPressed((InputSystem::GetInstance()->KEYBOARD_F1)))
+	{
+		Command profilerCmd = Command("profiler");
+		CommandRun(profilerCmd);
+	}
+
 	return deltaSeconds;
 }
 //  =========================================================================================

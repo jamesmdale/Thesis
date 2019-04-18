@@ -91,8 +91,6 @@ void SimSelectState::Initialize()
 	{
 		SimulationUIOption option = SimulationUIOption(definitionIndex, SimulationDefinition::s_simulationDefinitions[definitionIndex]);
 		m_selectableSimulationDefinitions.push_back(option);
-
-		m_executionSimulationDefinitions.push_back(option);
 	}
 
 	m_isInitialized = true;

@@ -1,5 +1,71 @@
 <SimulationDefinitions>
 
+  <SimulationDefinition
+  name="100_optimized_test"
+  mapName="20x20"
+  numAgents="100"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="2"
+  numWells="2"
+  bombardmentRatePerSecond="2.0"
+  threatRatePerSecond = "5.0"
+  startingThreat="400"
+  processTimerInSeconds="200"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
+<SimulationDefinition
+  name="100_unoptomized_test"
+  mapName="20x20"
+  numAgents="100"
+  numArmories="2"
+  numLumberyards="2"
+  numMedStations="2"
+  numWells="2"
+  bombardmentRatePerSecond="2.0"
+  threatRatePerSecond = "5.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
+  <SimulationDefinition
+  name="1000_optimized_test"
+  mapName="50x50"
+  numAgents="1000"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
+     <SimulationDefinition
+  name="1000_unoptimized_test"
+  mapName="50x50"
+  numAgents="1000"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
+ <!-->
+
     <SimulationDefinition
   name="1000_optimized"
   mapName="50x50"
@@ -17,7 +83,7 @@
   />
 
       <SimulationDefinition
-  name="1000_unoptimized"
+  name="1000_unoptimized_test"
   mapName="50x50"
   numAgents="1000"
   numArmories="10"
@@ -33,7 +99,7 @@
   />
 
      <SimulationDefinition
-  name="1000_optimized_sm"
+  name="1000_optimized_sm_test"
   mapName="20x20"
   numAgents="1000"
   numArmories="2"
@@ -49,7 +115,7 @@
   />
 
       <SimulationDefinition
-  name="1000_unoptimized_sm"
+  name="1000_unoptimized_sm_test"
   mapName="20x20"
   numAgents="1000"
   numArmories="2"
@@ -65,9 +131,9 @@
   />
 
    <SimulationDefinition
-  name="100_optimized_lng"
+  name="100_optimized_small_test"
   mapName="15x15"
-  numAgents="100"
+  numAgents="50"
   numArmories="1"
   numLumberyards="1"
   numMedStations="1"
@@ -165,7 +231,7 @@
 
 </SimulationDefinitions>
 
- <!-->
+ 
     <SimulationDefinition
   name="1000_optimized"
   mapName="50x50"
@@ -197,9 +263,8 @@
   isOptimized="false" 
   isBudgeted="false"
   />
--->
 
- <!-->
+
   <SimulationDefinition
   name="default_optimized"
   mapName="50x50"
