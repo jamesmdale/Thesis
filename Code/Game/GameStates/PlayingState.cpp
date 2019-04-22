@@ -95,7 +95,7 @@ void PlayingState::Initialize()
 	InitializeSimulation(g_currentSimulationDefinition);
 
 	//set per frame budget for 60fps
-	g_perFrameHPCBudget = SecondsToPerformanceCounter(1.0 / 70.0);
+	g_perFrameHPCBudget = SecondsToPerformanceCounter(1.0 / 60.0);
 
 	//generate debug input even if we don't really use it
 	DebugInputBox::CreateInstance();
@@ -807,15 +807,12 @@ Mesh* PlayingState::CreateUIDebugTextMesh()
 	builder.CreateText2DInAABB2( camPosBox.GetCenter(), camPosBox.GetDimensions(), 1.f, Stringf("Cam Pos: %f,%f", camPosition.x, camPosition.y));
 
 	//agent update per frameinfo ----------------------------------------------
-	if (GetIsAgentUpdateBudgeted())
-	{
-		AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.75f), Vector2(0.95f, 0.8f));
-		builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);
-	}
+	AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.75f), Vector2(0.95f, 0.8f));
+	builder.CreateText2DInAABB2(agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);	
 	
 	//threat ----------------------------------------------
-	AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.7f), Vector2(0.95f, 0.8f));
-	builder.CreateText2DInAABB2( agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Threat: %i/%i", (int)m_map->m_threat, (int)g_maxThreat), Rgba::WHITE);
+	AABB2 threatBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.7f), Vector2(0.95f, 0.8f));
+	builder.CreateText2DInAABB2(threatBox.GetCenter(), threatBox.GetDimensions(), 1.f, Stringf("Threat: %i/%i", (int)m_map->m_threat, (int)g_maxThreat), Rgba::WHITE);
 
 	//debug input ----------------------------------------------
 	DebugInputBox* theDebugInputBox = DebugInputBox::GetInstance();

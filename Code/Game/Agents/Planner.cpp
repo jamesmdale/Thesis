@@ -1585,3 +1585,16 @@ bool Planner::GetDoesHaveTopActionGoalPosition(Vector2& positionOut)
 		return false;
 	}	
 }
+
+//  =========================================================================================
+bool Planner::IsMoving()
+{
+	if (m_actionStack.size() == 0)
+		return false;
+
+	ActionData* goal = m_actionStack.top();
+	if (goal->m_action == &MoveAction)
+		return true;
+
+	return false;
+}

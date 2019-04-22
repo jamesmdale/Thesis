@@ -64,6 +64,102 @@
   isBudgeted="false"
   />
 
+   <SimulationDefinition
+  name="2500_optimized_test"
+  mapName="50x50"
+  numAgents="2500"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
+     <SimulationDefinition
+  name="2500_unoptimized_test"
+  mapName="50x50"
+  numAgents="2500"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
+   <SimulationDefinition
+  name="3000_optimized_test"
+  mapName="50x50"
+  numAgents="3000"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
+     <SimulationDefinition
+  name="3000_unoptimized_test"
+  mapName="50x50"
+  numAgents="3000"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
+     <SimulationDefinition
+  name="7500_optimized_test"
+  mapName="50x50"
+  numAgents="7500"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="true" 
+  isBudgeted="true"
+  />
+
+     <SimulationDefinition
+  name="7500_unoptimized_test"
+  mapName="50x50"
+  numAgents="7500"
+  numArmories="10"
+  numLumberyards="10"
+  numMedStations="10"
+  numWells="10"
+  bombardmentRatePerSecond="6.0"
+  threatRatePerSecond = "15.0"
+  startingThreat="400"
+  processTimerInSeconds="60"
+  isOptimized="false" 
+  isBudgeted="false"
+  />
+
  <!-->
 
     <SimulationDefinition

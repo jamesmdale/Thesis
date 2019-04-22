@@ -33,6 +33,8 @@ public:
 	Agent(Vector2 startingPosition, IsoSpriteAnimSet* animationSet, Map* mapReference);
 	~Agent();
 
+	//bool operator<(const Agent& compareAgent) const;
+
 	void GenerateRandomStats();
 
 	//overriden classes
@@ -135,6 +137,8 @@ bool HealAction(Agent* agent, const Vector2& goalDestination, int interactEntity
 bool FightFireAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);	//fight fire
 bool GatherAction(Agent* agent, const Vector2& goalDestination, int interactEntityId);		//acquire resource at poiLocation	
 
+
+bool AgentSort(Agent* a, Agent* b);
 
 
 

@@ -71,6 +71,15 @@ Agent::~Agent()
 	m_animationSet = nullptr;
 }
 
+////  =========================================================================================
+//bool Agent::operator<(const Agent & compareAgent) const
+//{
+//	if (m_updatePriority > compareAgent.m_updatePriority)
+//		return true;
+//
+//	return false;
+//}
+
 //  =========================================================================================
 void Agent::GenerateRandomStats()
 {
@@ -123,13 +132,13 @@ void Agent::QuickUpdate(float deltaSeconds)
 	m_animationSet->Update(deltaSeconds);
 
 	//if we are walking at the moment, keep walking in the same direction (physics will handle the rest)
-	if (m_currentPath.size() > 0)
+	if (m_currentPath.size() > 0 && m_planner->IsMoving())
 	{
 		m_forward = m_intermediateGoalPosition - m_position;
 		m_forward.NormalizeAndGetLength();
 
 		//move even slower if we can't get here
-		m_position += (m_forward * (m_movespeed * GetGameClock()->GetDeltaSeconds() * 0.1f));
+		m_position += (m_forward * (m_movespeed * GetGameClock()->GetDeltaSeconds()));
 	}
 
 	TODO("Later add more criteria to better define this data");
@@ -776,6 +785,15 @@ bool GatherAction(Agent* agent, const Vector2& goalDestination, int interactEnti
 		}	
 	
 	targetPoi = nullptr;
+	return false;
+}
+
+//  =========================================================================================
+bool AgentSort(Agent* a, Agent* b)
+{
+	if (a->m_updatePriority > b->m_updatePriority)
+		return true;
+
 	return false;
 }
 

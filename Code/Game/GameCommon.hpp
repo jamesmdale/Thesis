@@ -82,6 +82,7 @@ extern float g_maxCoordinateDistanceSquared;
 //time globals
 extern uint64_t g_perFrameHPCBudget;
 extern uint64_t g_previousFrameRenderTime;
+extern uint64_t g_previousSortTime;
 extern uint64_t g_previousFrameNonAgentUpdateTime;
 extern uint64_t g_agentUpdateBudgetThisFrame;
 extern int g_agentsUpdatedThisFrame;

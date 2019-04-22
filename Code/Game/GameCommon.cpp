@@ -42,10 +42,11 @@ float g_halfTileSize = 1.f;
 float g_maxCoordinateDistanceSquared = 0.f;
 
 //time globals
-uint64_t g_perFrameHPCBudget = 0.0;
-uint64_t g_previousFrameRenderTime = 0.0;
-uint64_t g_previousFrameNonAgentUpdateTime = 0.0;
-uint64_t g_agentUpdateBudgetThisFrame = 0.0;
+uint64_t g_perFrameHPCBudget = 0;
+uint64_t g_previousFrameRenderTime = 0;
+uint64_t g_previousSortTime = 0;
+uint64_t g_previousFrameNonAgentUpdateTime = 0;
+uint64_t g_agentUpdateBudgetThisFrame = 0;
 int g_agentsUpdatedThisFrame = 0;
 
 //general globals

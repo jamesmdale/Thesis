@@ -325,8 +325,11 @@ void Map::UpdateAgents(float deltaSeconds)
 
 	if (!GetIsAgentUpdateBudgeted())
 	{
+		g_agentsUpdatedThisFrame = 0;
+
 		for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByXPosition.size(); ++agentIndex)
 		{
+			++g_agentsUpdatedThisFrame;
 			m_agentsOrderedByXPosition[agentIndex]->Update(deltaSeconds);
 			DetectAgentToTileCollision(m_agentsOrderedByXPosition[agentIndex]);
 		}
@@ -352,32 +355,46 @@ void Map::UpdateAgents(float deltaSeconds)
 void Map::UpdateAgentsBudgeted(float deltaSeconds)
 {
 	PROFILER_PUSH();
-
-	int64_t remainingAgentUpdateBudget = int64_t(g_perFrameHPCBudget - g_previousFrameNonAgentUpdateTime - g_previousFrameRenderTime);
+	SimpleTimer callTimer;
 	g_agentsUpdatedThisFrame = 0;
 
+
+	uint64_t priorityQuickSortTime = 0;
+	
 	//if this is the first frame, there is no point in sorting because we have no criteria to decide on
 	if (g_previousFrameNonAgentUpdateTime != 0 && g_previousFrameRenderTime != 0)
 	{
-		QuickSortAgentByPriority(m_agentsOrderedByPriority, 0, (int)m_agentsOrderedByPriority.size() - 1);
+		callTimer.Start();
+
+		std::sort(m_agentsOrderedByPriority.begin(), m_agentsOrderedByPriority.end(), AgentSort);
+
+		callTimer.Stop();
+		priorityQuickSortTime = callTimer.GetRunningTime();
+		callTimer.Reset();
 	}	
 
-	SimpleTimer agentUpdateTimer;
+	//int64_t remainingAgentUpdateBudget = int64_t(g_perFrameHPCBudget - g_previousFrameNonAgentUpdateTime - g_previousFrameRenderTime);
+
+	int64_t remainingAgentUpdateBudget = int64_t(double(((int64_t)g_perFrameHPCBudget)- ((int64_t)g_previousFrameNonAgentUpdateTime) - ((int64_t)g_previousFrameRenderTime) - ((int64_t)g_previousSortTime) - ((int64_t)priorityQuickSortTime)) * 0.8);
+
+	if (remainingAgentUpdateBudget > g_perFrameHPCBudget || remainingAgentUpdateBudget < 0)
+		remainingAgentUpdateBudget = g_perFrameHPCBudget * 0.2;
+
 	bool canUpdate = true;
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
 	{
 		//if there is still budget left for update, continue..
 		if (canUpdate)
 		{
-			agentUpdateTimer.Start();
+			callTimer.Start();
 
 			//do udpate work
 			m_agentsOrderedByPriority[agentIndex]->Update(deltaSeconds);
 			//DetectAgentToTileCollision(m_agentsOrderedByPriority[agentIndex]);
 
-			agentUpdateTimer.Stop();
-			uint64_t totalUpdateTime = agentUpdateTimer.GetRunningTime();
-			agentUpdateTimer.Reset();
+			callTimer.Stop();
+			uint64_t totalUpdateTime = callTimer.GetRunningTime();
+			callTimer.Reset();
 
 			remainingAgentUpdateBudget -= totalUpdateTime;
 			m_agentsOrderedByPriority[agentIndex]->ResetPriority();
@@ -402,8 +419,15 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 	{		
 		if (m_sortTimer->CheckAndReset())
 		{
+			callTimer.Reset();
+			callTimer.Start();
+
 			SortAgentsByX();
 			SortAgentsByY();
+
+			callTimer.Stop();
+			g_previousSortTime = callTimer.GetRunningTime();
+			callTimer.Reset();
 		}		
 	}
 }

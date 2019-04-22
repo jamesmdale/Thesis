@@ -116,6 +116,7 @@ public:
 	Agent* GetAgentFromSortedList(uint16_t agentIndex, eAgentSortType sortType);
 
 	bool GetDoesHaveTopActionGoalPosition(Vector2& outPosition);
+	bool IsMoving();
 
 public:
 	Map* m_map = nullptr;
