@@ -63,7 +63,7 @@ public:
 	//optimized mesh generation  ----------------------------------------------
 	void CreateMapMesh();
 	void CreateDebugMapMesh();
-	Mesh* CreateDynamicAgentMesh();
+	void CreateDynamicAgentMesh();
 	Mesh* CreateDynamicBombardmentMesh();
 	Mesh* CreateDynamicFireMesh();
 	Mesh* CreateTextMesh();
@@ -144,8 +144,13 @@ public:
 	std::vector<Fire*> m_fires;
 
 	//meshes for rendering
+	MeshBuilder* m_mapBuilder = nullptr;
+	MeshBuilder* m_debugBuilder = nullptr;
+	MeshBuilder* m_agentBuilder = nullptr;
+
 	Mesh* m_mapMesh = nullptr;
 	Mesh* m_debugMapMesh = nullptr;
+	Mesh* m_agentMesh = nullptr;
 
 	Stopwatch* m_bombardmentTimer = nullptr;
 	Stopwatch* m_threatTimer = nullptr;

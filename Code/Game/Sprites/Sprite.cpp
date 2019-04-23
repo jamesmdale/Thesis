@@ -27,10 +27,13 @@ AABB2 Sprite::GetNormalizedUV()
 	{
 		IntVector2 dimensions = GetSpriteTexture()->GetDimensions();
 
-		normalizedUv.mins.x /= (float)dimensions.x;
-		normalizedUv.maxs.x /= (float)dimensions.x;
-		normalizedUv.mins.y /= (float)dimensions.y;
-		normalizedUv.maxs.y /= (float)dimensions.y;
+		float scaleX = 1.f / (float)dimensions.x;
+		float scaleY = 1.f/ (float)dimensions.y;
+
+		normalizedUv.mins.x *= scaleX;
+		normalizedUv.maxs.x *= scaleX;
+		normalizedUv.mins.y *= scaleY;
+		normalizedUv.maxs.y *= scaleY;
 	}	
 
 	normalizedUv.mins.y = 1.f - normalizedUv.mins.y;

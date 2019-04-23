@@ -21,6 +21,7 @@
 #include "Engine\Renderer\MeshBuilder.hpp"
 #include "Engine\Renderer\Mesh.hpp"
 #include "Engine\Time\SimpleTimer.hpp"
+#include "Engine\Math\MathUtils.hpp"
 
 int g_fireIdMarker = 0;
 
@@ -90,12 +91,25 @@ Map::~Map()
 	delete(m_mapAsGrid);
 	m_mapAsGrid = nullptr;
 
+	//delete builders
+	delete(m_mapBuilder);
+	m_mapBuilder = nullptr;
+
+	delete(m_debugBuilder);
+	m_debugBuilder = nullptr;
+
+	delete(m_agentBuilder);
+	m_agentBuilder = nullptr;
+
 	//delete mesh
 	delete(m_mapMesh);
 	m_mapMesh = nullptr;
 
 	delete(m_debugMapMesh);
 	m_debugMapMesh = nullptr;
+
+	delete(m_agentMesh);
+	m_agentMesh = nullptr;
 
 	//cleanup bombardments
 	for (int bombardmentIndex = 0; bombardmentIndex < (int)m_activeBombardments.size(); ++bombardmentIndex)
@@ -273,7 +287,13 @@ void Map::Initialize()
 	SortAgentsByX();
 	SortAgentsByY();
 
+	m_mapBuilder = new MeshBuilder();
+	m_debugBuilder = new MeshBuilder();
+	m_agentBuilder = new MeshBuilder();
+
 	CreateMapMesh();
+	m_agentMesh = new Mesh();
+	CreateDynamicAgentMesh();
 	InitializeMapGrid();
 	UpdateMapGrid();
 }
@@ -358,7 +378,6 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 	SimpleTimer callTimer;
 	g_agentsUpdatedThisFrame = 0;
 
-
 	uint64_t priorityQuickSortTime = 0;
 	
 	//if this is the first frame, there is no point in sorting because we have no criteria to decide on
@@ -369,16 +388,21 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 		std::sort(m_agentsOrderedByPriority.begin(), m_agentsOrderedByPriority.end(), AgentSort);
 
 		callTimer.Stop();
-		priorityQuickSortTime = callTimer.GetRunningTime();
+		g_perFramePrioritySort = callTimer.GetRunningTime();
 		callTimer.Reset();
 	}	
 
 	//int64_t remainingAgentUpdateBudget = int64_t(g_perFrameHPCBudget - g_previousFrameNonAgentUpdateTime - g_previousFrameRenderTime);
 
-	int64_t remainingAgentUpdateBudget = int64_t(double(((int64_t)g_perFrameHPCBudget)- ((int64_t)g_previousFrameNonAgentUpdateTime) - ((int64_t)g_previousFrameRenderTime) - ((int64_t)g_previousSortTime) - ((int64_t)priorityQuickSortTime)) * 0.8);
+	int64_t remainingTime = (int64_t)g_perFrameHPCBudget - (int64_t)g_previousFrameNonAgentUpdateTime - (int64_t)g_previousFrameRenderTime - (int64_t)g_previousSortTime - (int64_t)g_perFramePrioritySort;
+	double adjustedRemainingTime = (double)remainingTime * 0.8;
+	int64_t remainingAgentUpdateBudget = int64_t(adjustedRemainingTime);
 
-	if (remainingAgentUpdateBudget > g_perFrameHPCBudget || remainingAgentUpdateBudget < 0)
-		remainingAgentUpdateBudget = g_perFrameHPCBudget * 0.2;
+
+	Clamp(remainingAgentUpdateBudget, (int64_t)(g_perFrameHPCBudget * 0.2), (int64_t)g_perFrameHPCBudget);
+
+	//if (remainingAgentUpdateBudget > g_perFrameHPCBudget || remainingAgentUpdateBudget < 0)
+	//	remainingAgentUpdateBudget = g_perFrameHPCBudget * 0.2;
 
 	bool canUpdate = true;
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
@@ -455,10 +479,10 @@ void Map::Render()
 	}
 
 	//create and render agent mesh
-	Mesh* agentMesh = CreateDynamicAgentMesh();
+	CreateDynamicAgentMesh();
 	theRenderer->SetTexture(*theRenderer->CreateOrGetTexture(m_agentsOrderedByXPosition[0]->m_animationSet->GetCurrentSprite(m_agentsOrderedByXPosition[0]->m_spriteDirection)->m_definition->m_diffuseSource));
 	theRenderer->SetShader(theRenderer->CreateOrGetShader("agents"));
-	theRenderer->DrawMesh(agentMesh);
+	theRenderer->DrawMesh(m_agentMesh);
 
 	//create and render text
 	Mesh* textMesh = CreateTextMesh();	
@@ -495,12 +519,6 @@ void Map::Render()
 	//set back to default
 	theRenderer->SetTexture(*theRenderer->m_defaultTexture);
 	theRenderer->SetShader(theRenderer->m_defaultShader);
-
-	//cleanup
-	delete(agentMesh);
-	agentMesh = nullptr;
-
-	theRenderer = nullptr;
 }
 
 //  =============================================================================
@@ -603,15 +621,15 @@ void Map::CreateMapMesh()
 {
 	PROFILER_PUSH();
 
-	MeshBuilder builder;
+	m_mapBuilder->FlushBuilder();
 	
 	//create mesh for static tiles and buildings
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); ++tileIndex)
 	{
-		builder.CreateTexturedQuad2D(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.mins, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.maxs, m_tiles[tileIndex]->m_tint );
+		m_mapBuilder->CreateTexturedQuad2D(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.mins, m_tiles[tileIndex]->m_tileDefinition->m_baseSpriteUVCoords.maxs, m_tiles[tileIndex]->m_tint );
 	}
 
-	m_mapMesh = builder.CreateMesh<VertexPCU>();
+	m_mapMesh = m_mapBuilder->CreateMesh<VertexPCU>();
 
 	CreateDebugMapMesh();
 }
@@ -627,7 +645,7 @@ void Map::CreateDebugMapMesh()
 		m_debugMapMesh = nullptr;
 	}
 
-	MeshBuilder builder;
+	m_debugBuilder->FlushBuilder();
 
 	//create debug mesh to show blocking states
 	for (int tileIndex = 0; tileIndex < (int)m_tiles.size(); ++tileIndex)
@@ -635,18 +653,18 @@ void Map::CreateDebugMapMesh()
 		int value = m_tiles[tileIndex]->m_tileDefinition->m_allowsWalking == true ? 0 : 1;
 		std::string doesBlock = Stringf("%i", value);
 
-		builder.CreateText2DInAABB2(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, 1.f, doesBlock, m_tiles[tileIndex]->m_tint );
+		m_debugBuilder->CreateText2DInAABB2(m_tiles[tileIndex]->GetBounds().GetCenter(), Vector2::ONE, 1.f, doesBlock, m_tiles[tileIndex]->m_tint );
 	}
 
-	m_debugMapMesh = builder.CreateMesh<VertexPCU>();
+	m_debugMapMesh = m_debugBuilder->CreateMesh<VertexPCU>();
 }
 
 //  =========================================================================================
-Mesh* Map::CreateDynamicAgentMesh()
+void Map::CreateDynamicAgentMesh()
 {
 	PROFILER_PUSH();
 
-	MeshBuilder builder = MeshBuilder();
+	m_agentBuilder->FlushBuilder();
 
 	//create mesh for static tiles and buildings
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByYPosition.size(); ++agentIndex)
@@ -691,15 +709,14 @@ Mesh* Map::CreateDynamicAgentMesh()
 				agentSize = Vector2(1.75f, 1.75f);
 		}	
 
-		builder.CreateTexturedQuad2D(m_agentsOrderedByXPosition[agentIndex]->m_position,
-			agentSize, 
-			Vector2(sprite.GetNormalizedUV().mins.x, sprite.GetNormalizedUV().maxs.y), 
-			Vector2(sprite.GetNormalizedUV().maxs.x, sprite.GetNormalizedUV().mins.y), 
+		m_agentBuilder->CreateTexturedQuad2D(m_agentsOrderedByXPosition[agentIndex]->m_position,
+			agentSize,
+			Vector2(sprite.GetNormalizedUV().mins.x, sprite.GetNormalizedUV().maxs.y),
+			Vector2(sprite.GetNormalizedUV().maxs.x, sprite.GetNormalizedUV().mins.y),
 			agentColor);
 	}
 
-	Mesh* agentMesh = builder.CreateMesh<VertexPCU>();
-	return agentMesh;
+	m_agentBuilder->UpdateMesh<VertexPCU>(m_agentMesh);
 }
 
 

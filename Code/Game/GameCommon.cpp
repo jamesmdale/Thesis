@@ -43,6 +43,7 @@ float g_maxCoordinateDistanceSquared = 0.f;
 
 //time globals
 uint64_t g_perFrameHPCBudget = 0;
+uint64_t g_perFramePrioritySort = 0;
 uint64_t g_previousFrameRenderTime = 0;
 uint64_t g_previousSortTime = 0;
 uint64_t g_previousFrameNonAgentUpdateTime = 0;
