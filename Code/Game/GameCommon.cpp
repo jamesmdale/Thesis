@@ -41,6 +41,8 @@ float g_divideTileSize = 1.f;
 float g_halfTileSize = 1.f;
 float g_maxCoordinateDistanceSquared = 0.f;
 
+uint g_utilityStorageDivisions = 100;
+
 //time globals
 uint64_t g_perFrameHPCBudget = 0;
 uint64_t g_perFramePrioritySort = 0;

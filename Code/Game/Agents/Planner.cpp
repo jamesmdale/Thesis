@@ -33,11 +33,11 @@ Planner::Planner(Map* mapReference, Agent* agentReference)
 
 	if (GetIsOptimized())
 	{
-		m_distanceUtilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
-		m_buildingHealthUtilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
-		m_agentHealthUitilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
-		m_agentGatherUtilityStorage = new UtilityStorage(0.f, 1.f, 20.f);
-		m_shootUtilityStorageUtility = new UtilityStorage(0.f, 1.f, 20.f);
+		m_distanceUtilityStorage = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
+		m_buildingHealthUtilityStorage = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
+		m_agentHealthUitilityStorage = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
+		m_agentGatherUtilityStorage = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
+		m_shootUtilityStorageUtility = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
 	}
 
 	m_updatePlanTimer = new Stopwatch(GetGameClock());

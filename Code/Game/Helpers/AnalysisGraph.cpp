@@ -4,7 +4,7 @@
 #include "Engine\Window\Window.hpp"
 #include "Engine\Core\StringUtils.hpp"
 
-Rgba g_graphColorList[8] = { Rgba::RED, Rgba::GREEN, Rgba::BLUE, Rgba::YELLOW, Rgba::LIGHT_BLUE, Rgba::ORANGE, Rgba::PURPLE };
+Rgba g_graphColorList[8] = { Rgba::RED, Rgba::DARK_GREEN, Rgba::BLUE, Rgba::ORANGE, Rgba::LIGHT_BLUE, Rgba::ORANGE, Rgba::PURPLE };
 
 //  =========================================================================================
 AnalysisGraph::AnalysisGraph()

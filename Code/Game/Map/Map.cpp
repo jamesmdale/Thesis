@@ -398,11 +398,7 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 	double adjustedRemainingTime = (double)remainingTime * 0.8;
 	int64_t remainingAgentUpdateBudget = int64_t(adjustedRemainingTime);
 
-
 	Clamp(remainingAgentUpdateBudget, (int64_t)(g_perFrameHPCBudget * 0.2), (int64_t)g_perFrameHPCBudget);
-
-	//if (remainingAgentUpdateBudget > g_perFrameHPCBudget || remainingAgentUpdateBudget < 0)
-	//	remainingAgentUpdateBudget = g_perFrameHPCBudget * 0.2;
 
 	bool canUpdate = true;
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
@@ -614,6 +610,16 @@ void Map::Reload(SimulationDefinition* definition)
 
 	SortAgentsByX();
 	SortAgentsByY();	
+
+	m_mapBuilder = new MeshBuilder();
+	m_debugBuilder = new MeshBuilder();
+	m_agentBuilder = new MeshBuilder();
+
+	CreateMapMesh();
+	m_agentMesh = new Mesh();
+	CreateDynamicAgentMesh();
+	InitializeMapGrid();
+	UpdateMapGrid();
 }
 
 //  =========================================================================================
@@ -1150,8 +1156,6 @@ void Map::SpawnFire(Tile* spawnTile)
 //  =========================================================================================
 void Map::DetectAgentToTileCollision(Agent* agent)
 {
-	
-
 #ifdef CollisionDataAnalysis
 	// profiling ----------------------------------------------
 	g_collisionAnalysisData->Start();
@@ -1163,40 +1167,12 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 	bool didPushOutCorner = false;
 	bool didPushOutAxis = false;
 
-	//handle northeast
-	IntVector2 tileDirection = IntVector2(1,1);
-	IntVector2 tileCoord = agentTileCoord + tileDirection;
-	didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHEAST_TILE_DIRECTION);
-
-	if (!didPushOutCorner)
-	{
-		//handle southeast
-		tileDirection = IntVector2(1,-1);
-		tileCoord = agentTileCoord + tileDirection;
-		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHEAST_TILE_DIRECTION);
-	}
-
-	if (!didPushOutCorner)
-	{
-		//handle northwest
-		tileDirection = IntVector2(-1,1);
-		tileCoord = agentTileCoord + tileDirection;
-		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, NORTHWEST_TILE_DIRECTION);
-	}
-
-	if (!didPushOutCorner)
-	{
-		//handle southwest
-		tileDirection = IntVector2(-1,-1);
-		tileCoord = agentTileCoord + tileDirection;
-		didPushOutCorner = PushAgentOutOfTile(agent, tileCoord, SOUTHWEST_TILE_DIRECTION);
-	}
- 
+	
 	// handle up,down,left,right push out (because we've done corners, we can skip scenarios where we have both) ----------------------------------------------
 	//handle north
-	tileDirection = IntVector2(0,1);
-	tileCoord = agentTileCoord + tileDirection;
-	didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, NORTH_TILE_DIRECTION);
+	IntVector2 tileDirection = IntVector2(0, 1);
+	IntVector2 tileCoord = agentTileCoord + tileDirection;
+	didPushOutAxis = PushAgentOutOfTileNorth(agent, tileCoord);
 
 	//handle south
 	if (!didPushOutAxis)
@@ -1204,7 +1180,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle southeast
 		tileDirection = IntVector2(0,-1);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, SOUTH_TILE_DIRECTION);
+		didPushOutAxis = PushAgentOutOfTileSouth(agent, tileCoord);
 	}
 
 	//handle east
@@ -1213,7 +1189,7 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle southeast
 		tileDirection = IntVector2(1,0);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, EAST_TILE_DIRECTION);
+		didPushOutAxis = PushAgentOutOfTileEast(agent, tileCoord);
 	}
 
 	//handle west
@@ -1222,14 +1198,38 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 		//handle southeast
 		tileDirection = IntVector2(-1,0);
 		tileCoord = agentTileCoord + tileDirection;
-		didPushOutAxis = PushAgentOutOfTile(agent, tileCoord, WEST_TILE_DIRECTION);
+		didPushOutAxis = PushAgentOutOfTileWest(agent, tileCoord);
 	}
 
-	if (didPushOutAxis || didPushOutCorner)
+	//handle northeast
+	tileDirection = IntVector2(1, 1);
+	tileCoord = agentTileCoord + tileDirection;
+
+	didPushOutCorner = PushAgentOutOfTileNorthEast(agent, tileCoord);
+
+	if (!didPushOutCorner)
 	{
-		int i = 0;
+		//handle southeast
+		tileDirection = IntVector2(1, -1);
+		tileCoord = agentTileCoord + tileDirection;
+		didPushOutCorner = PushAgentOutOfTileSouthEast(agent, tileCoord);
 	}
 
+	if (!didPushOutCorner)
+	{
+		//handle northwest
+		tileDirection = IntVector2(-1, 1);
+		tileCoord = agentTileCoord + tileDirection;
+		didPushOutCorner = PushAgentOutOfTileNorthWest(agent, tileCoord);
+	}
+
+	if (!didPushOutCorner)
+	{
+		//handle southwest
+		tileDirection = IntVector2(-1, -1);
+		tileCoord = agentTileCoord + tileDirection;
+		didPushOutCorner = PushAgentOutOfTileSouthWest(agent, tileCoord);
+	}
 #ifdef CollisionDataAnalysis
 	// profiling ----------------------------------------------
 	g_collisionAnalysisData->End();
@@ -1238,8 +1238,202 @@ void Map::DetectAgentToTileCollision(Agent* agent)
 }
 
 //  =========================================================================================
+bool Map::PushAgentOutOfTileNorth(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+	
+	//check to see if our Y + the radius would overlap
+	float pushOutAmount = (agent->m_physicsDisc.center.y + agent->m_physicsDisc.radius) - (float)tileCoordinate.y;
+	
+	if (pushOutAmount > 0.f)
+	{
+		agent->m_position.y -= pushOutAmount;
+	}
+
+	agent->UpdatePhysicsData();
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTileSouth(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	//check to see if our Y + the radius would overlap
+	float pushOutAmount = (float)tileCoordinate.y - (agent->m_physicsDisc.center.y - agent->m_physicsDisc.radius);
+
+	if (pushOutAmount > 0.f)
+	{
+		agent->m_position.y += pushOutAmount;
+	}
+
+	agent->UpdatePhysicsData();
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTileEast(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	//check to see if our Y + the radius would overlap
+	float pushOutAmount = (agent->m_physicsDisc.center.x + agent->m_physicsDisc.radius) - (float)tileCoordinate.x;
+
+	if (pushOutAmount > 0)
+	{
+		agent->m_position.x -= pushOutAmount;
+	}
+
+	agent->UpdatePhysicsData();
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTileWest(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	//check to see if our Y + the radius would overlap
+	float pushOutAmount = (float)tileCoordinate.x - (agent->m_physicsDisc.center.x - agent->m_physicsDisc.radius);
+
+	if (pushOutAmount > 0)
+	{
+		agent->m_position.x += pushOutAmount;
+	}
+
+	agent->UpdatePhysicsData();
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTileNorthEast(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	Vector2 collisionPoint = Vector2((float)tileCoordinate.x, (float)tileCoordinate.y);
+
+	bool isColliding = agent->m_physicsDisc.IsPointInside(collisionPoint);
+	if (isColliding)
+	{
+		float displacement = GetDistance(agent->m_position, collisionPoint);
+
+		float amountToPush = agent->m_physicsDisc.radius - displacement;
+		Vector2 pushOutDirection = (agent->m_position - collisionPoint).GetNormalized();
+
+		agent->m_position += pushOutDirection * (amountToPush);
+		agent->UpdatePhysicsData();
+	}
+
+	return isColliding;	
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTileNorthWest(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	Vector2 collisionPoint = Vector2((float)tileCoordinate.x + 1.f, (float)tileCoordinate.y);
+
+	bool isColliding = agent->m_physicsDisc.IsPointInside(collisionPoint);
+	if (isColliding)
+	{
+		float displacement = GetDistance(agent->m_position, collisionPoint);
+
+		float amountToPush = agent->m_physicsDisc.radius - displacement;
+		Vector2 pushOutDirection = (agent->m_position - collisionPoint).GetNormalized();
+
+		agent->m_position += pushOutDirection * (amountToPush);
+		agent->UpdatePhysicsData();
+	}
+
+	return isColliding;
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTileSouthEast(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	Vector2 collisionPoint = Vector2((float)tileCoordinate.x, (float)tileCoordinate.y + 1.f);
+
+	bool isColliding = agent->m_physicsDisc.IsPointInside(collisionPoint);
+	if (isColliding)
+	{
+		float displacement = GetDistance(agent->m_position, collisionPoint);
+
+		float amountToPush = agent->m_physicsDisc.radius - displacement;
+		Vector2 pushOutDirection = (agent->m_position - collisionPoint).GetNormalized();
+
+		agent->m_position += pushOutDirection * (amountToPush);
+		agent->UpdatePhysicsData();
+	}
+
+	return isColliding;
+}
+
+//  =========================================================================================
+bool Map::PushAgentOutOfTileSouthWest(Agent * agent, const IntVector2 & tileCoordinate)
+{
+	Tile* tile = GetTileAtCoordinate(tileCoordinate);
+	if (tile == nullptr)
+		return false;
+
+	if (tile->m_tileDefinition->m_allowsWalking)
+		return false;
+
+	Vector2 collisionPoint = Vector2((float)tileCoordinate.x + 1.f, (float)tileCoordinate.y + 1.f);
+
+	bool isColliding = agent->m_physicsDisc.IsPointInside(collisionPoint);
+	if (isColliding)
+	{
+		float displacement = GetDistance(agent->m_position, collisionPoint);
+
+		float amountToPush = agent->m_physicsDisc.radius - displacement;
+		Vector2 pushOutDirection = (agent->m_position - collisionPoint).GetNormalized();
+
+		agent->m_position += pushOutDirection * (amountToPush);
+		agent->UpdatePhysicsData();
+	}
+
+	return isColliding;
+}
+
+//  =========================================================================================
 bool Map::PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection)
 {
+	PROFILER_PUSH();
+
 	//early outs
 	Tile* tile = GetTileAtCoordinate(tileCoordinate);
 	if(tile == nullptr)

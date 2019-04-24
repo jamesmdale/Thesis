@@ -589,6 +589,8 @@ void PlayingState::DeleteMap()
 //  =========================================================================================
 void PlayingState::LoadNextSim()
 {
+	g_isDebugDataShown = false;
+
 	Game* theGame = Game::GetInstance();
 	ExportSimulationData();
 	ResetCurrentSimulationData();
@@ -810,12 +812,12 @@ Mesh* PlayingState::CreateUIDebugTextMesh()
 	AABB2 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.75f), Vector2(0.95f, 0.8f));
 	builder.CreateText2DInAABB2(agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Agents Updated: %i", g_agentsUpdatedThisFrame), Rgba::WHITE);	
 
- agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.5f, 0.7f), Vector2(0.75f, 0.8f));
-	builder.CreateText2DInAABB2(agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Priority Update Time: %.0f", PerformanceCounterToMilliseconds(g_perFramePrioritySort)), Rgba::WHITE);
+ //agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.5f, 0.7f), Vector2(0.75f, 0.8f));
+	//builder.CreateText2DInAABB2(agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Priority Update Time: %.0f", PerformanceCounterToMilliseconds(g_perFramePrioritySort)), Rgba::WHITE);
 
-	 agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.5f, 0.65f), Vector2(0.75f, 0.8f));
-	builder.CreateText2DInAABB2(agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Sort Time: %.0f", PerformanceCounterToMilliseconds(g_sortTimerInSeconds)), Rgba::WHITE);
-	
+	// agentsUpdatedBox = AABB2(theWindow->GetClientWindow(), Vector2(0.5f, 0.65f), Vector2(0.75f, 0.8f));
+	//builder.CreateText2DInAABB2(agentsUpdatedBox.GetCenter(), agentsUpdatedBox.GetDimensions(), 1.f, Stringf("Sort Time: %.0f", PerformanceCounterToMilliseconds(g_sortTimerInSeconds)), Rgba::WHITE);
+	//
 	//threat ----------------------------------------------
 	AABB2 threatBox = AABB2(theWindow->GetClientWindow(), Vector2(0.8f, 0.7f), Vector2(0.95f, 0.8f));
 	builder.CreateText2DInAABB2(threatBox.GetCenter(), threatBox.GetDimensions(), 1.f, Stringf("Threat: %i/%i", (int)m_map->m_threat, (int)g_maxThreat), Rgba::WHITE);

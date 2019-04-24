@@ -79,6 +79,8 @@ extern float g_halfTileSize;
 extern bool g_isBlockedTileDataShown;
 extern float g_maxCoordinateDistanceSquared;
 
+extern uint g_utilityStorageDivisions;
+
 //time globals
 extern uint64_t g_perFrameHPCBudget;
 extern uint64_t g_perFramePrioritySort;

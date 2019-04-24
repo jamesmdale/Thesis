@@ -289,17 +289,17 @@ void Agent::ConstructInformationAsText(std::vector<std::string>& outStrings)
 
 	//biases
 	outStrings.push_back(Stringf("Biases"));
-	outStrings.push_back(Stringf("CB: %f", m_combatBias));
-	outStrings.push_back(Stringf("RB: %f", m_repairBias));
-	outStrings.push_back(Stringf("HB: %f", m_healBias));
-	outStrings.push_back(Stringf("FB: %f", m_fireFightingBias));
+	outStrings.push_back(Stringf("Shoot: %f", m_combatBias));
+	outStrings.push_back(Stringf("Repair: %f", m_repairBias));
+	outStrings.push_back(Stringf("Heal: %f", m_healBias));
+	outStrings.push_back(Stringf("Firefight: %f", m_fireFightingBias));
 
 	//efficiencies
 	outStrings.push_back(Stringf("Efficiencies"));
-	outStrings.push_back(Stringf("CE: %f", m_combatEfficiency));
-	outStrings.push_back(Stringf("RE: %f", m_repairEfficiency));
-	outStrings.push_back(Stringf("HE: %f", m_healEfficiency));
-	outStrings.push_back(Stringf("FE: %f", m_fireFightingEfficiency));
+	outStrings.push_back(Stringf("Shoot: %f", m_combatEfficiency));
+	outStrings.push_back(Stringf("Repair: %f", m_repairEfficiency));
+	outStrings.push_back(Stringf("Heal: %f", m_healEfficiency));
+	outStrings.push_back(Stringf("Firefight: %f", m_fireFightingEfficiency));
 
 	//inventory
 	outStrings.push_back(Stringf("Inventory"));

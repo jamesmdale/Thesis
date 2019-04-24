@@ -115,6 +115,16 @@ public:
 
 	//agent to tile collision  ----------------------------------------------
 	void DetectAgentToTileCollision(Agent* agent);
+	bool PushAgentOutOfTileNorth(Agent* agent, const IntVector2& tileCoordinate);
+	bool PushAgentOutOfTileSouth(Agent* agent, const IntVector2& tileCoordinate);
+	bool PushAgentOutOfTileEast(Agent* agent, const IntVector2& tileCoordinate);
+	bool PushAgentOutOfTileWest(Agent* agent, const IntVector2& tileCoordinate);
+
+	bool PushAgentOutOfTileNorthEast(Agent* agent, const IntVector2& tileCoordinate);
+	bool PushAgentOutOfTileNorthWest(Agent* agent, const IntVector2& tileCoordinate);
+	bool PushAgentOutOfTileSouthEast(Agent* agent, const IntVector2& tileCoordinate);
+	bool PushAgentOutOfTileSouthWest(Agent* agent, const IntVector2& tileCoordinate);
+
 	bool PushAgentOutOfTile(Agent* agent, const IntVector2& tileCoordinate, int tileDirection);
 
 public:
