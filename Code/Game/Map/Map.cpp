@@ -375,31 +375,29 @@ void Map::UpdateAgents(float deltaSeconds)
 void Map::UpdateAgentsBudgeted(float deltaSeconds)
 {
 	PROFILER_PUSH();
-	SimpleTimer callTimer;
+	static SimpleTimer callTimer;
 	g_agentsUpdatedThisFrame = 0;
-
-	uint64_t priorityQuickSortTime = 0;
 	
 	//if this is the first frame, there is no point in sorting because we have no criteria to decide on
-	if (g_previousFrameNonAgentUpdateTime != 0 && g_previousFrameRenderTime != 0)
+	if (g_previousFrameNonAgentUpdateTime != 0)
 	{
-		callTimer.Start();
-
 		std::sort(m_agentsOrderedByPriority.begin(), m_agentsOrderedByPriority.end(), AgentSort);
-
-		callTimer.Stop();
-		g_perFramePrioritySort = callTimer.GetRunningTime();
-		callTimer.Reset();
 	}	
 
-	//int64_t remainingAgentUpdateBudget = int64_t(g_perFrameHPCBudget - g_previousFrameNonAgentUpdateTime - g_previousFrameRenderTime);
+	callTimer.Stop();
+	g_previousFrameNonAgentUpdateTime = callTimer.GetRunningTime();
+	callTimer.Reset();
 
-	int64_t remainingTime = (int64_t)g_perFrameHPCBudget - (int64_t)g_previousFrameNonAgentUpdateTime - (int64_t)g_previousFrameRenderTime - (int64_t)g_previousSortTime - (int64_t)g_perFramePrioritySort;
+	int64_t remainingTime = (int64_t)g_perFrameHPCBudget - (int64_t)g_previousFrameNonAgentUpdateTime;
 	double adjustedRemainingTime = (double)remainingTime * 0.8;
 	int64_t remainingAgentUpdateBudget = int64_t(adjustedRemainingTime);
 
-	Clamp(remainingAgentUpdateBudget, (int64_t)(g_perFrameHPCBudget * 0.2), (int64_t)g_perFrameHPCBudget);
+	remainingAgentUpdateBudget = Clamp(remainingAgentUpdateBudget, (int64_t)(g_perFrameHPCBudget * 0.2), (int64_t)g_perFrameHPCBudget);
 
+	static int64_t previousRemainingBudget = 0;
+	previousRemainingBudget = 0;
+
+	bool didBlowBudget = false;
 	bool canUpdate = true;
 	for (int agentIndex = 0; agentIndex < (int)m_agentsOrderedByPriority.size(); ++agentIndex)
 	{
@@ -424,30 +422,32 @@ void Map::UpdateAgentsBudgeted(float deltaSeconds)
 				canUpdate = false;
 			}	
 
+			previousRemainingBudget = remainingAgentUpdateBudget;
+
 			g_agentsUpdatedThisFrame++;
 		}	
 		else //we are out of budgets
 		{
+			if(didBlowBudget == false)
+				callTimer.Start();
+
 			m_agentsOrderedByPriority[agentIndex]->QuickUpdate(deltaSeconds);
+			didBlowBudget = true;
 		}		
 
 		DetectAgentToTileCollision(m_agentsOrderedByPriority[agentIndex]);
 	}
+
+	if(!didBlowBudget)
+		callTimer.Start();
 
 	//sort if we are optimized
 	if (GetIsOptimized())
 	{		
 		if (m_sortTimer->CheckAndReset())
 		{
-			callTimer.Reset();
-			callTimer.Start();
-
 			SortAgentsByX();
 			SortAgentsByY();
-
-			callTimer.Stop();
-			g_previousSortTime = callTimer.GetRunningTime();
-			callTimer.Reset();
 		}		
 	}
 }
