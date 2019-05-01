@@ -969,9 +969,9 @@ void Planner::SkewUtilityForBias(UtilityInfo& outInfo, float biasValue)
 float Planner::CalculateDistanceUtility(float normalizedDistance)
 {
 
-#ifdef DistanceMemoizationDataAnalysis
+#ifdef MemoizationDataAnalysis
 	// profiling ----------------------------------------------
-	g_distanceMemoizationAnalysisData->Start();	
+	g_memoizationAnalysisData->Start();
 	//  ----------------------------------------------
 #endif
 
@@ -982,21 +982,22 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 		float outValue;
 		if (m_distanceUtilityStorage->DoesValueExistForInput(normalizedDistance, outValue, outIndex))
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationStorageAccesses;
 #endif
+			g_memoizationAnalysisData->End();
 			return outValue;
 		}
 		else
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationUtilityCalls;
 #endif
 		}
 	}
 	else
 	{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 		++g_numMemoizationUtilityCalls;
 #endif
 	}
@@ -1014,10 +1015,10 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 	}
 	//  ----------------------------------------------
 
-#ifdef DistanceMemoizationDataAnalysis
-	// profiling ----------------------------------------------
-	g_distanceMemoizationAnalysisData->End();
-	//  ---------------------------------------------
+#ifdef MemoizationDataAnalysis
+// profiling ----------------------------------------------
+	g_memoizationAnalysisData->End();
+	//  ----------------------------------------------
 #endif
 
 	return utility;
@@ -1026,9 +1027,11 @@ float Planner::CalculateDistanceUtility(float normalizedDistance)
 //  =========================================================================================
 float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 {
-//#ifdef	MemoizationDataAnalysis
-//	++g_numMemoizationUtilityCalls;
-//#endif
+#ifdef MemoizationDataAnalysis
+	// profiling ----------------------------------------------
+	g_memoizationAnalysisData->Start();
+	//  ----------------------------------------------
+#endif
 
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
@@ -1037,21 +1040,22 @@ float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 		float outValue;
 		if (m_buildingHealthUtilityStorage->DoesValueExistForInput(normalizedBuildingHealth, outValue, outIndex))
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationStorageAccesses;
 #endif
+			g_memoizationAnalysisData->End();
 			return outValue;
 		}
 		else
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationUtilityCalls;
 #endif
 		}
 	}
 	else
 	{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 		++g_numMemoizationUtilityCalls;
 #endif
 	}
@@ -1069,15 +1073,23 @@ float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 	}
 	//  ----------------------------------------------
 
+#ifdef MemoizationDataAnalysis
+// profiling ----------------------------------------------
+	g_memoizationAnalysisData->End();
+	//  ----------------------------------------------
+#endif
+
 	return utility;
 }
 
 //  =============================================================================
 float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 {
-//#ifdef	MemoizationDataAnalysis
-//	++g_numMemoizationUtilityCalls;
-//#endif
+#ifdef MemoizationDataAnalysis
+	// profiling ----------------------------------------------
+	g_memoizationAnalysisData->Start();
+	//  ----------------------------------------------
+#endif
 
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
@@ -1086,21 +1098,22 @@ float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 		float outValue;
 		if (m_agentHealthUitilityStorage->DoesValueExistForInput(normalizedAgentHealth, outValue, outIndex))
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationStorageAccesses;
 #endif
+			g_memoizationAnalysisData->End();
 			return outValue;
 		}
 		else
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationUtilityCalls;
 #endif
 		}
 	}
 	else
 	{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 		++g_numMemoizationUtilityCalls;
 #endif
 	}
@@ -1119,16 +1132,24 @@ float Planner::CalculateAgentHealthUtility(float normalizedAgentHealth)
 	}
 	//  ----------------------------------------------
 
+#ifdef MemoizationDataAnalysis
+// profiling ----------------------------------------------
+	g_memoizationAnalysisData->End();
+	//  ----------------------------------------------
+#endif
+
 	return utility;
 }
 
 //  =============================================================================
 float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 {
-//#ifdef	MemoizationDataAnalysis
-//	++g_numMemoizationUtilityCalls;
-//#endif
-//
+#ifdef MemoizationDataAnalysis
+	// profiling ----------------------------------------------
+	g_memoizationAnalysisData->Start();
+	//  ----------------------------------------------
+#endif
+
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
 	if (GetIsOptimized())
@@ -1136,21 +1157,22 @@ float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 		float outValue;
 		if (m_agentGatherUtilityStorage->DoesValueExistForInput(normalizedResourceCarryAmount, outValue, outIndex))
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationStorageAccesses;
 #endif
+			g_memoizationAnalysisData->End();
 			return outValue;
 		}
 		else
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationUtilityCalls;
 #endif
 		}
 	}
 	else
 	{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 		++g_numMemoizationUtilityCalls;
 #endif
 	}
@@ -1169,15 +1191,24 @@ float Planner::CalculateAgentGatherUtility(float normalizedResourceCarryAmount)
 	}
 	//  ----------------------------------------------
 
+#ifdef MemoizationDataAnalysis
+// profiling ----------------------------------------------
+	g_memoizationAnalysisData->End();
+	//  ----------------------------------------------
+#endif
+
 	return utility;
 }
 
 //  =============================================================================
 float Planner::CalculateShootUtility(float normalizedThreatUtility)
 {
-//#ifdef	MemoizationDataAnalysis
-//	++g_numMemoizationUtilityCalls;
-//#endif
+
+#ifdef MemoizationDataAnalysis
+	// profiling ----------------------------------------------
+	g_memoizationAnalysisData->Start();
+	//  ----------------------------------------------
+#endif
 
 	// dynamic programming solution ----------------------------------------------
 	int outIndex = 0;
@@ -1186,21 +1217,22 @@ float Planner::CalculateShootUtility(float normalizedThreatUtility)
 		float outValue;
 		if (m_shootUtilityStorageUtility->DoesValueExistForInput(normalizedThreatUtility, outValue, outIndex))
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationStorageAccesses;
 #endif
+			g_memoizationAnalysisData->End();
 			return outValue;
 		}			
 		else
 		{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 			++g_numMemoizationUtilityCalls;
 #endif
 		}
 	}
 	else
 	{
-#ifdef	MemoizationDataAnalysis
+#ifdef	MemoizationCountDataAnalysis
 		++g_numMemoizationUtilityCalls;
 #endif
 	}
@@ -1218,6 +1250,12 @@ float Planner::CalculateShootUtility(float normalizedThreatUtility)
 		m_shootUtilityStorageUtility->StoreValueForInputAtIndex(utility, outIndex);
 	}
 	//  ----------------------------------------------
+
+#ifdef MemoizationDataAnalysis
+// profiling ----------------------------------------------
+	g_memoizationAnalysisData->End();
+	//  ----------------------------------------------
+#endif
 
 	return utility;
 }

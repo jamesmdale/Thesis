@@ -505,14 +505,6 @@ void PlayingState::InitializeSimulationData()
 	g_queueActionPathingAnalysisData->FullReset();
 #endif // QueueActionPathingDataAnalysis
 
-#ifdef DistanceMemoizationDataAnalysis
-	//queue path data
-	g_distanceMemoizationData = new SimulationData();
-	g_distanceMemoizationData->Initialize(g_currentSimulationDefinition);
-	g_distanceMemoizationAnalysisData->m_data = g_distanceMemoizationData;
-	g_distanceMemoizationAnalysisData->FullReset();
-#endif // DistanceMemoizationDataAnalysis
-
 #ifdef CollisionDataAnalysis
 	//queue path data
 	g_collisionData = new SimulationData();
@@ -520,6 +512,14 @@ void PlayingState::InitializeSimulationData()
 	g_collisionAnalysisData->m_data = g_collisionData;
 	g_collisionAnalysisData->FullReset();
 #endif // CollisionDataAnalysis
+
+#ifdef MemoizationDataAnalysis
+	//memoization data
+	g_memoizationData = new SimulationData();
+	g_memoizationData->Initialize(g_currentSimulationDefinition);
+	g_memoizationAnalysisData->m_data = g_memoizationData;
+	g_memoizationAnalysisData->FullReset();
+#endif // MemoizationDataAnalysis
 }
 
 //  =============================================================================
@@ -564,16 +564,16 @@ void PlayingState::ResetCurrentSimulationData()
 	g_queueActionPathingAnalysisData->m_data = nullptr;
 #endif
 
-#ifdef DistanceMemoizationDataAnalysis
-	delete(g_distanceMemoizationData);
-	g_distanceMemoizationData = nullptr;
-	g_distanceMemoizationAnalysisData->m_data = nullptr;
-#endif
-
 #ifdef CollisionDataAnalysis
 	delete(g_collisionData);
 	g_collisionData = nullptr;
 	g_collisionAnalysisData->m_data = nullptr;
+#endif
+
+#ifdef MemoizationDataAnalysis
+	delete(g_memoizationData);
+	g_memoizationData = nullptr;
+	g_memoizationAnalysisData->m_data = nullptr;
 #endif
 
 	//reset memoization variables
@@ -711,16 +711,17 @@ void PlayingState::ExportSimulationData()
 	ASSERT_OR_DIE(success, "Que action pathing broken");
 #endif
 
-#ifdef DistanceMemoizationDataAnalysis
-	fileName = Stringf("DistanceMemoizationUtilityTimes_%s.csv", g_currentSimulationDefinition->m_name.c_str());
-	success = g_distanceMemoizationData ->ExportCSV(finalFilePath, fileName.c_str());
-	ASSERT_OR_DIE(success, "Distance memoization broken");
-#endif
-
 #ifdef CollisionDataAnalysis
 	fileName = Stringf("CollisionCalculationTimes_%s.csv", g_currentSimulationDefinition->m_name.c_str());
 	success = g_collisionData ->ExportCSV(finalFilePath, fileName.c_str());
 	ASSERT_OR_DIE(success, "Collision data broken");
+#endif
+
+
+#ifdef MemoizationDataAnalysis
+	fileName = Stringf("MemoizationCalculationTimes_%s.csv", g_currentSimulationDefinition->m_name.c_str());
+	success = g_memoizationData->ExportCSV(finalFilePath, fileName.c_str());
+	ASSERT_OR_DIE(success, "Memoization data broken");
 #endif
 }
 
@@ -772,7 +773,7 @@ void PlayingState::FinalizeGeneralSimulationData()
 	g_generalSimulationData->AddNewLine();
 #endif
 
-#ifdef MemoizationDataAnalysis
+#ifdef MemoizationCountDataAnalysis
 	//write counts for memoization
 	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT, g_numMemoizationUtilityCalls));
 	g_generalSimulationData->AddNewLine();

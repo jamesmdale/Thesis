@@ -16,8 +16,8 @@ SimulationData* g_agentUpdateData = nullptr;
 SimulationData* g_pathingData = nullptr;
 SimulationData* g_copyPathData = nullptr;
 SimulationData* g_queueActionPathingData = nullptr;
-SimulationData* g_distanceMemoizationData = nullptr;
 SimulationData* g_collisionData = nullptr;
+SimulationData* g_memoizationData = nullptr;
 
 AnalysisData* g_processActionStackAnalysisData = nullptr;
 AnalysisData* g_updatePlanAnalysisData = nullptr;
@@ -25,8 +25,8 @@ AnalysisData* g_agentUpdateAnalysisData = nullptr;
 AnalysisData* g_pathingAnalysisData = nullptr;
 AnalysisData* g_copyPathAnalysisData = nullptr;
 AnalysisData* g_queueActionPathingAnalysisData = nullptr;
-AnalysisData* g_distanceMemoizationAnalysisData = nullptr;
 AnalysisData* g_collisionAnalysisData = nullptr;
+AnalysisData* g_memoizationAnalysisData = nullptr;
 
 //debug globals
 bool g_isDebug = false;

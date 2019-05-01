@@ -208,10 +208,10 @@ void Game::InitializeAnalysisData()
 		g_copyPathAnalysisData = new AnalysisData(nullptr, 1);
 	if (g_queueActionPathingAnalysisData == nullptr)
 		g_queueActionPathingAnalysisData = new AnalysisData(nullptr, 1);
-	if (g_distanceMemoizationAnalysisData == nullptr)
-		g_distanceMemoizationAnalysisData = new AnalysisData(nullptr, 1);
 	if (g_collisionAnalysisData == nullptr)
 		g_collisionAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_memoizationAnalysisData == nullptr)
+		g_memoizationAnalysisData = new AnalysisData(nullptr, 1);
 }
 
 

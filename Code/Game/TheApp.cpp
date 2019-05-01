@@ -45,6 +45,12 @@ TheApp::~TheApp()
 //  =============================================================================
 void TheApp::RunFrame()
 {
+
+	int const i = 10;
+	char color[30];
+	color[0] = '\0';
+	strcpy_s(color, "yellow");
+
 	//start profiler for frame
 	Profiler::GetInstance()->MarkFrame();
 

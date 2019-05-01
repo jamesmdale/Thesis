@@ -13,8 +13,8 @@
 #define PathingDataAnalysis
 #define CopyPathAnalysis
 #define QueueActionPathingDataAnalysis
+#define MemoizationCountDataAnalysis
 #define MemoizationDataAnalysis
-#define DistanceMemoizationDataAnalysis
 #define CollisionDataAnalysis
 
 class SimulationData;
@@ -46,8 +46,8 @@ extern SimulationData* g_agentUpdateData;
 extern SimulationData* g_pathingData;
 extern SimulationData* g_copyPathData;
 extern SimulationData* g_queueActionPathingData;
-extern SimulationData* g_distanceMemoizationData;
 extern SimulationData* g_collisionData;
+extern SimulationData* g_memoizationData;
 
 extern AnalysisData* g_processActionStackAnalysisData;
 extern AnalysisData* g_updatePlanAnalysisData;
@@ -55,8 +55,8 @@ extern AnalysisData* g_agentUpdateAnalysisData;
 extern AnalysisData* g_pathingAnalysisData;
 extern AnalysisData* g_copyPathAnalysisData;
 extern AnalysisData* g_queueActionPathingAnalysisData;
-extern AnalysisData* g_distanceMemoizationAnalysisData;
 extern AnalysisData* g_collisionAnalysisData;
+extern AnalysisData* g_memoizationAnalysisData;
 
 //camera data
 const Vector2 g_bottomLeftOrtho = Vector2( -1.f, -1.f);
