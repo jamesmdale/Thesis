@@ -212,6 +212,8 @@ void Game::InitializeAnalysisData()
 		g_collisionAnalysisData = new AnalysisData(nullptr, 1);
 	if (g_memoizationAnalysisData == nullptr)
 		g_memoizationAnalysisData = new AnalysisData(nullptr, 1);
+	if (g_testExtremeMemoizationAnalysisData == nullptr)
+		g_testExtremeMemoizationAnalysisData = new AnalysisData(nullptr, 1);
 }
 
 

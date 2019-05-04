@@ -19,6 +19,8 @@ UtilityStorage* Planner::m_agentHealthUitilityStorage = nullptr;
 UtilityStorage* Planner::m_agentGatherUtilityStorage = nullptr;
 UtilityStorage* Planner::m_shootUtilityStorageUtility = nullptr;
 
+UtilityStorage* Planner::m_testUtilityStorage = nullptr;
+
 int iterationsOfUpdatePlan = 0;
 uint64_t averageTimeForUpdatePlan = 0.0;
 
@@ -38,6 +40,8 @@ Planner::Planner(Map* mapReference, Agent* agentReference)
 		m_agentHealthUitilityStorage = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
 		m_agentGatherUtilityStorage = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
 		m_shootUtilityStorageUtility = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
+
+		m_testUtilityStorage = new UtilityStorage(0.f, 1.f, g_utilityStorageDivisions);
 	}
 
 	m_updatePlanTimer = new Stopwatch(GetGameClock());
@@ -71,6 +75,9 @@ Planner::~Planner()
 
 		delete(m_shootUtilityStorageUtility);
 		m_shootUtilityStorageUtility = nullptr;
+
+		delete(m_testUtilityStorage);
+		m_testUtilityStorage = nullptr;
 	}
 }
 
@@ -151,6 +158,9 @@ void Planner::UpdatePlan()
 	ePlanTypes chosenOutcome = NONE_PLAN_TYPE;
 	UtilityInfo highestUtilityInfo = GetIdleUtilityInfo();
 	UtilityInfo compareUtilityInfo;
+
+	float randomInput = GetRandomFloatZeroToOne();
+	CalculateTestUtility(randomInput);
 
 	//utility for gathering arrows ----------------------------------------------
 	compareUtilityInfo = GetHighestGatherArrowsUtility();
@@ -1074,8 +1084,72 @@ float Planner::CalculateBuildingHealthUtility(float normalizedBuildingHealth)
 	//  ----------------------------------------------
 
 #ifdef MemoizationDataAnalysis
-// profiling ----------------------------------------------
+	// profiling ----------------------------------------------
 	g_memoizationAnalysisData->End();
+	//  ----------------------------------------------
+#endif
+
+	return utility;
+}
+
+//  =========================================================================================
+float Planner::CalculateTestUtility(float testValue)
+{
+#ifdef TestExtremeMemoizationDataAnalysis
+	// profiling ----------------------------------------------
+	g_testExtremeMemoizationAnalysisData->Start();
+	//  ----------------------------------------------
+#endif
+
+	// dynamic programming solution ----------------------------------------------
+	int outIndex = 0;
+	if (GetIsOptimized())
+	{
+		float outValue;
+		if (m_testUtilityStorage->DoesValueExistForInput(testValue, outValue, outIndex))
+		{
+#ifdef	TestExtremeMemoizationDataAnalysis
+			++g_numTestMemoizationStorageAccesses;
+#endif
+			g_testExtremeMemoizationAnalysisData->End();
+			return outValue;
+		}
+		else
+		{
+#ifdef	TestExtremeMemoizationDataAnalysis
+			++g_numTestMemoizationExtremeUtilityCalls;
+#endif
+		}
+	}
+	else
+	{
+#ifdef	TestExtremeMemoizationDataAnalysis
+		++g_numTestMemoizationExtremeUtilityCalls;
+#endif
+	}
+	//  ----------------------------------------------
+
+	//  UTILITY FORMULA: ((1 - x)^2x * 0.8) = y
+	float utility = 0;
+	int num = 500;
+	for (int i = 0; i < num; ++i)
+	{
+		//function call, subtraction, multiply, rand() call, division, addition
+		utility += GetRandomFloatInRange(0.f, 1.f);
+	}
+
+	utility /= num;
+
+	// dynamic programming solution ----------------------------------------------
+	if (GetIsOptimized())
+	{
+		m_testUtilityStorage->StoreValueForInputAtIndex(utility, outIndex);
+	}
+	//  ----------------------------------------------
+
+#ifdef TestExtremeMemoizationDataAnalysis
+	// profiling ----------------------------------------------
+	g_testExtremeMemoizationAnalysisData->End();
 	//  ----------------------------------------------
 #endif
 

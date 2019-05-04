@@ -100,6 +100,7 @@ public:
 	//utility functions
 	float CalculateDistanceUtility(float normalizedDistance);
 	float CalculateBuildingHealthUtility(float normalizedBuildingHealth);
+	float CalculateTestUtility(float testValue);
 	float CalculateAgentHealthUtility(float normalizedAgentHealth);
 	float CalculateAgentGatherUtility(float normalizedGatherUtility);
 	float CalculateShootUtility(float normalizedThreatUtility);
@@ -133,6 +134,8 @@ public:
 	static UtilityStorage* m_agentHealthUitilityStorage;
 	static UtilityStorage* m_agentGatherUtilityStorage;
 	static UtilityStorage* m_shootUtilityStorageUtility;
+
+	static UtilityStorage* m_testUtilityStorage;
 
 private:
 	std::stack<ActionData*> m_actionStack;

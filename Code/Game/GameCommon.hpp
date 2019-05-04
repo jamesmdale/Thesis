@@ -15,6 +15,7 @@
 #define QueueActionPathingDataAnalysis
 #define MemoizationCountDataAnalysis
 #define MemoizationDataAnalysis
+#define TestExtremeMemoizationDataAnalysis
 #define CollisionDataAnalysis
 
 class SimulationData;
@@ -48,6 +49,7 @@ extern SimulationData* g_copyPathData;
 extern SimulationData* g_queueActionPathingData;
 extern SimulationData* g_collisionData;
 extern SimulationData* g_memoizationData;
+extern SimulationData* g_testExtremeMemoizationData;
 
 extern AnalysisData* g_processActionStackAnalysisData;
 extern AnalysisData* g_updatePlanAnalysisData;
@@ -57,6 +59,7 @@ extern AnalysisData* g_copyPathAnalysisData;
 extern AnalysisData* g_queueActionPathingAnalysisData;
 extern AnalysisData* g_collisionAnalysisData;
 extern AnalysisData* g_memoizationAnalysisData;
+extern AnalysisData* g_testExtremeMemoizationAnalysisData;
 
 //camera data
 const Vector2 g_bottomLeftOrtho = Vector2( -1.f, -1.f);
@@ -118,8 +121,12 @@ extern int g_bombardmentDamage;
 extern float g_sortTimerInSeconds;
 extern float g_agentCopyDestinationPositionRadius;
 
-extern int g_numMemoizationStorageAccesses;
 extern int g_numMemoizationUtilityCalls;
+extern int g_numMemoizationStorageAccesses;
+
+extern int g_numTestMemoizationExtremeUtilityCalls;
+extern int g_numTestMemoizationStorageAccesses;
+
 
 //threat globals
 extern float g_maxThreat;
@@ -179,3 +186,6 @@ constexpr char* NUM_COPY_PATH_CALLS_OUTPUT_TEXT = "Num Copy Path Calls";
 constexpr char* NUM_QUEUE_ACTION_PATH_CALLS_OUTPUT_TEXT = "Num Queue Action Path Calls";
 constexpr char* NUM_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT = "Num Memoization Standard Calls";
 constexpr char* NUM_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT = "Num Memoization Optimized Accesses";
+
+constexpr char* NUM_EXTREME_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT = "Num Extreme Standard Calls";
+constexpr char* NUM_EXTREME_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT = "Num Extreme Memoization Optimized Accesses";

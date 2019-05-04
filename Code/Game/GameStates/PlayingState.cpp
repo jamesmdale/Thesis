@@ -520,6 +520,14 @@ void PlayingState::InitializeSimulationData()
 	g_memoizationAnalysisData->m_data = g_memoizationData;
 	g_memoizationAnalysisData->FullReset();
 #endif // MemoizationDataAnalysis
+
+#ifdef TestExtremeMemoizationDataAnalysis
+	//memoization data
+	g_testExtremeMemoizationData = new SimulationData();
+	g_testExtremeMemoizationData->Initialize(g_currentSimulationDefinition);
+	g_testExtremeMemoizationAnalysisData->m_data = g_testExtremeMemoizationData;
+	g_testExtremeMemoizationAnalysisData->FullReset();
+#endif // TestExtremeMemoizationDataAnalysis
 }
 
 //  =============================================================================
@@ -574,6 +582,12 @@ void PlayingState::ResetCurrentSimulationData()
 	delete(g_memoizationData);
 	g_memoizationData = nullptr;
 	g_memoizationAnalysisData->m_data = nullptr;
+#endif
+
+#ifdef TestExtremeMemoizationDataAnalysis
+	delete(g_testExtremeMemoizationData);
+	g_testExtremeMemoizationData = nullptr;
+	g_testExtremeMemoizationAnalysisData->m_data = nullptr;
 #endif
 
 	//reset memoization variables
@@ -723,6 +737,12 @@ void PlayingState::ExportSimulationData()
 	success = g_memoizationData->ExportCSV(finalFilePath, fileName.c_str());
 	ASSERT_OR_DIE(success, "Memoization data broken");
 #endif
+
+#ifdef TestExtremeMemoizationDataAnalysis
+	fileName = Stringf("ExtremeMemoizationTimes_%s.csv", g_currentSimulationDefinition->m_name.c_str());
+	success = g_testExtremeMemoizationData->ExportCSV(finalFilePath, fileName.c_str());
+	ASSERT_OR_DIE(success, "Extreme Memoization data broken");
+#endif
 }
 
 //  =============================================================================
@@ -781,6 +801,15 @@ void PlayingState::FinalizeGeneralSimulationData()
 	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT, g_numMemoizationStorageAccesses));
 	g_generalSimulationData->AddNewLine();
 	
+#endif
+
+#ifdef TestExtremeMemoizationDataAnalysis
+	//write counts for memoization
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_EXTREME_MEMOIZATION_STANDARD_CALLS_OUTPUT_TEXT, g_numTestMemoizationExtremeUtilityCalls));
+	g_generalSimulationData->AddNewLine();
+
+	g_generalSimulationData->AddCell(Stringf("%s: %i", NUM_EXTREME_MEMOIZATION_OPTIMIZED_ACCESSES_OUTPUT_TEXT, g_numTestMemoizationStorageAccesses));
+	g_generalSimulationData->AddNewLine();
 #endif
 
 	
